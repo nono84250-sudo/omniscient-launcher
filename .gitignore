@@ -1,0 +1,17 @@
+# dependencies
+/node_modules
+
+# electron-builder output (Phase 4 / packaging)
+/dist
+/out
+
+# secrets
+.env
+# genere par scripts/generate-env.js juste avant chaque build (voir ce
+# script) — contient la meme cle secrete que .env en clair, jamais commit
+# pour la meme raison.
+/src/env.generated.js
+
+# misc
+.DS_Store
+*.log

@@ -1,0 +1,64 @@
+# Construit le launcher depuis ce depot public (build verifiable, demande par SignPath).
+# Lancement a la main uniquement (onglet Actions > Build > Run workflow).
+# Ne publie RIEN dans les releases : les fichiers construits restent dans l'onglet Actions.
+#
+# Secrets du depot necessaires : LAUNCHER_API_KEY (DISCORD_CLIENT_ID et SENTRY_DSN optionnels).
+name: Build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Construire (installeur Windows)
+        env:
+          LAUNCHER_API_KEY: ${{ secrets.LAUNCHER_API_KEY }}
+          DISCORD_CLIENT_ID: ${{ secrets.DISCORD_CLIENT_ID }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          MCHUB_SITE_URL: https://omniscientlauncher.com
+        run: npm run dist -- --win --publish never
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: |
+            dist/nsis-web/*.exe
+            dist/nsis-web/*.7z
+            dist/nsis-web/*.yml
+      # Signature SignPath : a activer une fois le projet accepte par SignPath Foundation.
+
+  linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Construire (AppImage + .deb)
+        env:
+          LAUNCHER_API_KEY: ${{ secrets.LAUNCHER_API_KEY }}
+          DISCORD_CLIENT_ID: ${{ secrets.DISCORD_CLIENT_ID }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          MCHUB_SITE_URL: https://omniscientlauncher.com
+        run: npm run dist:linux
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: |
+            dist/*.AppImage
+            dist/*.deb
+            dist/*-linux.yml
