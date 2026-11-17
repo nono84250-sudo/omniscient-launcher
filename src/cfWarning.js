@@ -1,4 +1,4 @@
-// Avertissement CurseForge (06/11, preview validée par Rushi) : une seule fois par PC, la première
+// Avertissement CurseForge : une seule fois par PC, la première
 // fois que le joueur lance ou crée un pack CurseForge. Bouton « Je suis d'accord et je valide »
 // bloqué 8 s (compte à rebours visible). Relisible dans Paramètres > Divers.
 // Expose window.confirmCurseforgeWarning({ force }) -> Promise<boolean> (false = annulé).

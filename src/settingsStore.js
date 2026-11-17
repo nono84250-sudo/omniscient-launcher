@@ -39,7 +39,7 @@ const DEFAULTS = {
   // plus ancien (page "Recents" de la barre laterale) — deja limite en
   // taille par renderer.js avant d'etre enregistre.
   recentlyPlayed: [],
-  // Date (ms) de la derniere partie de chaque serveur de recentlyPlayed (14/10, page Recents
+  // Date (ms) de la derniere partie de chaque serveur de recentlyPlayed (page Recents
   // avec la date, retrait apres 7 jours) — local seulement, jamais envoye au site.
   recentPlayedAt: {},
   // Langue de l'UI (voir i18n.js) — seuls "fr"/"en" ont une vraie traduction
@@ -47,23 +47,23 @@ const DEFAULTS = {
   // prefers-color-scheme, sinon "dark"/"light" force l'un ou l'autre.
   locale: "fr",
   theme: "dark",
-  // Bleu choisi par le client (2026-10-11), re-sature le meme jour suite a
+  // Bleu choisi par le client, re-sature le meme jour suite a
   // la comparaison avec Modrinth — voir theme.js/ACCENT_PRESETS (meme
   // valeur en position 0).
   accentColor: "#2792dd",
   compactServerList: false,
-  // Parametres > Apparence > Reduire les animations (design 17/10, point 5) : "auto" suit
+  // Parametres > Apparence > Reduire les animations : "auto" suit
   // Windows, "on" coupe clignotements/reflets/zooms, "off" les garde toujours.
   reduceMotion: "auto",
-  // Mode discret (design 17/10, point 6) : cache adresses, codes d'invitation, pseudos des amis et
+  // Mode discret : cache adresses, codes d'invitation, pseudos des amis et
   // notifications (pratique en live). Assistant du premier lancement : montre une seule fois.
   discreetMode: false,
-  // Barre laterale depliee avec les noms (serie 2, idee 1) : repliee par defaut pour les habitues.
+  // Barre laterale depliee avec les noms : repliee par defaut pour les habitues.
   sidebarExpanded: false,
   // Passe a true apres le tout premier demarrage, ou la barre s'ouvre depliee une seule fois pour
-  // montrer le nom des pages (Rushi 25/10) ; ensuite elle suit sidebarExpanded (repliee par defaut).
+  // montrer le nom des pages ; ensuite elle suit sidebarExpanded (repliee par defaut).
   sidebarIntroShown: false,
-  // Dernier onglet de Ma bibliotheque (audit 17/10, lot 3) : Installes par defaut.
+  // Dernier onglet de Ma bibliotheque : Installes par defaut.
   libraryTab: "installed",
   firstRunWizardDone: false,
   // Parametres > Debogage (voir logStore.js/renderer.js) — logLevel ne
@@ -72,7 +72,7 @@ const DEFAULTS = {
   logLevel: "info",
   openConsoleOnLaunch: false,
   keepLauncherOpenWhilePlaying: true,
-  // Parametres > Divers > Pendant la partie (demande de Rushi, 24/10) : le launcher se reduit quand
+  // Parametres > Divers > Pendant la partie : le launcher se reduit quand
   // le jeu demarre et revient quand Minecraft se ferme. Coche par defaut ; jamais en mode discret
   // (voir shouldMinimizeWhilePlaying). Remplace keepLauncherOpenWhilePlaying, garde pour les
   // anciens fichiers de reglages mais plus lu.
@@ -92,16 +92,16 @@ const DEFAULTS = {
   discordPresence: true,
   // Parametres > Confidentialite : rapports d'erreurs anonymes (voir errorReports.js).
   errorReports: true,
-  // Parametres > Divers > Videos (16/10) : les videos des fiches serveur ne demarrent qu'au
+  // Parametres > Divers > Videos : les videos des fiches serveur ne demarrent qu'au
   // clic, meme si le proprietaire a choisi le lancement automatique (voir setupPageVideo).
   blockVideoAutoplay: false,
-  // Serveurs retirés du site (20/10) : slug -> date (ms) du dernier 404, pour ne pas redemander leur
+  // Serveurs retirés du site : slug -> date (ms) du dernier 404, pour ne pas redemander leur
   // fiche à chaque ouverture (voir servers:get dans main.js). Local seulement.
   removedServers: {},
-  // Mode Jouer (24/10) : petite notification par-dessus le jeu après une sauvegarde automatique
+  // Mode Jouer : petite notification par-dessus le jeu après une sauvegarde automatique
   // (toutes les 30 min). F6 / Maj+F6 affichent toujours leur petit menu.
   playSaveToast: true,
-  // Mon cloud (03/11) : choix retenu pour un modpack « Conseillé » ({ slug: true } = avec le modpack,
+  // Mon cloud : choix retenu pour un modpack « Conseillé » ({ slug: true } = avec le modpack,
   // { slug: false } = sans). Absent : le launcher demande au clic sur Jouer. Un modpack
   // « Obligatoire pour rejoindre » s'installe sans ce choix.
   cloudPackOptIn: {},
@@ -130,7 +130,7 @@ function clampGB(value, fallback) {
 // Ecriture atomique (fichier temporaire + renommage, comme les telechargements ".part" de
 // modpack.js/javaManager.js) : fs.writeFileSync direct laissait un fichier tronque si le
 // process etait tue pendant l'ecriture, avalee silencieusement au redemarrage par le catch de
-// loadSettings() (repart sur DEFAULTS sans aucune trace — voir audit 2026-10-10, §3.7).
+// loadSettings() (§3.7).
 function writeSettingsFile(data) {
   const tmpFile = `${SETTINGS_FILE}.tmp`;
   fs.writeFileSync(tmpFile, JSON.stringify(data, null, 2));
@@ -138,14 +138,12 @@ function writeSettingsFile(data) {
 }
 
 // Liste blanche des cles acceptees par settings:set (IPC, voir main.js) — toute cle absente
-// d'ici est silencieusement ignoree plutot que fusionnee a l'aveugle dans settings.json (voir
-// audit 2026-10-10, §1.6 : un futur XSS/dependance compromise dans le renderer pourrait sinon
+// d'ici est silencieusement ignoree plutot que fusionnee a l'aveugle dans settings.json (§1.6 :
+// un futur XSS/dependance compromise dans le renderer pourrait sinon
 // ecrire n'importe quelle cle, notamment javaPath, consomme ensuite par spawn() dans
 // mcLaunch.js/javaManager.js). Derivee de DEFAULTS plutot que maintenue a la main a cote : une
 // liste parallele aurait reintroduit exactement le risque de desynchronisation silencieuse que
-// cette liste blanche a ete ajoutee pour corriger (un futur reglage ajoute a DEFAULTS mais
-// oublie ici aurait ete rejete sans erreur pour toujours — trouve en relisant le correctif du
-// 2026-10-10 lors de la revue de code qui a suivi).
+// cette liste blanche a ete ajoutee pour corriger.
 const ALLOWED_KEYS = Object.keys(DEFAULTS);
 
 // javaPath n'est accepte que s'il pointe reellement vers un executable java present sur le
@@ -218,7 +216,7 @@ function resetSettings() {
 }
 
 // Reduire le launcher pendant la partie (meme regle dans renderer.js et play.js, qui lisent les
-// reglages par IPC). Il revient tout seul a la fin du jeu, SAUF en mode discret (Rushi, 24/10) :
+// reglages par IPC). Il revient tout seul a la fin du jeu, SAUF en mode discret :
 // en stream, la fenetre ne doit pas reapparaitre au milieu de l'ecran ; on la rouvre a la main.
 function shouldMinimizeWhilePlaying(settings = loadSettings()) {
   return settings.minimizeWhilePlaying !== false;

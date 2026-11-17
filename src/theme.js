@@ -8,9 +8,9 @@
 // i18n.js, qui a cause une vraie collision de nom avant l'ajout du wrapper).
 (function () {
 
-// Bleu (2026-10-11) en position 0 : nouvelle couleur par defaut, l'ancien
+// Bleu en position 0 : nouvelle couleur par defaut, l'ancien
 // blurple reste disponible en 2e position pour qui l'avait deja choisi.
-// Re-sature la meme nuance (2026-10-11, suite a la comparaison avec
+// Re-sature la meme nuance (suite a la comparaison avec
 // Modrinth) : la version precedente (#5fa3d3) etait jugee trop pastel pour
 // que les elements importants ressortent — pas une nouvelle couleur, juste
 // la meme poussee plus loin.
@@ -23,7 +23,7 @@ function resolveThemeMode(theme) {
   return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
 }
 
-// Reduire les animations (design 17/10, point 5) : "auto" suit le reglage Windows
+// Reduire les animations : "auto" suit le reglage Windows
 // (prefers-reduced-motion), "on"/"off" le forcent.
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 let lastMotionSetting = "auto";

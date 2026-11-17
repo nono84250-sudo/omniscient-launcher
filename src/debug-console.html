@@ -2,11 +2,11 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<!-- CSP en balise : voir le commentaire de index.html (audit 14/10, L1). -->
+<!-- CSP en balise : voir le commentaire de index.html. -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data: http://localhost:* http://127.0.0.1:*; object-src 'none'; base-uri 'none'; form-action 'none'" />
 <title>Console de débogage — Omniscient Launcher</title>
 <style>
-  /* Police Inter partout (serie 2, idee 5) : fichiers locaux (fonts/, licence SIL OFL jointe),
+  /* Police Inter partout : fichiers locaux (fonts/, licence SIL OFL jointe),
      aucune requete vers internet. Segoe UI reste en secours si le fichier ne charge pas. */
   @font-face {
     font-family: "Inter";
@@ -171,7 +171,7 @@
     <button type="button" class="icon-btn" id="console-clear" data-i18n-title="debugConsole.clear">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
     </button>
-    <!-- TEMPORAIRE (18/10) : test du nom et du logo des notifications Windows. A retirer avec son bloc dans debug-console.js. -->
+    <!-- TEMPORAIRE : test du nom et du logo des notifications Windows. A retirer avec son bloc dans debug-console.js. -->
     <button type="button" class="filter-chip" id="console-test-notif">Test notif</button>
     <button type="button" class="icon-btn" id="console-copy" data-i18n-title="debugConsole.copy">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>

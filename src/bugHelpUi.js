@@ -1,4 +1,4 @@
-// Aide Discord dans les bugs (02/11, preview validée par Rushi, Laboratoire « bugDiscord ») : le bloc
+// Aide Discord dans les bugs (Laboratoire « bugDiscord ») : le bloc
 // « Besoin d'aide ? » et ses 3 boutons, pour les fenêtres de bug (play.js, bugCatalogUi.js). Le rapport
 // est préparé et nettoyé côté main.js (voir crashHelp.js) ; ici, seulement l'affichage et les clics.
 (function () {

@@ -1,16 +1,16 @@
-// Pack Omniscient (27/10, preview v22 validée par Rushi, « tu peux tout coder ») : un pack fait dans
+// Pack Omniscient (« tu peux tout coder ») : un pack fait dans
 // le launcher (Modrinth seulement, ou vanilla avec map, packs de ressources et data packs), généré
-// pour d'autres versions de Minecraft, exporté en .omnipack (envoyé à Omniscient, que Rushi importe
-// dans l'admin du site, teste et publie) ou en .mrpack pour un ami.
+// pour d'autres versions de Minecraft, exporté en .omnipack (envoyé à Omniscient, testé puis publié)
+// ou en .mrpack pour un ami.
 //
 // Format .omnipack (un .zip) :
-//   omnipack.json                          la description (toujours la 1re entrée de l'archive)
-//   versions/<mc>/overrides/...            config/, defaultconfigs/, kubejs/, options.txt
-//   versions/<mc>/files/<dossier>/<nom>    packs de ressources, shaders, data packs qui ne sont PAS
+//   omnipack.json la description (toujours la 1re entrée de l'archive)
+//   versions/<mc>/overrides/... config/, defaultconfigs/, kubejs/, options.txt
+//   versions/<mc>/files/<dossier>/<nom> packs de ressources, shaders, data packs qui ne sont PAS
 //                                          sur Modrinth (fichier du joueur : licence à vérifier)
-//   versions/<mc>/worlds/<dossier>/...     mondes choisis (une map)
+//   versions/<mc>/worlds/<dossier>/... mondes choisis (une map)
 // Les mods ne sont jamais dans l'archive : seulement leur lien Modrinth (cdn.modrinth.com) et leurs
-// empreintes. Rien de CurseForge (règle de Rushi : jamais de mod CurseForge redistribué).
+// empreintes. Rien de CurseForge (jamais de mod CurseForge redistribué).
 const fs = require("node:fs");
 const fsp = require("node:fs/promises");
 const path = require("node:path");
@@ -24,12 +24,12 @@ const FORMAT = 1;
 const CFG_DIRS = ["config", "defaultconfigs", "kubejs"];
 const SAFE_JAR = /^[\w.+() \[\]!'&,-]+\.jar$/i;
 // Nom d'un fichier .zip : pas de dossier ni de caractère interdit par Windows. Les noms décorés (§, ✦)
-// de vrais packs de ressources Modrinth sont permis (audit du 01/11, pack PVP refusé à l'import).
+// de vrais packs de ressources Modrinth sont permis (pack PVP refusé à l'import).
 const SAFE_ZIP = /^(?!\.)[^\/:*?"<>|\u0000-\u001f]+\.zip$/i;
 const MC_ID = /^[\w.+-]+$/;
 // Première version de Minecraft où chaque chargeur existe (liste des versions à générer).
 const LOADER_MIN = { fabric: "1.14", quilt: "1.14", forge: "1.7.10", neoforge: "1.20.2" };
-// Pause entre deux versions générées : on ne surcharge pas Modrinth (bridé exprès, preview 06h35).
+// Pause entre deux versions générées : on ne surcharge pas Modrinth (bridé exprès).
 const GEN_PAUSE_MS = 1500;
 const isMrUrl = (u) => {
   try {
@@ -39,11 +39,11 @@ const isMrUrl = (u) => {
     return false;
   }
 };
-// Audit du 01/11 : à l'installation, seuls les réglages sortent de overrides/ (même règle que
+// À l'installation, seuls les réglages sortent de overrides/ (même règle que
 // lib/omniArchiveCheck.ts côté site), et jamais d'exécutable, où qu'il soit dans l'archive. Le
 // fichier reste lisible par le launcher : c'est le chemin final qui est refusé.
 const FORBIDDEN_EXT = /\.(jar|exe|dll|bat|cmd|com|scr|msi|msp|ps1|psm1|vbs|vbe|wsf|wsh|hta|lnk|sh|so|dylib|class|pif|reg|cpl|jse|url)$/i;
-// 02/11 (test au8) : Windows retire les points et espaces en fin de nom (« evil.jar. » devient
+// Windows retire les points et espaces en fin de nom (« evil.jar. » devient
 // evil.jar) et lit « a.txt:b » comme un flux caché. Un tel nom n'existe pas dans un vrai pack : refusé.
 const winUnsafe = (rel) => rel.split("/").some((seg) => /[. ]$/.test(seg) || /[<>:"|?*\x00-\x1f\\]/.test(seg));
 const isAllowedOverride = (rel) => {
@@ -183,7 +183,7 @@ function createOmniPack({ playMode }) {
     const { list, missing } = await modsFor(base, mc);
     const miss = missing.map((m) => m.name);
     const keepMiss = missing.filter((m) => keepSet.has(m.id) || keepSet.has(m.projectId)).map((m) => m.name);
-    // 28/10 : `stale` = version déjà dans le pack qui ne le suit plus (proposée au retrait, jamais retirée seule).
+    // `stale` = version déjà dans le pack qui ne le suit plus (proposée au retrait, jamais retirée seule).
     if (keepMiss.length) return { mc, kind: "no", miss, keepMiss, stale: existing?.id || null };
     if (existing) {
       // Déjà générée : on ajoute seulement les mods qui manquent (le reste, mondes et réglages gardés).
@@ -235,7 +235,7 @@ function createOmniPack({ playMode }) {
       datapacks: [],
       dpLoader: playMode.loaderOf(v),
       worlds: [],
-      // RAM conseillée pour cette version du pack (RAM par pack, 01/11) : calculée, pas celle du joueur.
+      // RAM conseillée pour cette version du pack (RAM par pack) : calculée, pas celle du joueur.
       ...(parts.ram !== false ? { ramGB: packRam.needGB(packRam.ctxOf(v)) } : {}),
     };
     if (v.pack) {
@@ -319,7 +319,7 @@ function createOmniPack({ playMode }) {
   }
 
   // .jar posés à la main dans mods/ (hors liste du pack) : l'export les refuse, l'aperçu doit les
-  // montrer aussi (05/11, avant il disait « tout est bon » puis l'export refusait).
+  // montrer aussi (avant il disait « tout est bon » puis l'export refusait).
   async function handJars(v) {
     if (!v?.pack) return [];
     const known = new Set((v.mods || []).map((m) => m.file?.filename).filter(Boolean));
@@ -379,7 +379,7 @@ function createOmniPack({ playMode }) {
   // Pour un ami (.mrpack, format Modrinth) : mods en liens Modrinth, réglages, packs, mondes cochés.
   // Les mods qui ne viennent pas de Modrinth ne sont JAMAIS dans le fichier : leur liste (avec la page)
   // est dans « omniscient-a-telecharger.txt ».
-  // `cloud` (03/11, « Envoyer dans le cloud ») : les mods perso ne vont PAS dans le fichier, ils sont
+  // `cloud` (« Envoyer dans le cloud ») : les mods perso ne vont PAS dans le fichier, ils sont
   // renvoyés dans `custom` (le launcher les envoie à part, le site les contrôle un par un).
   async function exportMrpack(id, outFile, { parts = {}, worlds = [], plan = null, ramGB = null, cloud = false } = {}) {
     const { v, dir } = playMode.omniSource(id);
@@ -400,7 +400,7 @@ function createOmniPack({ playMode }) {
     const mods = (v.mods || []).filter((m) => m.on !== false);
     const needHashes = plan ? [] : mods.filter((m) => isMrUrl(m.file?.url) && m.file?.sha1 && !m.file?.sha512).map((m) => m.file.sha1);
     const hashes = needHashes.length ? await packs.lookupHashes(needHashes).catch(() => new Map()) : new Map();
-    // Menus d'ajout (31/10, Rushi) : liens Modrinth, et les autres mods (CurseForge ajoutés à la main,
+    // Menus d'ajout : liens Modrinth, et les autres mods (CurseForge ajoutés à la main,
     // mods perso) en .jar dans le fichier. Un fichier pour des amis, pas à publier.
     if (plan) {
       for (const x of plan.mods) {
@@ -459,7 +459,7 @@ function createOmniPack({ playMode }) {
       await fsp.writeFile(txt, `Mods à télécharger à la main (pas sur Modrinth) :\r\n\r\n${manual.join("\r\n")}\r\n`);
       zipFiles.push({ abs: txt, rel: "overrides/omniscient-a-telecharger.txt", mtimeMs: Date.now(), tmp: true });
     }
-    // RAM conseillée (01/11) : le .mrpack n'a pas de case pour ça ; Omniscient la lit dans ce petit
+    // RAM conseillée : le .mrpack n'a pas de case pour ça ; Omniscient la lit dans ce petit
     // fichier à côté (Modrinth App et Prism l'ignorent).
     if (packRam.intGB(ramGB)) {
       const rj = path.join(os.tmpdir(), `omni-ram-${crypto.randomBytes(4).toString("hex")}.json`);
@@ -474,14 +474,14 @@ function createOmniPack({ playMode }) {
     }
   }
 
-  // --- « Exporter pour un ami » (31/10, preview validée par Rushi, Laboratoire « addMenus ») --------
+  // --- « Exporter pour un ami » (Laboratoire « addMenus ») --------
   // Deux formats au choix, la liste change avec :
   // - .mrpack (Modrinth) : liens Modrinth ; tout le reste (CurseForge ajoutés à la main, mods perso)
   //   part en .jar dans le fichier. Jamais de lien CurseForge (Modrinth refuserait le fichier).
   // - .zip (CurseForge) : liens CurseForge (manifest.json) pour tout ce qui existe sur CurseForge,
   //   même les mods réservés à l'appli CurseForge ; le reste (Modrinth seulement, perso) en .jar.
   // `cfMatch(fingerprints)` : empreintes → { projectId, fileId } (route du site, notre clé).
-  // Cache (Rushi 31/10 : la fenêtre mettait 6 s) : lire les .jar, leurs empreintes et demander à
+  // Cache (la fenêtre mettait 6 s) : lire les .jar, leurs empreintes et demander à
   // Modrinth/CurseForge ne se refait que si le dossier mods ou la liste du pack a changé.
   const friendCache = new Map();
   async function friendMods(id, opts = {}) {
@@ -551,7 +551,7 @@ function createOmniPack({ playMode }) {
     }
     return { v, dir, mods: out };
   }
-  // Liste des auteurs et de leurs pages, dans le fichier exporté (Rushi : honorer les moddeurs).
+  // Liste des auteurs et de leurs pages, dans le fichier exporté (pour créditer les moddeurs).
   async function creditsFile(plan) {
     const lines = plan.mods.map((x) => `${x.name}${x.page ? ` : ${x.page}` : ""}`);
     if (!lines.length) return [];
@@ -565,7 +565,7 @@ function createOmniPack({ playMode }) {
     let lv = String(v.pack?.loaderVersion || "");
     if (lv.startsWith(`${v.minecraftVersion}-`)) lv = lv.slice(v.minecraftVersion.length + 1);
     const manifest = {
-      // recommendedRam (Mo) : case officielle de CurseForge, lue aussi par Prism et Omniscient (01/11).
+      // recommendedRam (Mo) : case officielle de CurseForge, lue aussi par Prism et Omniscient.
       minecraft: { version: v.minecraftVersion, modLoaders: loader && lv ? [{ id: `${loader}-${lv}`, primary: true }] : [], ...(packRam.intGB(ramGB) ? { recommendedRam: packRam.intGB(ramGB) * 1024 } : {}) },
       manifestType: "minecraftModpack",
       manifestVersion: 1,
@@ -683,7 +683,7 @@ function createOmniPack({ playMode }) {
         return null;
       };
     };
-    // Progression (27/10) : fichiers et octets à extraire, par version et en tout.
+    // Progression : fichiers et octets à extraire, par version et en tout.
     const sizes = list.map((ver) => {
       const pick = pickFor(ver);
       const c = { files: 0, bytes: 0 };

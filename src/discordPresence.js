@@ -63,7 +63,7 @@ function connect(clientId) {
   // partage (ready/pendingActivity) : on le detruit explicitement plutot que de
   // le laisser trainer en arriere-plan — sinon une resolution ou un echec tardif
   // de SA connexion pourrait ecraser l'etat de thisClient, pourtant plus recent
-  // et peut-etre deja bien connecte (course trouvee par l'audit du 2026-10-10).
+  // et peut-etre deja bien connecte.
   if (previousClient && previousClient !== thisClient) {
     previousClient.removeAllListeners?.();
     previousClient.destroy?.().catch(() => {});

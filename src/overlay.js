@@ -1,4 +1,4 @@
-// Petit menu de sauvegarde par-dessus le jeu (mode Jouer, 24/10). Les textes arrivent déjà
+// Petit menu de sauvegarde par-dessus le jeu (mode Jouer). Les textes arrivent déjà
 // traduits depuis liveSave.js : cette page ne fait qu'afficher, et renvoyer le nom tapé.
 (() => {
   const $ = (id) => document.getElementById(id);

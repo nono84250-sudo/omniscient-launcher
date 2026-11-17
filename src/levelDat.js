@@ -1,4 +1,4 @@
-// Lecture du level.dat d'un monde Minecraft (mode Jouer, 24/10) : nom affiche dans le jeu,
+// Lecture du level.dat d'un monde Minecraft (mode Jouer) : nom affiche dans le jeu,
 // version qui l'a ouvert en dernier, date de derniere partie, mode de jeu. Format NBT compresse
 // en gzip (big-endian). Lecture seule : on n'ecrit jamais dans un level.dat.
 const fsp = require("node:fs/promises");
@@ -54,7 +54,7 @@ function parseNbt(buffer) {
   return payload(10, 0);
 }
 
-// Monde modé ? (26/10, un monde CurseForge ouvert en vanilla dans Jouer a été abîmé) Le jeu note
+// Monde modé ? (un monde CurseForge ouvert en vanilla dans Jouer a été abîmé) Le jeu note
 // le chargeur dans Data.ServerBrands (« forge », « neoforge », « fabric », « quilt ») et WasModded ;
 // Forge et NeoForge listent aussi leurs mods dans Data.DataPacks.Enabled (« mod:<id> »). Fabric
 // ne note pas la liste de ses mods : on connaît seulement le chargeur.
@@ -81,7 +81,7 @@ async function readLevelDat(file) {
     return null;
   }
 }
-// Même lecture depuis le contenu du fichier (monde dans un export CurseForge .zip, 26/10).
+// Même lecture depuis le contenu du fichier (monde dans un export CurseForge .zip).
 async function readLevelBuffer(raw) {
   try {
     return levelFromBuffer(raw);

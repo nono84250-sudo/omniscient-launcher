@@ -19,8 +19,7 @@ function mojangJvmArgs(vanilla) {
   // ruleAllows() (modpack.js) : meme logique de filtrage des regles JVM Mojang
   // partagee avec le chargement d'un modpack — la version locale d'ici ignorait
   // l'architecture (r.os.arch) contrairement a celle de modpack.js, qui gere
-  // aussi correctement la semantique "derniere regle qui matche gagne" (trouve
-  // par l'audit du 2026-10-10).
+  // aussi correctement la semantique "derniere regle qui matche gagne".
   for (const arg of vanilla.arguments?.jvm || []) {
     if (typeof arg === "string") {
       if (keep(arg)) out.push(arg);
@@ -36,10 +35,10 @@ function mojangJvmArgs(vanilla) {
 // telecharges ici au premier lancement, puis reutilises. Les serveurs moddes
 // (modpack CurseForge, NeoForge/Forge, Fabric) y ont chacun leur instance dans
 // instances/<slug> (voir modpack.js) ; seul Quilt n'est pas encore gere.
-// Dans le dossier des jeux, deplacable sur un autre disque (serie 2, idee 9, gamesLocation.js).
+// Dans le dossier des jeux, deplacable sur un autre disque (gamesLocation.js).
 const GAME_ROOT = path.join(require("./gamesLocation").GAMES_BASE, "minecraft");
 
-// Partie en cours (16/10, bouton « Arrêter le jeu ») : le processus Java et le serveur
+// Partie en cours (bouton « Arrêter le jeu ») : le processus Java et le serveur
 // (slug) qu'il joue. Un seul Minecraft a la fois (voir gameLaunchInProgress dans main.js).
 let runningGame = null;
 
@@ -97,9 +96,9 @@ async function launchMinecraft({
   customJvmArgs,
   onGameState,
   slug = null,
-  // Mode Jouer (24/10) : dossier du monde a ouvrir directement (Quick Play solo, 1.20+).
+  // Mode Jouer : dossier du monde a ouvrir directement (Quick Play solo, 1.20+).
   quickPlayWorld = null,
-  // Mode Jouer (24/10) : chaque morceau de la sortie du jeu, pour la sauvegarde en jeu (liveSave.js).
+  // Mode Jouer : chaque morceau de la sortie du jeu, pour la sauvegarde en jeu (liveSave.js).
   onGameLine = null,
 }) {
   await ensureJavaAvailable(javaPath);
@@ -158,7 +157,7 @@ async function launchMinecraft({
     memory: memory || { max: "4G", min: "1G" },
   };
   if (javaPath) opts.javaPath = javaPath;
-  // cwd = dossier de l'instance (16/10) : certains mods (FancyMenu...) ecrivent leurs fichiers en
+  // cwd = dossier de l'instance : certains mods (FancyMenu...) ecrivent leurs fichiers en
   // chemin relatif ; lances depuis le dossier de jeu partage, ils plantaient au chargement.
   if (gameDirectory) opts.overrides = { gameDirectory, cwd: gameDirectory };
   if (jvmArgs.length) opts.customArgs = jvmArgs;
@@ -167,7 +166,7 @@ async function launchMinecraft({
     // Le lancement rapide connecte le joueur mais n'ajoute rien a la liste
     // Multijoueur : sans ca, apres une deconnexion il ne peut plus revenir sans
     // tout relancer. Ne doit jamais empecher le lancement.
-    // Desactive par le proprietaire (serverForm.addToServerList, 21/10) : l'adresse n'est pas
+    // Desactive par le proprietaire (serverForm.addToServerList) : l'adresse n'est pas
     // ecrite ; la connexion directe ci-dessous est alors forcee, seul moyen d'entrer.
     if (addToServerList) {
       try {
@@ -202,7 +201,7 @@ async function launchMinecraft({
       // demarre — jamais eu de presence "en jeu" a annuler dans ce cas.
       if (started) runningGame = null;
       if (started) discordPresence.setBrowsingActivity();
-      // Code de sortie transmis : un plantage au demarrage s'affiche comme un echec clair (point 4).
+      // Code de sortie transmis : un plantage au demarrage s'affiche comme un echec clair.
       if (started) onGameState?.(false, code);
       if (!started) reject(new Error(`Le jeu s'est fermé avant de démarrer (code ${code}).`));
     });

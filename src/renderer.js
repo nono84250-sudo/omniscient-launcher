@@ -1,6 +1,6 @@
 const t = window.i18n.t;
 
-// Idee 3 du lancement (19/10) : une erreur non prevue de l'interface part dans le rapport
+// Idee 3 du lancement : une erreur non prevue de l'interface part dans le rapport
 // d'erreurs (Sentry, seulement s'il est configure ; voir errorReports.js cote main.js).
 window.addEventListener("error", (event) => {
   window.mchub.reportError({ message: event.message, stack: event.error?.stack });
@@ -11,8 +11,8 @@ window.addEventListener("unhandledrejection", (event) => {
 });
 
 // Animations en boucle (ronds qui tournent, barres sans fin) : un bloc redessiné recrée l'élément et
-// l'animation repartait de zéro à chaque mise à jour, ce qui saccadait (retour de Rushi du 27/10 :
-// pilule de téléchargement en haut à droite, fenêtres d'import). Chaque animation qui apparaît
+// l'animation repartait de zéro à chaque mise à jour, ce qui saccadait (pilule de téléchargement en
+// haut à droite, fenêtres d'import). Chaque animation qui apparaît
 // reprend à la même horloge que les autres, donc là où l'ancienne en était.
 (function keepSpinnersInPhase() {
   const SEL = ".activity-ring, .mc-conn-spin, .ip-spin, .activity-bar.indeterminate > i, .conn-indeterminate, .cf-bar.ind > i";
@@ -62,11 +62,11 @@ const navServersBtn = document.getElementById("nav-servers");
 const navFavoritesBtn = document.getElementById("nav-favorites");
 const navRecentBtn = document.getElementById("nav-recent");
 const navMyInstancesBtn = document.getElementById("nav-my-instances");
-// Systeme d'amis, phase 1 (2026-10-14) : vue plein ecran #friends-panel (voir showFriendsView()
+// Systeme d'amis, phase 1 : vue plein ecran #friends-panel (voir showFriendsView()
 // plus bas), et renderAccountHeader()/renderGuestHeader() pour sa visibilite (compte Microsoft
 // requis, comme nav-settings).
 const navFriendsBtn = document.getElementById("nav-friends");
-// Laboratoire (25/10) : l'onglet Amis suit l'interrupteur « friends » du site (voir features.js).
+// Laboratoire : l'onglet Amis suit l'interrupteur « friends » du site (voir features.js).
 let friendsFeatureOn = true;
 function applyLabFeatures(state) {
   friendsFeatureOn = state?.friends?.visible === true;
@@ -105,14 +105,14 @@ function playersText(server) {
   if (server.playerCount === null || server.playerCount === undefined) {
     return t("serverCard.statusUnknown");
   }
-  // Version A (19/10, validee par Rushi) : un maximum de 0 veut dire « pas de maximum annonce »
+  // Version A : un maximum de 0 veut dire « pas de maximum annonce »
   // (beaucoup de grands serveurs cachent leur limite), jamais « 3570 / 0 ».
   const capacity = server.playerCapacity > 0 ? ` / ${Number(server.playerCapacity)}` : "";
   // Juste le nombre : « 16170 / 200000 » (le libellé est donné par le titre de la case).
   return `${Number(server.playerCount)}${capacity}`;
 }
 
-// Remplissage du serveur (17/10, meme logique que la jauge du site) : orange a partir de 80 % des
+// Remplissage du serveur (meme logique que la jauge du site) : orange a partir de 80 % des
 // places, rouge a 100 % avec le mot « Complet » en plus de la couleur. null sans capacite connue.
 function fillLevel(server) {
   const count = server.playerCount;
@@ -124,7 +124,7 @@ function fillLevel(server) {
 
 function playersLabel(server) {
   const online = server.playerCount !== null && server.playerCount !== undefined;
-  // Table des etats (audit 17/10, lot 2) : hors ligne en gris (le rouge est pour « Complet »),
+  // Table des etats : hors ligne en gris (le rouge est pour « Complet »),
   // presque plein en orange avec son mot, inconnu en rond pointille.
   if (!online && server.pinged) {
     return `<span class="status-dot" style="background:var(--state-off)"></span><span style="color:var(--state-off)">${t("serverCard.offline")}</span>`;
@@ -174,7 +174,7 @@ function serverIconInner(server) {
   return server.iconUrl ? `<img src="${escapeHtml(server.iconUrl)}" alt="" />` : serverInitial(server.name);
 }
 
-// Teams (19/10, meme logique que le site : site/src/components/TeamByline.tsx). server.team :
+// Teams (meme logique que le site : site/src/components/TeamByline.tsx). server.team :
 // { name, slug, iconUrl, description, official } ou null (site plus ancien : absent, rien ne
 // s'affiche). Team Omniscient : « Proposé par Omniscient · C'est ton serveur ? », qui deplie la
 // description et « Nous contacter » (page Contact du site, sujet « C'est mon serveur »).
@@ -272,9 +272,9 @@ function isOwnServer(server) {
 // Ligne serveur partagee entre la liste principale, "Favoris" et "Recents" —
 // meme rendu partout, seule la source de la liste de serveurs change.
 // `playedAt` (page Recents seulement) : date de la derniere partie, affichee avant les joueurs.
-// Bandeau aux couleurs du serveur (point 5) : sa banniere etiree sur 5 px, sinon un degrade
+// Bandeau aux couleurs du serveur : sa banniere etiree sur 5 px, sinon un degrade
 // tire de son nom (toujours le meme pour un serveur donne).
-// Bande en haut des cartes (17/10, variante A choisie par Rushi) : elle montre l'etat du serveur,
+// Bande en haut des cartes : elle montre l'etat du serveur,
 // avec les memes seuils que la jauge de joueurs. Avant, c'etait la banniere ou une couleur tiree
 // du nom : un serveur ferme pouvait sortir orange, ce qui ne voulait rien dire.
 function serverBandState(server) {
@@ -283,7 +283,7 @@ function serverBandState(server) {
   return fillLevel(server) || "ok";
 }
 
-// Lot 2 (audit 17/10) : memes couleurs que la table des etats du site ; inconnu en rayures grises.
+// Memes couleurs que la table des etats du site ; inconnu en rayures grises.
 const BAND_COLORS = {
   ok: "var(--success)",
   busy: "var(--state-busy)",
@@ -291,8 +291,8 @@ const BAND_COLORS = {
   off: "var(--state-off)",
   unknown: "repeating-linear-gradient(90deg, var(--state-off) 0 6px, transparent 6px 12px)",
 };
-// Reglage en attente de Rushi : true = bande seulement quand l'etat n'est PAS « En ligne »
-// (avis de 9 testeurs sur 10), false = bande sur toutes les cartes (variante A du 17/10).
+// Reglage en attente : true = bande seulement quand l'etat n'est PAS « En ligne »
+// (avis de 9 testeurs sur 10), false = bande sur toutes les cartes.
 const BAND_ONLY_WHEN_PROBLEM = true;
 
 function serverBandCss(server) {
@@ -328,7 +328,7 @@ document.addEventListener("click", (event) => {
 function serverRowHtml(server, isFav, playedAt = null, withPlay = false) {
   const ownerTag = isOwnServer(server) ? `<span class="owner-tag">${t("serverCard.owner")}</span>` : "";
   const played = playedAt ? playedLabel(playedAt, Date.now()) : null;
-  // Disposition A du site (19/10, choisie par Rushi) : ligne 1 = nom puis la team (qui se
+  // Disposition A du site : ligne 1 = nom puis la team (qui se
   // raccourcit en premier) ; ligne 2 = etiquettes principales (3) puis secondaires, cachees en
   // entier si elles ne tiennent pas ; ligne 3 = « version · type » en petit, puis la description
   // (gardee dans le launcher). A droite : les joueurs, et la langue dessous, jamais cachee.
@@ -382,7 +382,7 @@ function serverRowHtml(server, isFav, playedAt = null, withPlay = false) {
     </div>`;
 }
 
-// --- Recents (14/10, preview validee par Rushi) ------------------------------
+// --- Recents ------------------------------
 // 10 serveurs au plus, joues ces 7 derniers jours, avec la date de la derniere partie. Tout
 // reste local (settings.recentlyPlayed + settings.recentPlayedAt), aucune requete au site.
 const RECENT_MAX = 10;
@@ -398,8 +398,8 @@ function datesForSlugs(dates, slugs) {
 // les serveurs de plus de 7 jours sortent de la liste. Un serveur enregistre avant les dates
 // (ancienne version) recoit la date d'aujourd'hui : il reste 7 jours, puis sort comme les autres.
 // Liste vide mais « dernier joue » connu (voir recentSlugsFromSettings) : celui-ci est repris.
-// Le « dernier joue » (menu rapide, accueil) suit la meme regle des 7 jours (second audit du
-// 14/10) : sa date est gardee meme hors de la liste, et il est efface une fois trop vieux.
+// Le « dernier joue » (menu rapide, accueil) suit la meme regle des 7 jours : sa date est gardee
+// meme hors de la liste, et il est efface une fois trop vieux.
 // Avant, le repli lui redonnait la date du jour a chaque ouverture et il ne sortait jamais.
 function recentEntries(settings, now) {
   const slugs = recentSlugsFromSettings(settings).slice(0, RECENT_MAX);
@@ -444,14 +444,14 @@ function playedLabel(playedAt, now) {
   const days = Math.max(0, Math.round((startOfDay(now) - startOfDay(playedAt)) / 86_400_000));
   const day = days === 0 ? t("recent.today") : days === 1 ? t("recent.yesterday") : t("recent.daysAgo", { count: days });
   const time = new Date(playedAt).toLocaleTimeString(window.i18n.getLocale() === "en" ? "en-US" : "fr-FR", { hour: "2-digit", minute: "2-digit" });
-  // Une seule ligne (16/10, preview validee) : « Il y a 2 jours · 22:44 ».
+  // Une seule ligne : « Il y a 2 jours · 22:44 ».
   return { day, time, line: t("recent.oneLine", { day, time }) };
 }
 
-// --- Filtres de la liste (16/10, option C validee, preview https://claude.ai/artifact/DGSAjFDstaKgMRLwudGMYd)
+// --- Filtres de la liste
 // Memes regles que le site (site/src/lib/serverFilters.ts) : garder les deux alignees. Tout se
-// calcule sur la liste deja recuperee, aucun appel reseau par frappe ou par clic. Les champs du
-// 16/10 (tags, languages, minecraftVersion, launchCount, trendScore, isNew) peuvent manquer face a
+// calcule sur la liste deja recuperee, aucun appel reseau par frappe ou par clic. Les champs (tags, languages,
+// minecraftVersion, launchCount, trendScore, isNew) peuvent manquer face a
 // un site plus ancien : chaque lecture a sa valeur par defaut, et le tri « Plus recents » garde
 // simplement l'ordre recu du site.
 let allServers = [];
@@ -466,7 +466,7 @@ function defaultListFilters() {
 let listFilters = defaultListFilters();
 let listFiltersPanelOpen = false;
 
-// 23/10 (« Remplacer une etiquette » du site) : noms des etiquettes renommees ou ajoutees par
+// « Remplacer une etiquette » du site : noms des etiquettes renommees ou ajoutees par
 // l'equipe, recus avec la liste (server.tagLabels) ; sinon le nom du dictionnaire du launcher.
 const serverTagLabels = new Map();
 function rememberTagLabels(servers) {
@@ -500,7 +500,7 @@ function isServerOnline(server) {
 
 // « Un ami y joue » : slug -> pseudos des amis en ligne sur ce serveur. Vient de la liste d'amis
 // (friendsList, deja gardee une minute par main.js) : seulement quand une liste de serveurs est
-// ouverte par un joueur connecte. Audit de charge du 19/10 (B2) : rechargee au plus toutes les
+// ouverte par un joueur connecte. Rechargee au plus toutes les
 // 5 min ici (et non plus chaque minute, ~75 % du cout d'un joueur sur l'onglet Serveurs) ; l'onglet
 // Amis, lui, la recharge toujours a l'ouverture.
 function friendsBySlug() {
@@ -514,7 +514,7 @@ function friendsBySlug() {
 }
 let friendsForListsAt = 0;
 const FRIENDS_FOR_LISTS_MS = 5 * 60_000;
-// Correctif 3 de l'audit du 28/10 : tant qu'une liste de serveurs est affichee, les amis arrivent
+// Tant qu'une liste de serveurs est affichee, les amis arrivent
 // avec le signal de presence (sendPresenceHeartbeat), sans appel a part. Le site deja en ligne ne
 // les renvoie pas encore : pulseGivesFriends reste faux et l'appel a part continue comme avant.
 // Au-dela de FRIENDS_STALE_MS (liste rouverte apres un long moment, fin de partie), un appel a part.
@@ -530,7 +530,7 @@ function friendsChangedForLists(before) {
 }
 function refreshFriendsForLists(onChange, panel) {
   friendsListsTarget = { onChange, panel };
-  // 21/10 : pas de relecture des amis pendant une partie (une seule a la fermeture du jeu).
+  // Pas de relecture des amis pendant une partie (une seule a la fermeture du jeu).
   if (!signedIn || gamePlaying || Date.now() - friendsForListsAt < FRIENDS_FOR_LISTS_MS) return;
   if (pulseGivesFriends && friendsForListsAt && Date.now() - friendsForListsAt < FRIENDS_STALE_MS) return;
   friendsForListsAt = Date.now();
@@ -548,7 +548,7 @@ function serverMatches(server, f, skip, friends) {
   if (skip !== "tags" && f.tags?.length && !serverTagsOf(server).some((tag) => f.tags.includes(tag))) return false;
   if (skip !== "version" && f.version && f.version !== "all" && versionBranch(server.minecraftVersion) !== f.version) return false;
   if (skip !== "friend" && f.friend && !friends.has(server.slug)) return false;
-  // Filtre Team (19/10, version C validee par Rushi) : le clic sur le nom d'une team y mene.
+  // Filtre Team : le clic sur le nom d'une team y mene.
   if (skip !== "team" && f.team && f.team !== "all" && teamOf(server)?.slug !== f.team) return false;
   return true;
 }
@@ -573,7 +573,7 @@ function showTeamInServers(slug) {
 }
 
 // Tri stable : a egalite, l'ordre recu (deja du plus recent au plus ancien).
-// Tris inversables (19/10, variante A validee par Rushi, memes mots que le site) : `reversed`
+// Tris inversables (memes mots que le site) : `reversed`
 // retourne l'ordre. Pour Tendance, Joueurs en ligne, Les plus joues et Petits serveurs actifs,
 // les serveurs pas actifs (hors ligne, sans mesure ou vides ; pour « Petits serveurs actifs »,
 // aussi ceux a moins de 3 joueurs) restent toujours a la fin, meme inverses : on ne met jamais en
@@ -685,7 +685,7 @@ function renderListFilters(shownCount) {
   if (f.version !== "all" && !versionCounts.has(f.version)) versionCounts.set(f.version, 0);
   const rank = (b) => (b === "other" ? -1 : Number(b.slice(2)));
   const versions = [...versionCounts.entries()].sort((a, b) => rank(b[0]) - rank(a[0]));
-  // Barre allegee (19/10, preview « Filtre Team » version C validee) : la barre garde la recherche,
+  // Barre allegee : la barre garde la recherche,
   // Tous / Vanilla / Moddés et « Filtres » ; En ligne, Un ami y joue, langue, style, version et team
   // vont dans le panneau. Le bouton compte tout ce qui est actif dans le panneau.
   const panelCount = activeFilterKeys(f).filter((key) => key !== "type").length;
@@ -902,7 +902,7 @@ async function renderRowsInto(container, servers, origin, onFavoriteToggled, pla
     });
   });
 
-  // « … » des lignes (option C) : Installer (meme pendant une partie) et Voir la fiche.
+  // « … » des lignes : Installer (meme pendant une partie) et Voir la fiche.
   container.querySelectorAll(".row-more-btn").forEach((btn) => {
     btn.addEventListener("click", (event) => {
       event.stopPropagation();
@@ -922,7 +922,7 @@ async function renderRowsInto(container, servers, origin, onFavoriteToggled, pla
       if (server) installServerStandalone(server, null);
     });
   });
-  // ⋯ › Réglages (03/11) : même fenêtre que dans Mes instances (modpack conseillé, suivi, fichiers).
+  // ⋯ › Réglages : même fenêtre que dans Mes instances (modpack conseillé, suivi, fichiers).
   container.querySelectorAll("[data-row-settings]").forEach((btn) => {
     btn.addEventListener("click", (event) => {
       event.stopPropagation();
@@ -1085,7 +1085,7 @@ listSortSelectEl.addEventListener("change", () => {
 });
 
 // Serveur gelé par l'équipe : même fiche, avec « Serveur gelé » à la place de « Rejoindre ».
-// Fiche disparue (19/10) : supprimee, ou plus publique. Au lieu d'une page vide ou d'une ligne
+// Fiche disparue : supprimee, ou plus publique. Au lieu d'une page vide ou d'une ligne
 // d'erreur, un message clair et ce qu'on peut encore faire (dossier installe, retirer des listes).
 async function renderMissingDetail(slug) {
   listEl.hidden = true;
@@ -1126,7 +1126,7 @@ function renderFrozenDetail(slug) {
   wireDetailBreadcrumb();
 }
 
-// Fiche personnalisable (16/10, disposition « deux colonnes » validee par Rushi) : le site envoie
+// Fiche personnalisable : le site envoie
 // server.page (voir site/src/lib/serverPage.ts), server.discordUrl et server.websiteUrl. Tout le
 // texte du proprietaire passe par escapeHtml ; seuls **gras**, *italique*, « ## titre » et
 // « - liste » sont mis en forme, apres echappement. Les liens ne sont jamais des <a> (la fenetre
@@ -1135,7 +1135,7 @@ const PAGE_SECTIONS = ["about", "gallery", "video", "rules", "social"];
 const DOWNLOAD_SVG =
   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>';
 const PAGE_ACCENTS = { blue: "#2f78ad", green: "#2f9e6e", violet: "#7a5bd0", orange: "#d0742f", red: "#c0453f", gold: "#b08a1a" };
-// Liste fermee de 30 etiquettes (16/10), meme ordre que site/src/lib/serverPage.ts.
+// Liste fermee de 30 etiquettes, meme ordre que site/src/lib/serverPage.ts.
 const PAGE_TAGS = [
   "survival", "creative", "pvp", "pve", "coop", "roleplay", "minigames", "tech", "magic", "adventure",
   "economy", "hardcore", "skyblock", "factions", "bedwars", "prison", "towny", "smp", "anarchy", "events",
@@ -1275,7 +1275,7 @@ function pageSectionBodyHtml(section, page, server) {
         )
         .join("")}</div>`;
     case "video":
-      // Repli du 16/10 (VIDEO_EMBED_ENABLED coupe : YouTube demandait de se connecter) : la
+      // Repli (VIDEO_EMBED_ENABLED coupe : YouTube demandait de se connecter) : la
       // vignette ouvre la video sur YouTube, dans le navigateur.
       if (!VIDEO_EMBED_ENABLED) {
         return `
@@ -1284,8 +1284,8 @@ function pageSectionBodyHtml(section, page, server) {
         </button>
         <p class="page-video-note">${t("serverPage.videoCaption")}</p>`;
       }
-      // Vignette sans requete vers YouTube, lecteur youtube-nocookie au clic (ou tout seul et
-      // Audit du 01/11 : plus de lancement automatique, même si le propriétaire l'a coché).
+      // Vignette sans requete vers YouTube, lecteur youtube-nocookie au clic (plus de
+      // lancement automatique, même si le propriétaire l'a coché).
       return `
         <div class="page-video-box" data-video-id="${escapeHtml(page.videoId)}" data-video-autoplay="">
           <button type="button" class="page-video" aria-label="${escapeHtml(t("serverPage.videoPlay"))}">
@@ -1338,16 +1338,16 @@ function openGalleryLightbox(item, index) {
   document.body.appendChild(overlay);
 }
 
-// Lecteur integre, lancement automatique, reglage « Bloquer » et petite phrase : coupes le 16/10
+// Lecteur integre, lancement automatique, reglage « Bloquer » et petite phrase : coupes
 // (YouTube demandait de se connecter, « pas un robot »). Le code reste ; true pour les reactiver.
-const VIDEO_EMBED_ENABLED = true; // rallume le 18/10 (test de Rushi : le lecteur marche)
-const VIDEO_AUTOPLAY_ENABLED = false; // audit du 01/11 : aucune vidéo sans clic (voir lib/serverPage.ts du site)
+const VIDEO_EMBED_ENABLED = true; // rallume (le lecteur marche)
+const VIDEO_AUTOPLAY_ENABLED = false; // Aucune vidéo sans clic (voir lib/serverPage.ts du site)
 
-// Video de la fiche (16/10) : le lecteur YouTube (domaine youtube-nocookie) ne se charge qu'au
+// Video de la fiche : le lecteur YouTube (domaine youtube-nocookie) ne se charge qu'au
 // clic, ou des que la video est visible a 90 % si le proprietaire a coche « Lancer
 // automatiquement » (alors sans le son). L'identifiant est deja verifie par readServerPage.
 // Le joueur peut l'interdire dans Parametres > Divers (blockVideoAutoplay) : clic seulement.
-// Rushi 25/10 : la video s'arrete des que la fiche n'est plus affichee (autre onglet du menu,
+// La video s'arrete des que la fiche n'est plus affichee (autre onglet du menu,
 // fiche fermee, retour a l'annuaire) : le lecteur est retire et la vignette revient, prete a
 // relancer. Faire defiler la fiche ne coupe rien, seule une fiche cachee compte.
 function setupPageVideo(box, blockAutoplay) {
@@ -1424,7 +1424,7 @@ function clearPageTheme() {
 // Derniere fiche affichee : la pilule s'en sert pour retrouver un serveur prive (voir knownServer).
 var currentDetailServer = null;
 
-// En-tete de fiche, variante A (19/10, choisie par Rushi) : l'icone prend la hauteur du bloc de
+// En-tete de fiche : l'icone prend la hauteur du bloc de
 // texte a cote (nom, team, etiquettes), entre 44 et 108 px, coins arrondis. Recalculee quand la
 // fenetre change de largeur (le texte peut passer sur plus ou moins de lignes).
 const DETAIL_ICON_MIN = 44;
@@ -1449,7 +1449,7 @@ function fitDetailIcon() {
   }
 }
 
-// Mon cloud (03/11, preview v2 validée par Rushi) : carte « Modpack du serveur » de la fiche.
+// Mon cloud : carte « Modpack du serveur » de la fiche.
 // « Obligatoire pour rejoindre » : rien à choisir, Jouer l'installe. « Conseillé » : le joueur
 // choisit de l'installer (retenu pour ce serveur) ou de jouer sans.
 async function fillCloudPackCard(server) {
@@ -1485,7 +1485,7 @@ async function fillCloudPackCard(server) {
   });
 }
 
-// Preview « Modpack relié au serveur » (03/11, validée par Rushi) : modpack « Conseillé » et pas
+// « Modpack relié au serveur » : modpack « Conseillé » et pas
 // encore de choix retenu : au clic sur Jouer, le joueur choisit. À gauche Vanilla (ou le jeu
 // habituel d'un serveur moddé), à droite « <modpack> (moddé) » avec le mot du propriétaire.
 // « Obligatoire pour rejoindre » : rien à demander. Résout false si le joueur annule.
@@ -1563,19 +1563,19 @@ async function renderDetail(server) {
 
   const tags = [`<span class="tag-chip">${server.type === "modded" ? t("serverCard.modded") : t("serverCard.vanilla")}</span>`];
   for (const tag of page.tags) tags.push(`<span class="tag-chip tag-chip-accent">${escapeHtml(tagLabel(tag))}</span>`);
-  // Langue : meme etiquette que les lignes (variante A du 20/10), le code avec le nom en infobulle.
+  // Langue : meme etiquette que les lignes, le code avec le nom en infobulle.
   for (const lang of page.languages) tags.push(`<span class="lang-code${page.languages.length === 1 ? " solo" : ""}" title="${escapeHtml(t(`serverPage.languages.${lang}`))}">${escapeHtml(lang.toUpperCase())}</span>`);
   if (!page.languages.length) tags.push(`<span class="lang-code none">${escapeHtml(t("serverList.noLang"))}</span>`);
 
-  // Toujours actif, meme sans connexion (2026-10-11, audit onboarding) :
+  // Toujours actif, meme sans connexion :
   // launchServer() demande la connexion lui-meme au clic si besoin — plus de
   // bouton desactive avec une note a ce stade. La progression de lancement ne
   // s'affiche plus ici — voir launchServer()/la barre de lancement rapide.
-  // "Installer" a cote de "Rejoindre" (2026-10-11, audit onboarding) :
+  // "Installer" a cote de "Rejoindre" :
   // telecharge le modpack/Java sans lancer le jeu, donc sans demander de
   // connexion — voir installServerStandalone(). "Rejoindre" reste le seul
   // bouton qui demande un compte Microsoft (voir launchServer()).
-  // "Installer" disponible pour tous les types de serveur (2026-10-11) : un
+  // "Installer" disponible pour tous les types de serveur : un
   // vanilla profite aussi de pouvoir etre prepare a l'avance (ex. avant un
   // evenement programme, pour qui a une connexion lente) — pas qu'un confort
   // reserve aux moddes. Une fois CE serveur precis pret, plus besoin du
@@ -1583,7 +1583,7 @@ async function renderDetail(server) {
   // servers:installStatus cote main.js, qui gere les deux cas).
   const showInstallBtn = !(await window.mchub.getServerInstallStatus(server.slug)).installed;
   const isFav = (await getFavoriteSlugs()).includes(server.slug);
-  // Lot 3 (audit 17/10) : le bouton principal dit l'action reelle, et « Installer » n'apparait
+  // Le bouton principal dit l'action reelle, et « Installer » n'apparait
   // plus deux fois.
   const action = detailJoinAction(server, { installed: !showInstallBtn });
 
@@ -1691,10 +1691,10 @@ async function renderDetail(server) {
   `;
 
   wireDetailBreadcrumb();
-  // Mon cloud (03/11) : modpack relié par le propriétaire, lu à part (la fiche s'affiche sans attendre).
+  // Mon cloud : modpack relié par le propriétaire, lu à part (la fiche s'affiche sans attendre).
   fillCloudPackCard(server);
   fitDetailIcon();
-  // Fiche partielle (19/10) : un de SES serveurs pas encore dans l'annuaire, lu par la route du
+  // Fiche partielle : un de SES serveurs pas encore dans l'annuaire, lu par la route du
   // lancement (sans banniere ni description). On le dit plutot que de montrer des cases vides.
   if (server.partial) {
     const note = document.createElement("p");
@@ -1725,7 +1725,7 @@ async function renderDetail(server) {
     syncJoinButtons();
   }
 
-  // Deja installe (Rushi 25/10) : « Désinstaller » a la place de « Installer », avec confirmation.
+  // Deja installe : « Désinstaller » a la place de « Installer », avec confirmation.
   document.getElementById("uninstall-btn")?.addEventListener("click", async () => {
     if ((await uninstallServer({ slug: server.slug, name: server.name, type: server.type === "modded" ? "modded" : "vanilla" })) && !detailEl.hidden) renderDetail(server);
   });
@@ -2041,11 +2041,11 @@ async function applyRecommendedRamIfNeeded(server) {
 
 // Orchestration partagee du lancement, quel que soit le point d'entree
 // (bouton "Rejoindre" d'une fiche serveur, carte "Reprendre", "Mes instances"...).
-// La progression ne vit plus dans une barre du bas (supprimee, design 17/10 point 1) mais dans
+// La progression ne vit plus dans une barre du bas (supprimee) mais dans
 // la pilule d'etat de la barre du haut (voir renderActivity ci-dessous).
 let launchInProgress = false;
 
-// --- Pilule d'etat (design 17/10, points 1 et 2, preview validee par Rushi) ------------------
+// --- Pilule d'etat (points 1 et 2) ------------------
 // Un seul etat, lu au meme endroit par la pilule de la barre du haut ET par le bouton Rejoindre
 // de la fiche serveur : "empty" (jamais joue), "idle", "install", "start", "play", "fail".
 // Arreter le jeu se fait uniquement depuis le panneau de la pilule, avec confirmation.
@@ -2084,7 +2084,7 @@ async function resolveServer(slug) {
   }
 }
 
-// Message du proprietaire pendant l'installation (design 17/10, point 6) : ecrit sur le site
+// Message du proprietaire pendant l'installation : ecrit sur le site
 // (fiche > « Message pendant l'installation », pageConfig.installMessage), garde ici par serveur des
 // qu'une fiche ou un lancement le fait connaitre.
 const installMessages = new Map();
@@ -2099,7 +2099,7 @@ function activityServerName(slug) {
   if (!slug) return "";
   if (activity.current?.slug === slug && activity.current.name) return activity.current.name;
   if (activity.lastPlayed?.slug === slug && activity.lastPlayed.name) return activity.lastPlayed.name;
-  // Mode Jouer (24/10) : « play:<id de version> » n'est pas un serveur, nom lisible fourni par play.js.
+  // Mode Jouer : « play:<id de version> » n'est pas un serveur, nom lisible fourni par play.js.
   if (String(slug).startsWith("play:")) return window.playRunningLabel?.(slug) || "Minecraft";
   return knownServer(slug)?.name || slug;
 }
@@ -2171,7 +2171,7 @@ function activityPillParts(state) {
         long = eta ? t("activity.pillInstallEta", { percent: state.percent, eta }) : t("activity.pillInstall", { percent: state.percent });
       }
       const short = state.percent == null ? t("activity.shortInstall") : t("activity.shortPercent", { percent: state.percent });
-      // File d'attente (serie 2, idee 4) : « … · 2 en attente » quand d'autres installations attendent.
+      // File d'attente : « … · 2 en attente » quand d'autres installations attendent.
       const waiting = queuedTasks().length;
       if (waiting) long = `${long} · ${t("queue.waitingShort", { count: waiting })}`;
       return { cls: "hl", icon: '<span class="activity-ring"></span>', long, short };
@@ -2186,7 +2186,7 @@ function activityPillParts(state) {
         icon: '<span class="status-dot online"></span>',
         long: state.name ? t("activity.pillPlay", { name: state.name, time: formatPlayMinutes(activity.playingSince || Date.now()) }) : t("activity.shortPlay"),
         short: t("activity.shortPlay"),
-        // 28/10 (Rushi) : un nom de pack trop long cachait le temps de jeu. Le nom est coupé (…),
+        // Un nom de pack trop long cachait le temps de jeu. Le nom est coupé (…),
         // « En jeu » et le temps restent toujours visibles (voir renderActivity).
         play: state.name ? { name: state.name, time: formatPlayMinutes(activity.playingSince || Date.now()) } : null,
       };
@@ -2235,7 +2235,7 @@ function activityPanelHtml(state) {
       const eta = state.paused ? t("titlebar.taskPaused") : formatEta(state.etaS);
       const firstTime = state.slug && !playCountsCache[state.slug];
       const steps = activitySteps(state);
-      // Pack FTB (21/10, preview validee) : d'ou viennent les mods, une ligne par origine non vide.
+      // Pack FTB : d'ou viennent les mods, une ligne par origine non vide.
       const origins = task?.origins;
       const originsHtml = origins
         ? [
@@ -2300,7 +2300,7 @@ function activityPanelHtml(state) {
         manual: [btn("manual", t("activity.showManual"), "full"), btn("retry", t("activity.retry"))],
         generic: [btn("retry", t("activity.retry"), "full"), btn("log", t("activity.seeLog")), btn("services", t("activity.servicesStatus"))],
       }[info.kind];
-      // Detail technique replie (lot 5 bis) : utile pour l'aide, sans faire peur au joueur.
+      // Detail technique replie : utile pour l'aide, sans faire peur au joueur.
       const raw = String(state.error || "").trim();
       const tech = raw && info.kind !== "manual" ? `<details class="activity-tech"><summary>${escapeHtml(t("activity.techDetails"))}</summary><code>${escapeHtml(raw.slice(0, 600))}</code></details>` : "";
       const stage = activity.failure?.reportStage || null;
@@ -2335,7 +2335,7 @@ function activityPanelHtml(state) {
   }
 }
 
-// Etapes visibles du panneau (design 17/10, point 4, L3-A). Serveur moddé : 6 etapes, dont la
+// Etapes visibles du panneau. Serveur moddé : 6 etapes, dont la
 // recherche sur Modrinth des mods que CurseForge bloque et les mods a ajouter a la main ; vanilla :
 // 3 etapes. Les etapes viennent de main.js (task.step) puis de game:progress pour le demarrage.
 const MODDED_STEPS = ["prepare", "java", "mods", "blocked", "manual", "start"];
@@ -2370,7 +2370,7 @@ function activitySteps(state) {
   return { html: `<div class="activity-steps">${lines.join("")}</div>`, index: curIndex + 1, total: order.length };
 }
 
-// Echec affiche par la pilule (L3-E) : un titre clair et une phrase, plus le texte brut. Le type
+// Echec affiche par la pilule : un titre clair et une phrase, plus le texte brut. Le type
 // choisit les boutons proposes (disque plein, connexion coupee, plantage du jeu...).
 function describeFailure(failure) {
   const raw = String(failure.error || "");
@@ -2382,7 +2382,7 @@ function describeFailure(failure) {
     const free = activity.diskFreeBytes;
     return { kind: "disk", title: t("activity.errDiskTitle"), body: free != null ? t("activity.errDiskFree", { free: formatTaskBytes(free) }) : t("activity.errDiskBody") };
   }
-  // Site saturé (audit de charge du 19/10) : message de main.js, rien a reparer de ce cote.
+  // Site saturé : message de main.js, rien a reparer de ce cote.
   if (/très demandé : réessaie dans une minute/i.test(raw)) {
     return { kind: "net", title: t("activity.errBusyTitle"), body: t("activity.errBusyBody") };
   }
@@ -2393,16 +2393,16 @@ function describeFailure(failure) {
   if (failure.crashCode != null || (code && /fermé|arrêté|closed|exited|stopped/i.test(raw))) {
     return { kind: "crash", title: t("activity.errCrashTitle", { code: failure.crashCode ?? code }), body: t("activity.errCrashBody") };
   }
-  // Lot 5 bis : Java qui manque ou ne se prepare pas -> dit pourquoi et propose de le reparer.
+  // Java qui manque ou ne se prepare pas -> dit pourquoi et propose de le reparer.
   if (/Version de Java|Java \d+ disponible|Java introuvable|Java a été téléchargé|UnsupportedClassVersionError|JAVA_HOME|could not find java|java\.exe.*ENOENT/i.test(raw)) {
     const major = raw.match(/Java\s*(\d{1,2})/i)?.[1];
     return { kind: "java", title: t("activity.errJavaTitle"), body: major ? t("activity.errJavaBodyMajor", { major }) : t("activity.errJavaBody") };
   }
-  // Plus de texte technique brut en premier (lot 5 bis) : une phrase claire, le detail replie.
+  // Plus de texte technique brut en premier : une phrase claire, le detail replie.
   return { kind: "generic", title: t("activity.failTitle", { name }), body: t("activity.errGenericBody") };
 }
 
-// Notification Windows (L3-G) quand le launcher n'est pas au premier plan : installation finie,
+// Notification Windows quand le launcher n'est pas au premier plan : installation finie,
 // ou jeu qui se lance tout seul. Un clic ramene la fenetre.
 function notifyIfAway(title, body) {
   if (document.hasFocus() || typeof Notification === "undefined" || discreetMode) return;
@@ -2414,7 +2414,7 @@ function notifyIfAway(title, body) {
   }
 }
 
-// --- Mode discret (design 17/10, point 6, preview validee) ------------------------------------
+// --- Mode discret ------------------------------------
 // Un interrupteur dans la barre du haut et dans Parametres > Apparence. Il cache les adresses des
 // serveurs, les codes d'invitation, les pseudos des amis et les notifications (pas de pastille,
 // pas de notification Windows). Tout passe par la classe html.discreet et les elements .sensitive.
@@ -2440,7 +2440,7 @@ async function setDiscreetMode(on) {
 document.getElementById("discreet-toggle")?.addEventListener("click", () => setDiscreetMode(!discreetMode));
 window.mchub.settings.get().then((settings) => applyDiscreetMode(settings.discreetMode)).catch(() => applyDiscreetMode(false));
 
-// --- Etats vides (design 17/10, point 6, L5-G) : une phrase et un seul bouton par page ---------
+// --- Etats vides : une phrase et un seul bouton par page ---------
 const EMPTY_ICONS = {
   star: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z"/></svg>',
   clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
@@ -2461,7 +2461,7 @@ function emptyStateHtml({ icon, title, text, action, actionId, extraClass = "" }
     </div>`;
 }
 
-// --- File d'attente des installations (serie 2, idee 4, version A) -------------------------------
+// --- File d'attente des installations -------------------------------
 function queuedTasks() {
   return activity.tasks.filter((task) => task.status === "queued").sort((a, b) => (a.queuePosition || 99) - (b.queuePosition || 99));
 }
@@ -2502,7 +2502,7 @@ function renderActivity() {
   const pill = document.getElementById("tasks-trigger");
   if (!pill) return;
   let parts = activityPillParts(state);
-  // Mode Jouer (24/10) : la synchro des mondes avec le cloud (play.js) prend la pilule quand rien
+  // Mode Jouer : la synchro des mondes avec le cloud (play.js) prend la pilule quand rien
   // d'autre ne tourne, et s'affiche en tete du panneau.
   const cloud = window.playCloudActivity?.() || null;
   if (cloud && (cloud.over || !["install", "move", "start", "play", "fail"].includes(state.phase))) parts = cloud.parts;
@@ -2529,7 +2529,7 @@ function renderActivity() {
   // Le panneau n'est redessine que si son contenu change (sinon un clic en cours sur un de ses
   // boutons pourrait tomber sur un element remplace entre mousedown et click).
   // Pendant le telechargement le texte change a chaque tick : on attend aussi que le bouton de la
-  // souris soit relache dans le panneau (26/10, Rushi : la case « Lancer le jeu quand c'est fini »
+  // souris soit relache dans le panneau (la case « Lancer le jeu quand c'est fini »
   // demandait une dizaine de clics), puis on rattrape au relachement (voir wireTasksMenu).
   const panelHtml = (cloud?.panelHtml || "") + activityPanelHtml(state);
   if (panelHtml !== activityRenderKey && !activityPointerDown) {
@@ -2539,7 +2539,7 @@ function renderActivity() {
   syncJoinButtons(state);
 }
 
-// Bouton Rejoindre de la fiche serveur (design 17/10, point 2) : il suit le meme etat que la
+// Bouton Rejoindre de la fiche serveur : il suit le meme etat que la
 // pilule, pour que le joueur voie la suite la ou il a clique. Seulement pour le serveur
 // concerne : les autres fiches restent sur « Rejoindre » (desactive pendant qu'un autre
 // lancement est en cours, minecraft-launcher-core ne gere qu'un jeu a la fois).
@@ -2569,7 +2569,7 @@ function syncJoinButtons(state = activityState()) {
     } else {
       html = escapeHtml(t(btn.dataset.joinLabel || "serverDetail.joinBtn"));
       // Un seul lancement a la fois (minecraft-launcher-core) : les autres fiches attendent.
-      // Complet / hors ligne : bouton grise (lot 3), sauf si « Essayer quand meme » est choisi.
+      // Complet / hors ligne : bouton grise, sauf si « Essayer quand meme » est choisi.
       disabled = launchInProgress || launchStarting || btn.dataset.joinBlocked === "1";
     }
     if (btn.dataset.joinState !== `${cls}|${html}|${disabled}`) {
@@ -2735,7 +2735,7 @@ async function handleActivityAction(btn) {
 // Ouvre la pilule sur la confirmation d'arret : utilise par le bouton « Arrêter » de la fiche et
 // des cartes d'instance, pour qu'il n'y ait qu'une seule facon d'arreter le jeu.
 function askStopFromPill() {
-  // Ouvert juste APRES le clic (19/10, bug « Arrêter ne fait rien » vu par Rushi) : le clic du
+  // Ouvert juste APRES le clic : le clic du
   // bouton « Arrêter » (fiche, carte, bibliotheque, accueil) remontait jusqu'a l'ecouteur global
   // qui ferme le panneau au clic exterieur — il s'ouvrait et se refermait aussitot, sans rien
   // montrer. Attendre la fin du clic regle tous ces boutons d'un coup.
@@ -2775,7 +2775,7 @@ async function installedInstanceFor(server) {
 }
 
 async function launchServer(server) {
-  // Avertissement CurseForge (06/11) : une seule fois par PC, avant de lancer un pack CurseForge.
+  // Avertissement CurseForge : une seule fois par PC, avant de lancer un pack CurseForge.
   if (server?.type === "modded" && server.curseforgeModpackId && typeof window.confirmCurseforgeWarning === "function" && !(await window.confirmCurseforgeWarning())) return null;
   // Le flag doit etre pose ICI, avant le moindre await — pas apres
   // applyRecommendedRamIfNeeded() (qui peut ouvrir une modale bloquante et
@@ -2787,9 +2787,9 @@ async function launchServer(server) {
   if (launchInProgress) return null;
   launchInProgress = true;
 
-  // Connexion demandee ici, pas avant (2026-10-11, audit onboarding) : premier
+  // Connexion demandee ici, pas avant : premier
   // moment ou elle est reellement necessaire, quel que soit le point d'entree.
-  // Mode hors ligne (25/10, test de Rushi sur son portable) : sans internet, la connexion
+  // Mode hors ligne : sans internet, la connexion
   // Microsoft echoue forcement et le joueur revenait a l'annuaire sans rien pouvoir faire.
   // Si le serveur est deja installe sur ce PC, on lance le jeu en solo hors ligne a la place
   // (meme chemin que « Jouer en solo » dans Mes instances).
@@ -2884,7 +2884,7 @@ async function launchServer(server) {
     renderActivity();
   } else {
     if (result.code === "manual_mods" && Array.isArray(result.manualMods)) {
-      // Mods a ajouter a la main (14/10) : la fenetre explique quoi faire, et « Réessayer »
+      // Mods a ajouter a la main : la fenetre explique quoi faire, et « Réessayer »
       // relance tout de suite.
       renderActivity();
       const choice = await showManualModsModal(result.manualMods, result.fromModrinth, result.fromModrinthMods, { slug: server.slug });
@@ -2914,7 +2914,7 @@ async function launchServer(server) {
   return result;
 }
 
-// Ecran avant la 1re installation d'un serveur (design 17/10, point 4, L3-H) : place sur le disque,
+// Ecran avant la 1re installation d'un serveur : place sur le disque,
 // memoire utilisee et message du proprietaire, avec un seul bouton. Il ne s'affiche que si le
 // serveur n'est pas encore installe. Disque trop plein : le bouton reste grise et l'ecran se met a
 // jour tout seul quand le joueur libere de la place. Resout true pour continuer.
@@ -2930,7 +2930,7 @@ async function confirmFirstInstall(server, { launch }) {
   if (installed) return true;
 
   const need = server.type === "modded" ? FIRST_INSTALL_NEED_BYTES.modded : FIRST_INSTALL_NEED_BYTES.vanilla;
-  // 25/10 (demande de Rushi) : la source du modpack (CurseForge, Modrinth, FTB) est en maintenance.
+  // La source du modpack (CurseForge, Modrinth, FTB) est en maintenance.
   const SOURCE_SYSTEMS = { curseforge: "CurseForge", modrinth: "Modrinth", ftb: "FTB" };
   const sourceDisruption =
     server.type === "modded" && currentDisruption && currentDisruption.system === SOURCE_SYSTEMS[server.modpackSource || "curseforge"] ? currentDisruption : null;
@@ -2944,7 +2944,7 @@ async function confirmFirstInstall(server, { launch }) {
           ? `<div class="activity-errbox"><b>✕ ${escapeHtml(t("activity.errDiskTitle"))}</b><span class="muted">${escapeHtml(t("firstInstall.diskNeed", { need: formatTaskBytes(need), free: formatTaskBytes(free) }))}</span><span class="muted">${escapeHtml(t("firstInstall.diskFreeUp"))}</span></div>`
           : `<p class="first-install-line ok">✓ ${escapeHtml(t("firstInstall.sizeOk", { need: formatTaskBytes(need), free: formatTaskBytes(free) }))}</p>`;
     const ram = server.recommendedRamGB ? `<p class="first-install-line">${escapeHtml(t("firstInstall.ram", { count: server.recommendedRamGB }))}</p>` : "";
-    // Lot 5 bis : prevenir AVANT l'installation qu'il y aura des mods a ajouter a la main.
+    // Prevenir AVANT l'installation qu'il y aura des mods a ajouter a la main.
     const manualCount = Number(server.manualModsCount) || 0;
     const manual = manualCount > 0 ? `<p class="first-install-line">ⓘ ${escapeHtml(t("manualMods.badgeTip", { count: manualCount }))}</p>` : "";
     const ownerMessage = ownerInstallMessage(server);
@@ -3015,7 +3015,7 @@ async function joinServer(server, joinBtn) {
   syncJoinButtons();
 }
 
-// Bouton "Installer" (2026-10-11, audit onboarding) : telecharge le modpack
+// Bouton "Installer" : telecharge le modpack
 // et le Java requis sans lancer le jeu, donc sans demander de connexion
 // Microsoft — voir server:install cote main.js. La progression ne s'affiche
 // plus sur ce bouton : elle vit dans le panneau de taches de la barre de
@@ -3024,7 +3024,7 @@ async function joinServer(server, joinBtn) {
 // double-clic qui en creerait une seconde pour rien (meme si server:install
 // la rejette aussi de son cote, par securite).
 // Menus « … » (lignes de la bibliotheque, cartes Mes instances) : pour un serveur deja installe
-// sur ce PC, « Installer » devient « Désinstaller » (Rushi 25/10 : on pouvait reinstaller une 2e
+// sur ce PC, « Installer » devient « Désinstaller » (on pouvait reinstaller une 2e
 // fois). Meme fenetre de confirmation que « Supprimer les fichiers » des Reglages (mondes toujours
 // gardes, captures et reglages de jeu gardes par defaut). Un serveur vanilla n'a que des fichiers
 // partages : rien a desinstaller, l'entree disparait simplement.
@@ -3089,8 +3089,8 @@ async function installServerStandalone(server, btn) {
     if (btn) btn.disabled = false;
     return;
   }
-  // « Lancer le jeu quand c'est fini » (point 4, L3-G) : DECOCHE par defaut depuis le 25/10 (Rushi :
-  // « Installer » doit seulement installer) ; le joueur peut le cocher dans la pilule pendant l'installation.
+  // « Lancer le jeu quand c'est fini » : DECOCHE par defaut (« Installer » doit seulement installer) ; le
+  // joueur peut le cocher dans la pilule pendant l'installation.
   activity.failure = null;
   renderActivity();
   let retry = false;
@@ -3098,7 +3098,7 @@ async function installServerStandalone(server, btn) {
   try {
     const result = await window.mchub.installServer(server.slug, server.name);
     if (result?.ok) {
-      // Disparait tout de suite pour CE serveur (2026-10-11) — pas besoin de
+      // Disparait tout de suite pour CE serveur — pas besoin de
       // quitter puis revenir sur la fiche pour que ça se mette a jour.
       btn?.remove();
       hideInstallItems(document, new Map([[server.slug, server.type === "modded" ? "modded" : "vanilla"]]));
@@ -3134,7 +3134,7 @@ async function installServerStandalone(server, btn) {
 }
 
 // Fenetre des mods qu'un modpack CurseForge interdit de telecharger par les autres launchers
-// (14/10, preview validee par Rushi) : lien vers la page de chaque mod, dossier Telechargements
+// : lien vers la page de chaque mod, dossier Telechargements
 // ou les deposer, puis « Réessayer » (main.js/modpack.js les y retrouvent et verifient leur
 // empreinte). Un fichier retire de CurseForge ne se rattrape pas : seul « Fermer » est propose.
 // Resout "retry" ou "close".
@@ -3151,16 +3151,16 @@ function boldLabelIn(el, text, label) {
 
 // `fromModrinth` : mods bloques deja recuperes sur Modrinth (meme fichier, voir findOnModrinth dans
 // modpack.js) — la liste ne montre que ceux qui restent, le bandeau dit combien ont ete pris.
-// Point 4 (L3-F) : les lignes se cochent seules quand le fichier arrive dans Telechargements
+// Les lignes se cochent seules quand le fichier arrive dans Telechargements
 // (verifie toutes les 2 s), « Je l'ai déjà » coche a la main, et l'installation reprend toute seule
 // des que tout est la. Les mods deja pris sur Modrinth sont listes en dessous.
-// Lot 5 (audit 17/10, preview v3 validee) : titre « Encore X mods à ajouter », 3 etapes courtes,
+// Titre « Encore X mods à ajouter », 3 etapes courtes,
 // barre « 1 sur 2 ajouté », boutons Plus tard / Réessayer / Continuer l'installation (actif quand
 // tout est la), puis « Tout est prêt ». Un fichier retire de CurseForge : bouton « Prévenir le
-// serveur » (jamais d'envoi sans clic, audit du 19/10), une fois par serveur et par session.
+// serveur » (jamais d'envoi sans clic), une fois par serveur et par session.
 const removedModsReported = new Set();
-// Titre de la fenêtre des fichiers à la main (04/11) : « Encore 2 mods à ajouter » si ce ne sont que des
-// mods, sinon « Encore 1 mod et 1 pack de ressources à ajouter ». kind : "rp", "sh", "dp" (data pack, 04/11)
+// Titre de la fenêtre des fichiers à la main : « Encore 2 mods à ajouter » si ce ne sont que des
+// mods, sinon « Encore 1 mod et 1 pack de ressources à ajouter ». kind : "rp", "sh", "dp" (data pack)
 // ou absent (mod).
 function manualKindOf(mod) {
   return mod?.kind === "rp" || mod?.kind === "sh" || mod?.kind === "dp" ? mod.kind : "mod";
@@ -3182,7 +3182,7 @@ function showManualModsModal(manualMods, fromModrinth = 0, fromModrinthMods = []
     modrinthEl.textContent = fromModrinth > 0 ? t("manualMods.modrinthBanner", { count: fromModrinth }) : "";
     const viaModrinthEl = document.getElementById("manual-mods-via-modrinth");
     viaModrinthEl.innerHTML = Array.isArray(fromModrinthMods) && fromModrinthMods.length
-      // Repliee par defaut (26/10, Rushi) : le joueur la deplie s'il veut voir la liste.
+      // Repliee par defaut : le joueur la deplie s'il veut voir la liste.
       ? `<details class="manual-mods-fold"><summary class="manual-mods-section">${escapeHtml(t("manualMods.fromModrinthTitle"))} (${fromModrinthMods.length})</summary>${fromModrinthMods
           .map((name) => `<div class="manual-mod"><div class="manual-mod-text"><span class="manual-mod-name">${escapeHtml(name)}</span><span class="manual-mod-file">${escapeHtml(t("manualMods.sameFile"))}</span></div><span class="manual-mod-chip done">${escapeHtml(t("manualMods.modrinthOk"))}</span></div>`)
           .join("")}</details>`
@@ -3196,7 +3196,7 @@ function showManualModsModal(manualMods, fromModrinth = 0, fromModrinthMods = []
     const removed = manualMods.filter((mod) => mod.reason === "removed");
     const onlyRemoved = blocked.length === 0;
 
-    // Audit du 19/10 (L-B1) : plus d'envoi automatique. Le proprietaire n'est prevenu que si le
+    // Plus d'envoi automatique. Le proprietaire n'est prevenu que si le
     // joueur clique sur « Prévenir le serveur » (bouton plus bas) ; seuls partent les noms des
     // fichiers retires, deja affiches dans cette fenetre, et les versions.
     const reportRemoved = async (button) => {
@@ -3239,7 +3239,7 @@ function showManualModsModal(manualMods, fromModrinth = 0, fromModrinthMods = []
       boldLabelIn(li, t(key), label);
       stepsEl.append(li);
     }
-    // Barre « 1 sur 2 ajouté » (lot 5).
+    // Barre « 1 sur 2 ajouté ».
     const progressEl = document.getElementById("manual-mods-progress");
     const progressBar = progressEl.querySelector("i");
     const progressText = document.getElementById("manual-mods-progress-text");
@@ -3294,7 +3294,7 @@ function showManualModsModal(manualMods, fromModrinth = 0, fromModrinthMods = []
       const name = document.createElement("span");
       name.className = "manual-mod-name";
       name.textContent = mod.modName || mod.fileName || t("manualMods.fileFallback", { id: mod.fileId });
-      // Type du fichier (04/11) : mod, pack de ressources ou shader, et où il ira.
+      // Type du fichier : mod, pack de ressources ou shader, et où il ira.
       const kindChip = document.createElement("span");
       kindChip.className = `manual-mod-kind ${manualKindOf(mod)}`;
       kindChip.textContent = t({ mod: "manualMods.chipMod", rp: "manualMods.chipRp", sh: "manualMods.chipSh", dp: "manualMods.chipDp" }[manualKindOf(mod)]);
@@ -3302,7 +3302,7 @@ function showManualModsModal(manualMods, fromModrinth = 0, fromModrinthMods = []
       name.prepend(kindChip);
       const file = document.createElement("span");
       file.className = "manual-mod-file";
-      // Nom exact du fichier toujours affiche (26/10) : c'est lui que le joueur doit prendre sur la page.
+      // Nom exact du fichier toujours affiche : c'est lui que le joueur doit prendre sur la page.
       file.textContent = mod.fileName ? t("manualMods.fileToGet", { file: mod.fileName }) : "—";
       file.hidden = !mod.fileName;
       // « Mauvaise version » : autre fichier du meme mod trouve dans Telechargements (voir poll).
@@ -3310,7 +3310,7 @@ function showManualModsModal(manualMods, fromModrinth = 0, fromModrinthMods = []
       wrong.className = "manual-mod-wrong";
       wrong.hidden = true;
       text.append(name);
-      // Nom du fichier et « Mauvaise version » sur toute la largeur, sous la ligne (26/10, Rushi) :
+      // Nom du fichier et « Mauvaise version » sur toute la largeur, sous la ligne :
       // dans la colonne du nom ils rendaient chaque ligne tres haute.
       const extra = document.createElement("div");
       extra.className = "manual-mod-extra";
@@ -3364,7 +3364,7 @@ function showManualModsModal(manualMods, fromModrinth = 0, fromModrinthMods = []
       document.body.classList.remove("modal-blocking");
       resolve(choice);
     };
-    // Fichiers d'une autre version du meme mod (26/10) : la ligne dit lequel a ete trouve et
+    // Fichiers d'une autre version du meme mod : la ligne dit lequel a ete trouve et
     // qu'il ne sera pas utilise, la note du bas compte les fichiers refuses.
     const showWrongVersions = (wrongMap) => {
       if (finished) return;
@@ -3421,7 +3421,7 @@ function showManualModsModal(manualMods, fromModrinth = 0, fromModrinthMods = []
 }
 
 async function openDetail(slug) {
-  // Retour qui garde la place (serie 2, idee 3) : position de la liste et serveur ouvert.
+  // Retour qui garde la place : position de la liste et serveur ouvert.
   detailReturn = { origin: detailOrigin, scroll: document.querySelector("main")?.scrollTop || 0, slug, query: detailOrigin === "search" ? paletteLastQuery : "" };
   listViewGeneration++;
   homePanelEl.hidden = true;
@@ -3479,7 +3479,7 @@ async function fetchServerList({ force = false, background = false } = {}) {
 
 // Vue demandee en dernier : une liste qui finit de charger APRES l'ouverture d'une fiche (lien
 // « Ouvrir dans le launcher » du site, clic rapide) ne doit plus reafficher l'en-tete Serveurs
-// par-dessus la fiche (bug vu par Rushi le 17/10).
+// par-dessus la fiche.
 let listViewGeneration = 0;
 
 async function loadServers() {
@@ -3496,7 +3496,7 @@ async function loadServers() {
   const result = await fetchServerList({ force: true });
   if (generation !== listViewGeneration) return;
   if (!result.ok) {
-    // Idee 2 du lancement (19/10) : un bloc calme avec deux sorties plutot qu'une ligne rouge.
+    // Idee 2 du lancement : un bloc calme avec deux sorties plutot qu'une ligne rouge.
     // Le detail technique reste en petit, pour l'aide.
     listEl.innerHTML = `
       <div class="filters-empty empty-state list-error-state">
@@ -3592,7 +3592,7 @@ function skinUrlFor(profile) {
 }
 
 function renderAccountHeader(profile, { rememberFailed } = {}) {
-  // "Parametres" reprend sa place normale au-dessus de l'avatar (2026-10-11) :
+  // "Parametres" reprend sa place normale au-dessus de l'avatar :
   // en mode visiteur, renderGuestHeader() l'avait deplace tout en bas, a la
   // place de l'avatar absent — voir ce commentaire la-bas.
   navSettingsBtn.hidden = false;
@@ -3670,7 +3670,7 @@ function renderAccountHeader(profile, { rememberFailed } = {}) {
     myInstancesServers = [];
     myJoinedServers = [];
     // Retour en mode visiteur, pas vers l'ecran de connexion bloquant
-    // (2026-10-11, audit onboarding) : se deconnecter doit laisser l'annuaire
+    // : se deconnecter doit laisser l'annuaire
     // parcourable, comme au tout premier demarrage. L'annuaire plutot que
     // l'accueil : l'accueil (carte "Continuer", favoris) n'a rien a montrer
     // sans historique de connexion.
@@ -3697,7 +3697,7 @@ function enterApp(profile, opts) {
   maybeShowFirstRunWizard();
 }
 
-// Assistant du premier lancement (design 17/10, point 6, L5-I) : trois gros choix au tout premier
+// Assistant du premier lancement : trois gros choix au tout premier
 // demarrage, puis plus jamais (« Continuer » comme « Passer » le marquent comme vu). Un joueur qui a
 // deja joue (historique present) ne le voit pas.
 let firstRunWizardShown = false;
@@ -3731,7 +3731,7 @@ async function maybeShowFirstRunWizard() {
   });
   const result = await modal.done;
   await window.mchub.settings.set({ firstRunWizardDone: true });
-  // Serie 2, idee 9 : si le disque des jeux a peu de place, proposer d'en choisir un autre.
+  // Si le disque des jeux a peu de place, proposer d'en choisir un autre.
   if (await maybeAskGamesDrive()) return;
   if (result !== "go") return;
   if (choice === "packs") showMyInstancesView();
@@ -3786,7 +3786,7 @@ const MC_STATUS_CLASS = { ok: "online", degraded: "degraded", offline: "offline"
 const MC_STATUS_TILE = { minecraft: ["MC", "#62b246"], modrinth: ["Mr", "#1bd96a"], curseforge: ["CF", "#f16436"], ftb: ["FTB", "#6b7280"] };
 const MC_STATUS_REFRESH_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg>';
 const MC_STATUS_CHEV_SVG = '<svg class="mc-status-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
-// Replies par defaut, test de connexion compris (demande de Rushi le 25/10). Un clic sur un
+// Replies par defaut, test de connexion compris. Un clic sur un
 // bloc l'ouvre (il sort de cet ensemble).
 const MC_STATUS_GROUPS = ["connection", "minecraft", "modrinth", "curseforge", "ftb"];
 const mcStatusCollapsed = new Set(MC_STATUS_GROUPS);
@@ -3921,7 +3921,7 @@ function renderMcStatus(data) {
   const states = groups.flatMap((g) => g.services.map((s) => s.state));
   const worst = worstMcState(states);
   mcStatusDot.className = `status-dot ${MC_STATUS_CLASS[worst]}`;
-  // Barre du haut allegee (design 17/10, point 1) : une pastille seule quand tout va bien, un mot
+  // Barre du haut allegee : une pastille seule quand tout va bien, un mot
   // ne revient qu'en cas de panne ou de ralentissement (un point seul ferait croire a une panne).
   const word = document.getElementById("mc-status-word");
   const label = worst === "offline" ? t("titlebar.servicesDown") : worst === "degraded" ? t("titlebar.servicesSlow") : t("titlebar.servicesOk");
@@ -3974,7 +3974,7 @@ function renderMcStatus(data) {
 }
 
 // `force` : "Actualiser" — repasse outre le cache de 30 s du processus principal.
-// Test de connexion reactive (15/10) : main.js ne le refait qu'une fois par jour,
+// Test de connexion reactive : main.js ne le refait qu'une fois par jour,
 // "Actualiser" le relance a la demande.
 const CONNECTION_TEST_ENABLED = true;
 
@@ -4017,7 +4017,7 @@ function wireMcStatus() {
     event.stopPropagation();
     const wasHidden = mcStatusPanel.hidden;
     mcStatusPanel.hidden = !mcStatusPanel.hidden;
-    // Tout se replie à chaque ouverture (29/10 : un bloc ouvert restait ouvert à la suivante).
+    // Tout se replie à chaque ouverture (un bloc ouvert restait ouvert à la suivante).
     if (wasHidden) {
       MC_STATUS_GROUPS.forEach((id) => mcStatusCollapsed.add(id));
       if (mcStatusData) renderMcStatus(mcStatusData);
@@ -4030,7 +4030,7 @@ function wireMcStatus() {
     mcStatusPanel.hidden = true;
   });
   wireDismissOnEscape(mcStatusPanel, mcStatusTrigger);
-  // Vérifié en DERNIER au démarrage (bug signalé par Rushi le 18/10) : lancé en même temps que
+  // Vérifié en DERNIER au démarrage : lancé en même temps que
   // tout le reste, le test subissait les ralentissements du chargement et le point passait à
   // l'orange alors que tout allait bien. On attend que l'appli soit affichée et au calme.
   scheduleStartupMcStatus();
@@ -4052,7 +4052,7 @@ function scheduleStartupMcStatus() {
 
 // Cloche de notifications : alertes personnelles du joueur (reponse/
 // resolution de signalement, voir site/src/lib/notifications.ts) et messages diffuses.
-// 25/10 : centre de notifications (preview validee par Rushi) : onglets Tout / Actualites /
+// Centre de notifications : onglets Tout / Actualites /
 // Perturbations / Mes serveurs, perturbation en cours epinglee en haut (remplace le bandeau de
 // l'accueil), article lisible en entier au clic, pastille orange pendant une perturbation.
 let notifBadgeEl;
@@ -4079,7 +4079,7 @@ function notifTimeLabel(iso) {
 // Couleur par type de notification : gel en bleu, messages de l'équipe selon leur type, messages
 // diffusés (panel admin, voir site/src/app/admin/design/bind.ts notificationsHtml) pareil.
 const NOTIF_COLORS = {
-  // Couleurs du theme (sombre ET clair) au lieu de codes fixes (audit 17/10, lot 1).
+  // Couleurs du theme (sombre ET clair) au lieu de codes fixes.
   server_frozen: "var(--notif-frozen)",
   admin_info: "var(--notif-info)",
   admin_warning: "var(--warn)",
@@ -4140,7 +4140,7 @@ function newsItemHtml(notif) {
   `;
 }
 
-// 26/10 : nouveau signalement pour le proprietaire du serveur (voir site/src/lib/reportNotify.ts) :
+// Nouveau signalement pour le proprietaire du serveur (voir site/src/lib/reportNotify.ts) :
 // serverName « report:<serverId> », message « <nombre>|<nom du serveur> ». Un clic ouvre la page
 // Signalements de ce serveur sur le site.
 function notifReportInfo(notif) {
@@ -4235,7 +4235,7 @@ function renderNotifications() {
   const shown = latestNotifications.filter((n) => notifInTab(n, notifTab));
   notifListEl.className = "";
   if (!shown.length && !pinned) {
-    // Pas de bouton ici (audit 17/10, lot 1) : « Régler les notifications » menait a des
+    // Pas de bouton ici : « Régler les notifications » menait a des
     // Parametres sans aucun reglage de notifications.
     notifListEl.innerHTML = notifTab === "all"
       ? emptyStateHtml({ icon: "bell", title: t("notifications.emptyTitle"), text: t("notifications.emptyText"), extraClass: "notif-empty-state" })
@@ -4295,7 +4295,7 @@ let maintenanceBypassed = false;
 // Ecran plein (voir Design/Omniscient Launcher UI Mockups, "01a Maintenance") : bloque tout
 // le reste de l'appli jusqu'a un code valide. Reutilisable au demarrage (ensureNotInMaintenance)
 // et depuis le pop-up d'une notification "maintenance" deja en session.
-// 25/10 : ecran refait (preview validee par Rushi). `info` = { system, startsAt, endsAt } renvoyes
+// Ecran refait. `info` = { system, startsAt, endsAt } renvoyes
 // par le site (absents sur un site plus ancien). L'ecran revérifie toutes les 30 s et se ferme
 // tout seul quand la maintenance est finie ; « Fermer le launcher » / ✕ ferment l'appli.
 function formatMaintenanceTime(iso) {
@@ -4461,13 +4461,13 @@ async function checkMaintenanceLoop() {
   if (status.active) await showMaintenanceScreen(status.message, status);
 }
 
-// 25/10 : maintenance d'un seul systeme (Site, CurseForge, Modrinth, FTB) programmee dans
+// Maintenance d'un seul systeme (Site, CurseForge, Modrinth, FTB) programmee dans
 // /admin/notifications : le launcher reste utilisable, un bandeau previent des perturbations.
 // Seuls « Tout » et « Launcher » bloquent (ecran de maintenance ci-dessus).
 const disruptionBannerEl = document.getElementById("disruption-banner");
 // Derniere perturbation connue : reprise dans la fenetre avant d'installer (confirmFirstInstall).
 let currentDisruption = null;
-// 25/10 (centre de notifications) : plus de bandeau sur l'accueil, la perturbation est epinglee
+// Centre de notifications : plus de bandeau sur l'accueil, la perturbation est epinglee
 // dans la cloche et la pastille passe en orange.
 function applyDisruption(disruption) {
   currentDisruption = disruption || null;
@@ -4476,8 +4476,8 @@ function applyDisruption(disruption) {
   updateNotifBadge();
 }
 
-// Idee 2 du lancement (19/10) : le signal de presence (sendPresenceHeartbeat, toutes les 3 min
-// depuis le 28/10) rapporte aussi la maintenance et, environ toutes les 5 min, les notifications. Tant qu'il repond, les
+// Idee 2 du lancement : le signal de presence (sendPresenceHeartbeat) rapporte aussi la maintenance et, environ toutes
+// les 5 min, les notifications. Tant qu'il repond, les
 // verifications separees ci-dessus et plus bas ne refont pas l'appel (moins de charge sur la
 // base du site). Pas connecte ou site pas encore a jour : elles tournent comme avant.
 let lastGroupedPulseAt = 0;
@@ -4549,7 +4549,7 @@ async function applyNotifications(notifications) {
   for (const notif of freshBroadcasts) await showNotificationPopup(notif);
 }
 
-// --- Panneau de taches "Download Manager" (2026-10-11, inspire de Modrinth) ---
+// --- Panneau de taches "Download Manager" (inspire de Modrinth) ---
 // Un seul flux d'etat (window.mchub.onTasksUpdate) pour tout ce qui telecharge,
 // que ce soit via le bouton "Installer" ou "Rejoindre" — voir server:install/
 // game:launch cote main.js.
@@ -4741,16 +4741,16 @@ function wireNotifications() {
   wireDismissOnEscape(panel, trigger);
 }
 
-// --- Page "Amis" (systeme d'amis, 2026-10-14) ---
+// --- Page "Amis" (systeme d'amis) ---
 // Statut binaire en ligne/hors ligne uniquement (pas de "absent"/"invisible"/"ne pas
-// deranger", scope valide par l'utilisateur), visible des seuls amis acceptes. Demande puis
-// accord (corrige le 2026-10-14, avant : ajout direct sans accord) : sections "Demandes
+// deranger"), visible des seuls amis acceptes. Demande puis
+// accord (avant : ajout direct sans accord) : sections "Demandes
 // recues" (Accepter/Refuser), amis en ligne/hors ligne, puis "Demandes envoyees" (Annuler).
 // Chargee a l'ouverture de la page, pas de badge/compteur proactif comme les notifications.
 let friendsList = [];
 let friendsIncoming = [];
 let friendsOutgoing = [];
-// Etat du chargement (audit 14/10, K2) : avant, une panne s'affichait comme « Pas encore
+// Etat du chargement (K2) : avant, une panne s'affichait comme « Pas encore
 // d'amis », et les listes du compte precedent restaient affichees apres un changement de compte.
 // friendsOwnerId = compte a qui appartiennent les listes ci-dessus.
 let friendsStatus = "idle"; // "idle" | "loaded" | "error"
@@ -4783,7 +4783,7 @@ function friendRowHtml(friend) {
 }
 
 // Demande en attente : pas de pastille ni de statut en ligne (l'autre joueur n'a pas encore
-// accepte, ou c'est moi qui n'ai pas encore repondu).
+// accepte, ou le joueur n'a pas encore repondu).
 function friendRequestRowHtml(request, kind) {
   const name = request.minecraftUsername || "?";
   const id = escapeHtml(request.userId);
@@ -4869,7 +4869,7 @@ async function refreshFriends({ background = false } = {}) {
   applyFriendsOverview(result);
 }
 
-// Aussi appele par le signal de presence quand il rapporte les amis (correctif 3, 28/10).
+// Aussi appele par le signal de presence quand il rapporte les amis.
 function applyFriendsOverview(overview) {
   friendsList = overview.friends ?? [];
   friendsIncoming = overview.incoming ?? [];
@@ -4946,7 +4946,7 @@ function wireFriends() {
   listEl.addEventListener("click", async (event) => {
     const btn = event.target.closest(".friends-item-remove, .friends-request-accept, .friends-request-decline, .friends-request-cancel");
     if (!btn) return;
-    // Retirer un ami se confirme (lot 4) ; refuser ou annuler une demande, non (rien n'est perdu).
+    // Retirer un ami se confirme ; refuser ou annuler une demande, non (rien n'est perdu).
     if (btn.classList.contains("friends-item-remove")) {
       // Mode discret : le pseudo reste masque, meme dans la fenetre.
       const name = discreetMode ? t("discreet.friendMask") : btn.closest(".friends-item")?.querySelector(".friends-item-name")?.textContent?.trim() || "";
@@ -4979,8 +4979,8 @@ function wireFriends() {
 // jamais a signaler au joueur.
 let lastPresenceSentAt = 0;
 let lastPulseNotificationsAt = 0;
-// Notifications demandees au plus toutes les ~5 min (28/10 : selon l'heure, plus « 1 envoi sur 5 »,
-// qui serait passe a 15 min avec la presence toutes les 3 min) ; en jeu, a chaque envoi (5 min).
+// Notifications demandees au plus toutes les ~5 min (selon l'heure, plus « 1 envoi sur 5 », qui
+// serait passe a 15 min avec la presence toutes les 3 min) ; en jeu, a chaque envoi (5 min).
 const PULSE_NOTIFICATIONS_MS = 4 * 60_000;
 // Amis demandes au plus toutes les ~5 min, seulement si une liste de serveurs est affichee.
 const PULSE_FRIENDS_MS = FRIENDS_FOR_LISTS_MS - 60_000;
@@ -5058,7 +5058,7 @@ function showServersView() {
   loadServers();
 }
 
-// Bandeau "Tu navigues en visiteur" en haut de l'annuaire (2026-10-15) : seulement en mode
+// Bandeau "Tu navigues en visiteur" en haut de l'annuaire : seulement en mode
 // visiteur, dans la vue Serveurs. "Plus tard" le masque jusqu'au prochain demarrage (simple
 // variable en memoire, rien d'enregistre). Les autres vues appellent updateGuestBanner(false).
 let guestBannerDismissed = false;
@@ -5071,14 +5071,13 @@ document.getElementById("guest-banner-later").addEventListener("click", () => {
   updateGuestBanner(false);
 });
 
-// Accueil (voir "01b Home" dans Design/archive/2026-09-23/Omniscient Launcher
-// Mockups.dc.html — retire par megarde du dernier export, mais toujours voulu) —
+// Accueil (mais toujours voulu) —
 // sans le bandeau "a la une" (lie au futur systeme payant, voir memoire
 // project_page_builder) ni les actualites (aucun systeme de contenu a
 // publier dessus pour l'instant) : uniquement ce qui vient de donnees deja
 // disponibles localement — dernier serveur joue, favoris, et un apercu de
 // "Mes instances" pour les proprietaires.
-// Carte « Reprendre » (design 17/10, point 3, preview validee) : le dernier serveur joue, un gros
+// Carte « Reprendre » : le dernier serveur joue, un gros
 // bouton Jouer qui suit l'etat de la pilule (voir syncJoinButtons), et les favoris en puces juste
 // en dessous. Remplace l'ancienne grande carte « Continuer » et le menu favori de la barre du bas.
 function homeContinueCardHtml(server, playedAt) {
@@ -5160,12 +5159,12 @@ async function showHomeView() {
 }
 
 // Slugs de serveurs mis en avant par l'equipe (gratuit, jamais paye) pour la colonne "A la une"
-// de l'accueil. Vide = le serveur le plus actif non deja affiche. Decision de Rushi (14/10) :
-// la carte dit « Le plus actif » (home.teamPick) ; si un slug est ajoute ici un jour, changer
+// de l'accueil. Vide = le serveur le plus actif non deja affiche. La carte dit « Le plus actif »
+// (home.teamPick) ; si un slug est ajoute ici un jour, changer
 // aussi ce libelle, sinon il serait faux.
 const TEAM_PICK_SLUGS = [];
 
-// --- Demarrage plus rapide (18/10, point 1) : dernier pseudo et dernier accueil gardes en memoire
+// --- Demarrage plus rapide : dernier pseudo et dernier accueil gardes en memoire
 // (localStorage, jamais de jeton : seulement id, pseudo et skins du profil Minecraft public).
 const BOOT_PROFILE_KEY = "mchub.bootProfile";
 const HOME_CACHE_KEY = "mchub.homeCache";
@@ -5231,7 +5230,7 @@ async function renderHomeView() {
     currentProfile ? window.mchub.listMyServers() : Promise.resolve({ ok: false, servers: [] }),
   ]);
 
-  // En même temps plutôt que l'une après l'autre (14/10) : l'accueil attendait la somme des trois.
+  // En même temps plutôt que l'une après l'autre : l'accueil attendait la somme des trois.
   const [continueResolved, favoriteServers, listResult, featuredResult] = await Promise.all([
     settings.lastPlayedSlug ? resolveServersBySlug([settings.lastPlayedSlug]) : Promise.resolve([]),
     favoriteSlugs.length > 0 ? resolveServersBySlug(favoriteSlugs.slice(0, 4)) : Promise.resolve([]),
@@ -5274,7 +5273,7 @@ function paintHomeView({ settings, favoriteSlugs, myServersResult, continueResol
   const whereServers = continueServer ? [] : busiest.slice(0, 3);
   whereServers.forEach((s) => shownSlugs.add(s.slug));
   const allKnown = listResult.ok ? listResult.servers : [];
-  // « Petit serveur du jour » choisi par le site (19/10) s'il n'est pas deja affiche ailleurs sur
+  // « Petit serveur du jour » choisi par le site s'il n'est pas deja affiche ailleurs sur
   // l'accueil ; sinon (null, appel rate, doublon) l'ancien choix : le plus actif non affiche.
   const dailyPick = featured?.server && !shownSlugs.has(featured.server.slug) ? featured.server : null;
   const teamPick =
@@ -5283,7 +5282,7 @@ function paintHomeView({ settings, favoriteSlugs, myServersResult, continueResol
     busiest.find((s) => !shownSlugs.has(s.slug)) ||
     null;
 
-  // Accueil en deux colonnes (design A, preview validee par Rushi le 25/10) : a gauche ce qui sert
+  // Accueil en deux colonnes : a gauche ce qui sert
   // a jouer (dernier serveur et dernier monde cote a cote, puis les favoris), a droite « Mes
   // serveurs » et « A la une ». Toutes les infos restent visibles ; sur une fenetre etroite, la
   // colonne de droite passe sous la gauche au lieu d'etre cachee. play.js ajoute la carte du
@@ -5423,11 +5422,11 @@ function paintHomeView({ settings, favoriteSlugs, myServersResult, continueResol
 // confirme vraiment mort qu'avec un servers:get individuel (notFound=true, vrai 404) — seul ce
 // cas justifie de le retirer des favoris/recents (voir pruneDeadSlug ci-dessous), sinon on
 // garde l'ancien placeholder plutot que de perdre une fiche encore valide a tort.
-// Second audit du 14/10 : un de MES serveurs en pause (ou en attente) repond aussi 404, meme a
+// Un de MES serveurs en pause (ou en attente) repond aussi 404, meme a
 // son proprietaire. Avant d'effacer un slug, on verifie donc qu'il n'est pas dans « Mes
 // instances » (servers:mine) ; si cette liste est illisible (hors ligne, pas connecte), on
 // garde le slug plutot que de risquer de l'effacer a tort.
-// 25/10 : un serveur absent de l'annuaire (prive, en attente de validation) arrive ici sous forme
+// Un serveur absent de l'annuaire (prive, en attente de validation) arrive ici sous forme
 // de FICHE : ses etiquettes et langues sont dans `page`, pas a la racine comme dans la liste.
 // Sans ceci, sa ligne affichait « Langue ? » et aucune etiquette alors que la fiche les a.
 function asListServer(server) {
@@ -5475,14 +5474,14 @@ async function pruneDeadSlug(slug) {
   const settings = await window.mchub.settings.get();
   const favoriteServers = (settings.favoriteServers || []).filter((s) => s !== slug);
   const recentlyPlayed = (settings.recentlyPlayed || []).filter((s) => s !== slug);
-  // Le « dernier joué » du menu rapide suit la même règle (14/10) : avant, il gardait un serveur
+  // Le « dernier joué » du menu rapide suit la même règle : avant, il gardait un serveur
   // retiré des Récents, d'où deux listes qui ne disaient pas la même chose.
   const patch = { favoriteServers, recentlyPlayed };
   if (settings.lastPlayedSlug === slug) patch.lastPlayedSlug = null;
   await window.mchub.settings.set(patch);
 }
 
-// Slugs de la page Récents (14/10) : la liste enregistrée, ou à défaut le « dernier joué » du
+// Slugs de la page Récents : la liste enregistrée, ou à défaut le « dernier joué » du
 // menu rapide — un joueur dont les Récents avaient été vidés à tort (voir servers:get côté
 // main.js) retrouve au moins ce serveur, comme dans le menu rapide.
 function recentSlugsFromSettings(settings) {
@@ -5516,7 +5515,7 @@ async function showFavoritesView({ tab = "favorites" } = {}) {
   else await renderFavoritesList();
 }
 
-// Etat vide des pages Favoris et Recents (preview validee le 2026-10-14) : grand bloc grise
+// Etat vide des pages Favoris et Recents : grand bloc grise
 // centre, icone, titre, phrase et bouton vers la liste des serveurs. Textes en dur (i18n),
 // aucune donnee utilisateur dedans.
 const PAGE_EMPTY_ICONS = {
@@ -5524,10 +5523,10 @@ const PAGE_EMPTY_ICONS = {
   recent: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg>',
 };
 
-// --- Ma bibliotheque (planche L5-C) -----------------------------------------------------------
+// --- Ma bibliotheque -----------------------------------------------------------
 // Favoris, Recents et Installes reunis dans une seule page a onglets : une seule icone dans la
 // barre laterale, qui rouvre le dernier onglet choisi.
-// Lot 3 (audit 17/10) : Installes en premier et par defaut, puis le dernier onglet choisi est
+// Installes en premier et par defaut, puis le dernier onglet choisi est
 // garde dans les reglages (relu au premier affichage).
 let libraryTab = "installed";
 let libraryTabLoaded = false;
@@ -5675,7 +5674,7 @@ function renderPageEmpty(panelEl, kind, titleKey) {
   wireLibraryTabs(panelEl);
 }
 
-// Favoris et Recents (16/10, option C) : recherche, « En ligne », « Un ami y joue » et un tri
+// Favoris et Recents : recherche, « En ligne », « Un ami y joue » et un tri
 // propre a chaque page, sur la liste deja chargee (aucun appel en plus par clic). La barre est
 // dessinee une fois par ouverture ; seules les lignes sont re-dessinees quand on tape.
 const PAGE_SORTS = { favorites: ["online", "az", "players"], recent: ["last", "players", "az"], installed: ["last", "az", "size"] };
@@ -5858,8 +5857,8 @@ window.mchub.getSiteUrl().then((url) => { siteUrl = url; });
 // jamais fusionnee avec elle ni comptee dans le filtre "Tout".
 let myJoinedServers = [];
 
-// Variante B (19/10, choisie par Rushi) : l'etat et les joueurs de chaque serveur en une pastille
-// sur la ligne du nom, apres ses badges (deplacee le 19/10 a la demande de Rushi), sans colonne de plus a cote de Tester / Jouer / « … ». Memes couleurs que
+// L'etat et les joueurs de chaque serveur en une pastille
+// sur la ligne du nom, apres ses badges, sans colonne de plus a cote de Tester / Jouer / « … ». Memes couleurs que
 // l'annuaire ; maximum 0 = pas de maximum. Sans mesure (jamais joint) : « Statut inconnu ».
 function instancePlayersPillHtml(server) {
   if (server.frozenAt) return "";
@@ -5936,7 +5935,7 @@ function canSelfTest(server) {
   return !server.frozenAt && server.isPrivate && !server.selfTestPassedAt;
 }
 
-// Option C des cartes « Mes instances » (validee par Rushi, 2026-10-14) : boutons compacts a
+// Option C des cartes « Mes instances » : boutons compacts a
 // droite, en icones, avec une infobulle (data-tip, voir .instance-action dans index.html) ;
 // aria-label repete le nom pour les lecteurs d'ecran (pas de title : il doublerait l'infobulle).
 const INSTANCE_ICONS = {
@@ -5987,7 +5986,7 @@ function instanceCardHtml(server) {
     </div>`;
 }
 
-// Menu « … » des cartes (option C validee par Rushi le 18/10) : Installer y est toujours actif,
+// Menu « … » des cartes : Installer y est toujours actif,
 // meme pendant une partie (installation en arriere-plan), avec la fiche, les reglages et le dossier.
 function instanceMoreMenuHtml(server, extraItems = []) {
   const items = [
@@ -6109,12 +6108,12 @@ function askJoinCode(errorMessage) {
   });
 }
 
-// Reglages d'une instance (petite fenetre "Reglages", Mes instances, 2026-10-13) — structures
+// Reglages d'une instance (petite fenetre "Reglages", Mes instances) — structures
 // en LISTE plutot qu'en champs fixes : chaque reglage sait lui-meme s'il s'applique au serveur
 // courant (appliesTo) et comment se charger/s'enregistrer (load/save), pour qu'un futur reglage
 // s'ajoute a ce tableau sans reecrire la fenetre ni son flux (openInstanceSettingsModal
 // ci-dessous). Canal du modpack (reserve au PROPRIETAIRE d'un serveur modde, voir
-// servers:getChannel/setChannel) et, depuis le point 9, suivi de statut (ouvert a TOUTE
+// servers:getChannel/setChannel) et suivi de statut (ouvert a TOUTE
 // instance — possedee ou rejointe — voir servers:getWatch/setWatch dans main.js).
 const INSTANCE_SETTINGS_FIELDS = [
   {
@@ -6132,7 +6131,7 @@ const INSTANCE_SETTINGS_FIELDS = [
       </div>`,
     readValue: () => document.getElementById("instance-setting-modpackChannel").value,
   },
-  // Point 9 : case decochee par defaut, s'applique a TOUTE instance (possedee ou rejointe),
+  // Case decochee par defaut, s'applique a TOUTE instance (possedee ou rejointe),
   // pas seulement les favoris existants — un seul declencheur pour l'instant (hors ligne ->
   // en ligne, voir /api/cron/process-instance-watch), jamais le pic de joueurs ni le modpack
   // mis a jour (reportes a plus tard).
@@ -6151,7 +6150,7 @@ const INSTANCE_SETTINGS_FIELDS = [
       </div>`,
     readValue: () => document.getElementById("instance-setting-notifyOnStatusChange").checked,
   },
-  // Modpack « Conseillé » d'un serveur (03/11, preview validée par Rushi) : jouer en Vanilla ou
+  // Modpack « Conseillé » d'un serveur : jouer en Vanilla ou
   // avec le modpack, et « Retenir mon choix ». Décoché : le launcher demande à chaque clic sur
   // Jouer. La partie reste cachée tant que le serveur n'a pas de modpack conseillé.
   // Valeur : "ask" (demander), "mod" ou "vanilla" (choix retenu) ; null = rien à régler ici.
@@ -6218,7 +6217,7 @@ const INSTANCE_SETTINGS_FIELDS = [
   },
 ];
 
-// « Modpack du serveur » en premier dans la fenêtre (comme sur la preview du 03/11).
+// « Modpack du serveur » en premier dans la fenêtre.
 INSTANCE_SETTINGS_FIELDS.unshift(INSTANCE_SETTINGS_FIELDS.pop());
 
 // Petite fenetre "Reglages" d'une instance (reutilise le modal de confirmation generique, meme
@@ -6228,12 +6227,12 @@ INSTANCE_SETTINGS_FIELDS.unshift(INSTANCE_SETTINGS_FIELDS.pop());
 // dans le navigateur. `owned` : true pour une instance de l'onglet "Tout"/possedee (filtre
 // appliesTo du canal modpack), false pour une instance "Rejoint" — ce joueur n'en est jamais
 // proprietaire, voir joinedCardHtml.
-// Une seule fenetre Reglages a la fois (2026-10-14, bug vu par Rushi : sections repetees 2-3
+// Une seule fenetre Reglages a la fois (sections repetees 2-3
 // fois). Pendant le chargement, l'engrenage derriere la fenetre gardait le focus : Entree ou
 // Espace le re-cliquait, et chaque appel ajoutait ses propres sections et ses propres
 // ecouteurs (un clic sur Enregistrer sauvegardait alors autant de fois).
 let instanceSettingsOpen = false;
-// Jeton de generation (audit 14/10, K1) : apres « Annuler » pendant le chargement, la fenetre
+// Jeton de generation (K1) : apres « Annuler » pendant le chargement, la fenetre
 // est liberee tout de suite (l'engrenage repond de nouveau) alors que les requetes en cours
 // finissent en arriere-plan ; leur fin ne doit pas liberer le verrou d'une fenetre plus recente.
 let instanceSettingsGeneration = 0;
@@ -6249,7 +6248,7 @@ async function openInstanceSettingsModal(server, options) {
   }
 }
 
-// Ouverture instantanee (26/10, Rushi : la fenetre mettait plusieurs secondes a s'ouvrir).
+// Ouverture instantanee (la fenetre mettait plusieurs secondes a s'ouvrir).
 // Avant, elle attendait les reponses du site (canal du modpack puis suivi de statut, l'une
 // apres l'autre, chacune avec une verification du compte Minecraft cote site) avant de
 // s'afficher. Maintenant elle s'affiche tout de suite avec la derniere valeur connue (sinon la
@@ -6446,7 +6445,7 @@ async function joinByCodeFlow() {
   }
 }
 
-// Rejoindre un de SES serveurs par code reste possible (14/10, demande de Rushi : il teste ses
+// Rejoindre un de SES serveurs par code reste possible (il teste ses
 // codes ainsi) et suit la procedure normale. Mais a chaque chargement de Mes instances, un
 // serveur qu'il possede deja est retire de « Rejoint » (et de son compteur) : il est deja dans
 // « Tout ». Seule l'entree de la liste locale des rejoints (settings.joinedServers, sur ce PC)
@@ -6593,7 +6592,7 @@ function renderMyInstancesGrid() {
   myInstancesPanelEl.querySelectorAll(".my-instance-channel").forEach((btn) => {
     btn.addEventListener("click", (event) => {
       event.stopPropagation();
-      // Le bouton "Reglages" existe maintenant aussi sur les cartes "Rejoint" (point 9, suivi
+      // Le bouton "Reglages" existe maintenant aussi sur les cartes "Rejoint" (suivi
       // de statut ouvert a toute instance) — on cherche dans les deux pools, jamais les deux a
       // la fois (un meme slug n'apparait que dans un seul des deux).
       const owned = myInstancesServers.some((s) => s.slug === btn.dataset.slug);
@@ -6621,7 +6620,7 @@ function renderMyInstancesGrid() {
       event.stopPropagation();
       closeInstanceMenus();
       const server = myInstancesServers.find((s) => s.slug === btn.dataset.slug) || myJoinedServers.find((s) => s.slug === btn.dataset.slug);
-      // Installation sans lancer le jeu : possible pendant une partie (file d'attente du lot 4).
+      // Installation sans lancer le jeu : possible pendant une partie.
       if (server) installServerStandalone(server, null);
     });
   });
@@ -6701,7 +6700,7 @@ function myInstancesSkeletonHtml() {
     <div class="instance-grid" aria-busy="true">${card.repeat(3)}</div>`;
 }
 
-// Carte "disponible hors ligne" (2026-10-12) : pas la meme forme qu'instanceCardHtml, qui
+// Carte "disponible hors ligne" : pas la meme forme qu'instanceCardHtml, qui
 // attend un objet serveur complet (ip, published, isPrivate...) venu du site — une instance
 // locale (voir instances:listInstalled cote main.js) n'a que { slug, type, minecraftVersion,
 // modpackName }. Pas d'icone personnalisee possible hors ligne (iconUrl vient du site), donc
@@ -6759,7 +6758,7 @@ function renderOfflineInstancesGrid(instances) {
   });
 }
 
-// Lancement solo hors ligne (2026-10-12) : variante de launchServer() sans les etapes qui ne
+// Lancement solo hors ligne : variante de launchServer() sans les etapes qui ne
 // s'appliquent qu'en ligne (attemptSignIn, applyRecommendedRamIfNeeded — une instance locale
 // n'a pas de recommendedRamGB venu du site). Reutilise la meme barre de progression du bas
 // (playbar) pour rester visuellement coherent avec un lancement normal.
@@ -6806,7 +6805,7 @@ async function launchOfflineInstance(instance) {
 
 async function renderMyInstancesList() {
   if (!currentProfile) {
-    // Pas de session Microsoft active (2026-10-12) : probablement hors ligne, ou simplement
+    // Pas de session Microsoft active : probablement hors ligne, ou simplement
     // pas encore connecte. Avant, cet ecran se contentait d'un message "connecte-toi" meme si
     // des instances etaient deja installees sur le disque (bug confirme : rien n'etait propose
     // au joueur sans internet alors qu'il pouvait deja jouer en solo). On regarde maintenant ce
@@ -6839,7 +6838,7 @@ async function renderMyInstancesList() {
   const joinedServers = joinedResult.ok ? joinedResult.servers : [];
   myJoinedServers = withoutOwnedServers(joinedServers, myInstancesServers);
   // Retire aussi ces serveurs de la liste sauvegardee des rejoints (settings.joinedServers),
-  // sinon ils revenaient des le code suivant (retour de test de Rushi, 14/10).
+  // sinon ils revenaient des le code suivant.
   await Promise.all(
     ownedJoinedSlugs(joinedServers, myInstancesServers).map((slug) => window.mchub.leaveJoinedServer(slug).catch(() => {})),
   );
@@ -6903,7 +6902,7 @@ function wireSettingsNav() {
 
 async function renderSettingsTab(tab) {
   const contentEl = document.getElementById("settings-content");
-  // Une section choisie fait quitter la recherche (serie 2, idee 8).
+  // Une section choisie fait quitter la recherche.
   if (settingsSearchActive()) clearSettingsSearch();
   const settings = await window.mchub.settings.get();
   // Debogage (grille) et Divers (colonnes facon journal) s'etalent sur la largeur ; les autres
@@ -7148,8 +7147,8 @@ function renderAppearanceTab(contentEl, settings) {
         <p class="settings-row-desc">${t("appearance.accentColorDesc")}</p>
         <div class="accent-swatches">
           ${window.themeControls.ACCENT_PRESETS.map((color, i) => {
-            // Meme ordre que ACCENT_PRESETS (theme.js) : bleu, violet, vert, orange, rose (audit 17/10,
-            // lot 1 : les deux premiers noms etaient inverses). La pastille active porte une coche.
+            // Meme ordre que ACCENT_PRESETS (theme.js) : bleu, violet, vert, orange, rose (les deux
+            // premiers noms etaient inverses). La pastille active porte une coche.
             const names = [t("appearance.accentBlue"), t("appearance.accentPurple"), t("appearance.accentGreen"), t("appearance.accentOrange"), t("appearance.accentPink")];
             const active = (settings.accentColor || window.themeControls.ACCENT_PRESETS[0]) === color;
             return `<button type="button" class="accent-swatch${active ? " active" : ""}" data-accent-value="${color}" style="background:${color};" aria-label="${names[i] || color}" title="${names[i] || color}" aria-pressed="${active}">${active ? '<span aria-hidden="true">✓</span>' : ""}</button>`;
@@ -7334,7 +7333,7 @@ function flashSavedButton(btn) {
 }
 
 function renderMiscTab(contentEl, settings, { betaPending = false } = {}) {
-  // Colonnes facon journal (preview validee le 16/10) : 1, 2 ou 3 selon la largeur, chaque carte
+  // Colonnes facon journal : 1, 2 ou 3 selon la largeur, chaque carte
   // sous la precedente, sans le trou d'une grille quand la carte Java est plus haute.
   contentEl.innerHTML = `
     <div class="settings-masonry">
@@ -7532,7 +7531,7 @@ async function refreshJavaStatus(statusElId, installBtnId, { onReady, defaultOnl
 // Verrou obligatoire : Java est requis pour lancer Minecraft (allocation de
 // RAM comprise), donc on attend qu'il soit pret avant d'entrer dans l'appli —
 // a chaque demarrage, pas seulement au premier lancement.
-// Installation silencieuse (2026-10-11, audit onboarding) : reste dans le
+// Installation silencieuse : reste dans le
 // petit ecran de demarrage deja visible (meme barre de progression que la
 // verification de mise a jour juste avant), aucune page dediee tant que ca
 // fonctionne. Cet ecran dedie (javaGateEl) ne sert plus qu'au cas d'echec
@@ -7634,7 +7633,7 @@ async function renderAccountPanel() {
     <button id="account-my-data-btn" class="btn-secondary" type="button">${t("account.myDataBtn")}</button>
   `;
 
-  // « Récupérer mes données » (23/10) : ouvre Paramètres du site, où se trouve le bouton.
+  // « Récupérer mes données » : ouvre Paramètres du site, où se trouve le bouton.
   document.getElementById("account-my-data-btn").addEventListener("click", () => window.mchub.openLegalPage("myData"));
   wireAccountPanelActions();
   await refreshAccountList();
@@ -7817,7 +7816,7 @@ function wireSidebar() {
 // bloquant futur. Résout avec { confirmed, checked } plutôt que de bloquer
 // le thread comme un confirm() natif, pour rester cohérent avec le reste de
 // l'UI (pas de fenêtre système grise dans une appli aussi personnalisée).
-// Fenetre de confirmation unique (audit 17/10, lot 4, preview validee par Rushi) :
+// Fenetre de confirmation unique :
 // - tone "ok" | "warn" | "danger" : filet du haut, icone et bouton de la meme couleur ;
 // - Echap ou clic sur le fond = Annuler, focus sur Annuler a l'ouverture, Tab reste dans la
 //   fenetre, le focus revient au bouton qui l'a ouverte ;
@@ -7921,7 +7920,7 @@ function showModal({ title, body, confirmLabel, cancelLabel, checkboxLabel, tone
 
 // Les 3 controles de l'auto-test de publication (voir main.js/selftest:run), dans l'ordre ou
 // ils se resolvent — chaque clé correspond au `step` envoyé par les évènements
-// "selftest:progress". Le 4e controle ("Connexion au serveur") a ete retire le 2026-10-11 :
+// "selftest:progress". Le 4e controle ("Connexion au serveur") a ete retire :
 // intestable de maniere fiable pour le moment.
 const SELF_TEST_STEPS = [
   { key: "reachable", labelKey: "selfTest.stepReachable" },
@@ -7935,7 +7934,7 @@ function selfTestStepRowHtml(step, status, detail) {
   // en direct. "skipped" (étape jamais atteinte car une étape précédente a échoué ou le test a
   // été annulé) est volontairement distinct de "fail" (étape réellement testée et ratée) :
   // sinon un simple échec d'IP affichait à tort "tout échoué" comme si chaque contrôle avait
-  // individuellement rate, alors que les suivants n'ont jamais tourné (constate le 2026-10-10).
+  // individuellement rate, alors que les suivants n'ont jamais tourné.
   const icon =
     status === "warn"
       ? `<span class="selftest-warn-icon" aria-hidden="true">!</span>`
@@ -7975,7 +7974,7 @@ function selfTestStepRowHtml(step, status, detail) {
     </div>${selfTestDetailHtml(step, status, detail)}`;
 }
 
-// Explication sous un controle (14/10) : avant, un echec n'affichait que « échoué », sans dire
+// Explication sous un controle : avant, un echec n'affichait que « échoué », sans dire
 // pourquoi. Mods bloques par CurseForge : leur liste et le conseil au proprietaire.
 function selfTestDetailHtml(step, status, detail) {
   let text = "";
@@ -8073,7 +8072,7 @@ function runSelfTestFlow(server) {
       resolve();
     };
 
-    // Lot 5 (« aide puis lancement ») : mods a ajouter a la main pendant le test.
+    // « aide puis lancement » : mods a ajouter a la main pendant le test.
     const stopManual = window.mchub.onSelfTestManualMods(async (fields) => {
       overlay.hidden = true;
       const choice = await showManualModsModal(fields.manualMods || [], fields.fromModrinth || 0, fields.fromModrinthMods || [], { slug: server.slug });
@@ -8184,7 +8183,7 @@ function runSelfTestFlow(server) {
   });
 }
 
-// Applique la RAM suggeree sans rien demander (2026-10-11, audit onboarding) :
+// Applique la RAM suggeree sans rien demander :
 // la premiere fenetre qui forcait a confirmer min/max a ete retiree, les
 // valeurs calculees par main.js (voir getSystemMemoryInfo) suffisent dans
 // l'immense majorite des cas, et restent modifiables dans Parametres > Jeu.
@@ -8196,7 +8195,7 @@ async function applyDefaultRamSilently(settings) {
   });
 }
 
-// Connexion Microsoft declenchee a la demande (2026-10-11, audit onboarding) :
+// Connexion Microsoft declenchee a la demande :
 // plus de portail bloquant avant meme de voir l'annuaire — voir boot() et
 // launchServer(). Reutilisee par le bouton "Se connecter" invite et par le
 // clic sur "Jouer" quand le joueur n'est pas encore connecte.
@@ -8225,7 +8224,7 @@ async function attemptSignIn(remember, { offlineInstance = null } = {}) {
 
   if (signInCountdownTimer) clearInterval(signInCountdownTimer);
   const countdownEl = document.getElementById("gate-countdown");
-  // Pas pour "approbation en attente" (2026-10-11) : cet etat n'est pas un
+  // Pas pour "approbation en attente" : cet etat n'est pas un
   // simple echec/annulation (fenetre Microsoft fermee sans se connecter) —
   // il reste affiche tant que le compte n'est pas approuve, pas de retour
   // auto au mode visiteur qui ferait croire a tort que c'est regle.
@@ -8241,7 +8240,7 @@ async function attemptSignIn(remember, { offlineInstance = null } = {}) {
 // Compte a rebours de l'ecran de connexion vers le mode visiteur (echec de connexion, compte
 // Omniscient supprime) : le joueur n'y reste jamais bloque.
 function startBackToGuestCountdown(countdownEl, seconds) {
-  // Retour automatique en mode visiteur apres un echec (2026-10-11) : rester
+  // Retour automatique en mode visiteur apres un echec : rester
   // bloque sur l'ancien ecran de connexion casserait le principe de
   // navigation libre — le joueur peut toujours relancer la connexion plus
   // tard, au clic sur "Jouer" ou sur "Se connecter" en Parametres.
@@ -8282,9 +8281,9 @@ function startBackToGuestCountdown(countdownEl, seconds) {
 }
 
 // Barre laterale quand personne n'est connecte : un bouton-icone "Se connecter"
-// (2026-10-15, avant il n'y avait que le clic sur "Jouer" pour se connecter,
-// voir launchServer()/attemptSignIn()), au-dessus de "Parametres". Celui-ci prend la place de l'avatar
-// absent (2026-10-11, retour utilisateur : le laisser dans sa position
+// (avant il n'y avait que le clic sur "Jouer" pour se connecter, voir launchServer()/attemptSignIn()),
+// au-dessus de "Parametres". Celui-ci prend la place de l'avatar
+// absent (retour utilisateur : le laisser dans sa position
 // habituelle laissait un trou vide a la toute fin de la sidebar) plutot que
 // de laisser cet espace reserve a l'avatar completement vide.
 function renderGuestHeader() {
@@ -8316,8 +8315,8 @@ function renderGuestHeader() {
 }
 
 // Dernier etat connu de la verification de mise a jour (au demarrage), affiche dans Parametres
-// a cote de la version. Avant le 14/10, « À jour. » s'affichait toujours, meme apres un echec ou
-// sans verification (audit, T9). null = pas de verification (lancement en dev, hors app packagee).
+// a cote de la version. Avant, « À jour. » s'affichait toujours, meme apres un echec ou
+// sans verification (T9). null = pas de verification (lancement en dev, hors app packagee).
 let lastUpdatePhase = null;
 const UPDATE_PHASE_TEXT = { "up-to-date": "settings.upToDate", error: "settings.updateCheckFailed" };
 
@@ -8354,14 +8353,14 @@ async function boot() {
   // packagee (dev via `electron .`), main.js resout tout de suite sans rien
   // verifier reellement, mais cette etape reste visible un court instant
   // pour ne pas donner une impression buguee (texte qui clignote).
-  // Demarrage plus rapide (18/10, point 2 valide par Rushi) : maintenance et reconnexion
+  // Demarrage plus rapide : maintenance et reconnexion
   // Microsoft partent tout de suite, en meme temps que la verification de mise a jour, au lieu
   // d'attendre chacune la precedente. Leurs resultats sont lus plus bas, au meme endroit qu'avant.
   const maintenanceCheck = window.mchub.checkMaintenance().catch(() => ({ active: false }));
   const sessionRestore = window.mchub.tryRestoreSession().catch(() => ({ ok: false }));
 
   bootstrapStatusEl.textContent = t("bootstrap.checkingUpdates");
-  // Ecran de demarrage honnete (design 17/10, point 4) : la vraie etape et une barre qui tourne ;
+  // Ecran de demarrage honnete : la vraie etape et une barre qui tourne ;
   // un vrai pourcentage seulement pendant le telechargement d'une mise a jour.
   bootstrapProgressEl.parentElement.classList.add("indeterminate");
   let updateReadyToInstall = false;
@@ -8384,7 +8383,7 @@ async function boot() {
     // relai tout de suite — jamais d'ecran d'erreur pour une verification de
     // mise a jour ratee (pas de connexion, releases indisponibles...).
   });
-  // Laboratoire (audit du 01/11, L1) : droits demandés dès maintenant, en parallèle de la mise à jour,
+  // Laboratoire : droits demandés dès maintenant, en parallèle de la mise à jour,
   // au lieu d'attendre qu'elle soit finie pour commencer.
   const labReady = window.mchub.featuresReady?.().catch(() => null);
   await Promise.all([window.mchub.updates.check(), new Promise((resolve) => setTimeout(resolve, 500))]);
@@ -8404,7 +8403,7 @@ async function boot() {
     return;
   }
 
-  // Plus de verification/installation de Java au demarrage (2026-10-11) :
+  // Plus de verification/installation de Java au demarrage :
   // ensureJavaForMajor() (javaManager.js) resout et installe deja la version
   // exacte requise au moment reel du lancement d'un serveur (main.js,
   // game:launch) — rien a faire tant qu'on ne clique pas sur "Jouer".
@@ -8436,14 +8435,14 @@ async function boot() {
   bootstrapEl.hidden = true;
   await ensureNotInMaintenance(maintenanceCheck);
 
-  // Connexion differee (2026-10-11, audit onboarding) : une reprise de
+  // Connexion differee : une reprise de
   // session silencieuse est tentee, mais on ne bloque plus sur l'ecran de
   // connexion si elle echoue — l'annuaire reste parcourable sans compte.
   // Voir attemptSignIn() pour le moment ou la connexion est reellement
   // demandee (clic sur "Jouer").
-  // Point 1 (18/10) : si la reconnexion n'est pas encore finie, l'accueil s'affiche deja avec le
+  // Si la reconnexion n'est pas encore finie, l'accueil s'affiche deja avec le
   // dernier pseudo et les dernieres donnees connues, puis se rafraichit tout seul des qu'elle
-  // aboutit. Les clics sur l'accueil attendent ce moment (classe boot-preview, voir index.html).
+  // aboutit. Les clics sur l'accueil attendent ce moment (voir index.html).
   const lastProfile = readBootProfile();
   let restored = lastProfile ? await Promise.race([sessionRestore, new Promise((resolve) => setTimeout(() => resolve(null), 120))]) : null;
   if (!restored && lastProfile) {
@@ -8484,7 +8483,7 @@ boot();
 // Ne touche à rien si le joueur est sur une page de détail, et reste
 // silencieux en cas d'échec (on ne veut pas interrompre l'utilisateur
 // pour un ping raté en tâche de fond).
-// 21/10 (cache des fiches) : delais lus dans refreshSettings.js (un seul fichier de reglages).
+// Cache des fiches : delais lus dans refreshSettings.js (un seul fichier de reglages).
 // La liste ne se rafraichit seule qu'au plus toutes les 3 min, hors partie, et seulement si la
 // fenetre du launcher est visible (pas reduite ni cachee).
 const REFRESH_INTERVAL_MS = window.OMNI_REFRESH.LIST_REFRESH_MS;
@@ -8511,7 +8510,7 @@ window.mchub.onGameState((running, exitCode) => {
     activity.stopRequested = false;
   }
   // Jeu ferme avec une erreur dans les 2 premieres minutes, sans que le joueur l'ait arrete :
-  // c'est un plantage au demarrage, affiche comme un echec clair (point 4, L3-E).
+  // c'est un plantage au demarrage, affiche comme un echec clair.
   if (!running && gamePlaying && exitCode && !activity.stopRequested && Date.now() - activity.playingSince < 120_000) {
     const slug = runningGameSlug && runningGameSlug !== "unknown" ? runningGameSlug : activity.current?.slug;
     activity.failure = { slug, name: activityServerName(slug), error: t("activity.errCrashTitle", { code: exitCode }), crashCode: exitCode, action: "launch" };
@@ -8519,7 +8518,7 @@ window.mchub.onGameState((running, exitCode) => {
   }
   const changed = gamePlaying !== running;
   gamePlaying = running;
-  // 21/10 : presence envoyee tout de suite au lancement et a la fermeture du jeu (puis toutes les
+  // Presence envoyee tout de suite au lancement et a la fermeture du jeu (puis toutes les
   // 5 min en jeu) ; a la fermeture, une actualisation de la liste et des amis.
   if (changed) {
     schedulePresence(0);
@@ -8536,7 +8535,7 @@ window.mchub.onGameState((running, exitCode) => {
 
 function scheduleRefresh(task, baseMs = REFRESH_INTERVAL_MS) {
   const tick = async () => {
-    // Toujours reprogramme (audit 25/10) : avant, une seule erreur dans `task` arretait ce
+    // Toujours reprogramme : avant, une seule erreur dans `task` arretait ce
     // cycle pour toute la session (plus de liste, de notifications ni de maintenance).
     try {
       await task();
@@ -8557,8 +8556,8 @@ document.addEventListener("visibilitychange", () => {
 // Notifications : toutes les 5 minutes (chaque appel interroge la base du site).
 scheduleRefresh(scheduledRefreshNotifications, 300_000);
 scheduleRefresh(checkMaintenanceLoop, 120_000);
-// Presence (systeme d'amis) : son propre cycle, 3 min hors partie et 5 min fenetre reduite (audit
-// du 28/10, valide par Rushi : avant, chaque minute). Le site compte un ami « en ligne » pendant
+// Presence (systeme d'amis) : son propre cycle, 3 min hors partie et 5 min fenetre reduite (avant, chaque
+// minute). Le site compte un ami « en ligne » pendant
 // 7 min apres son dernier heartbeat (ONLINE_WINDOW_SECONDS cote site), donc un heartbeat rate ne
 // le fait pas encore passer « hors ligne ». Delibérément PAS via scheduleRefresh() : ce helper ralentit a
 // REFRESH_PLAYING_INTERVAL_MS (5 min) pendant une partie, ce qui est le bon choix pour la liste
@@ -8566,7 +8565,7 @@ scheduleRefresh(checkMaintenanceLoop, 120_000);
 // le mauvais choix ici — un ami en train de JOUER est le cas ou on veut le plus montrer "en
 // ligne", pas le laisser passer "hors ligne" apres 2 min (ONLINE_WINDOW_MS cote site) faute de
 // heartbeat. setInterval direct, jamais ralenti, jamais arrete.
-// 21/10 (cache des fiches, valide par Rushi) : en jeu, la presence ne part plus que toutes les
+// Cache des fiches : en jeu, la presence ne part plus que toutes les
 // 5 min (PRESENCE_PLAYING_MS), plus un envoi immediat au lancement et a la fermeture du jeu (voir
 // onGameState). Le site garde « en ligne » 7 min : pas de clignotement pour un ami en partie.
 var presenceTimer = null;
@@ -8587,14 +8586,14 @@ function schedulePresence(delayMs) {
 }
 // Premier envoi une minute apres le demarrage, comme avant.
 schedulePresence(60_000);
-// Fenetre de nouveau visible (28/10) : on revient au rythme de 3 min sans attendre la fin des
+// Fenetre de nouveau visible : on revient au rythme de 3 min sans attendre la fin des
 // 5 min de la fenetre reduite ; envoi tout de suite si le dernier date deja de 3 min.
 document.addEventListener("visibilitychange", () => {
   if (document.hidden || gamePlaying || !lastPresenceSentAt) return;
   schedulePresence(Math.max(0, window.OMNI_REFRESH.PRESENCE_IDLE_MS - (Date.now() - lastPresenceSentAt)));
 });
 
-// --- Fichiers de l'instance + « Arrêter le jeu » (16/10, option B validee par Rushi) ----------
+// --- Fichiers de l'instance + « Arrêter le jeu » ----------
 // Les actions sur les fichiers vivent dans la fenetre Reglages (engrenage, tout a droite de la
 // carte) : Dossier, Logs, Copier les logs, Reparer, Supprimer. Pendant une partie, « Rejoindre » devient « Arrêter le
 // jeu » (rouge, avec confirmation), Reparer et Supprimer sont grises. Supprimer ≠ Quitter : le
@@ -8703,7 +8702,7 @@ function openToolsModal({ title, bodyHtml, actions, wide = false, tone = "" }) {
   return controller;
 }
 
-// Arreter le jeu (design 17/10, point 2) : une seule facon, la confirmation du panneau de la
+// Arreter le jeu : une seule facon, la confirmation du panneau de la
 // pilule — les boutons « Arrêter » des cartes et de la fiche y renvoient.
 function confirmStopGame() {
   askStopFromPill();
@@ -8919,7 +8918,7 @@ window.mchub
 // Pilule d'etat : dernier serveur joue (panneau « Rien en cours » / « Relancer »).
 loadActivityHistory();
 
-// Ctrl+Entrée (design 17/10, point 3) : relance le dernier serveur joué depuis n'importe quelle
+// Ctrl+Entrée : relance le dernier serveur joué depuis n'importe quelle
 // page. Ignoré dans un champ de saisie (Ctrl+Entrée peut y valoir « envoyer ») et tant que
 // l'appli n'est pas ouverte (portail de connexion, écran de démarrage).
 document.addEventListener("keydown", async (event) => {
@@ -8946,7 +8945,7 @@ document.addEventListener("keydown", async (event) => {
   launchServer(server);
 });
 
-// --- Barre laterale depliable (serie 2, idee 1, preview validee) ---------------------------------
+// --- Barre laterale depliable ---------------------------------
 // Repliee par defaut ; le bouton en haut la deplie et le launcher s'en souvient. Sous 900 px elle se
 // replie seule : depliee a la main, elle passe par-dessus la page (sans etre memorisee) et se referme
 // des qu'on choisit une page. Les noms viennent des memes cles que les infobulles (data-i18n-title).
@@ -8981,7 +8980,7 @@ function renderSidebarState() {
   const expanded = narrow ? sidebarOverlayOpen : sidebarExpandedSetting;
   sidebarEl.classList.toggle("expanded", expanded);
   sidebarEl.classList.toggle("overlay", narrow && expanded);
-  // Coin du logo (variante D) : s'elargit avec la barre quand elle est depliee dans la page
+  // Coin du logo : s'elargit avec la barre quand elle est depliee dans la page
   // (pas quand elle passe par-dessus en petite fenetre).
   document.body.classList.toggle("sidebar-expanded", expanded && !narrow);
   let scrim = document.querySelector(".sidebar-scrim");
@@ -9047,7 +9046,7 @@ window.mchub.settings
     setTimeout(applySidebarLabels, 2500);
   });
 
-// --- Recherche globale Ctrl+K (serie 2, idee 2, preview validee) --------------------------------
+// --- Recherche globale Ctrl+K --------------------------------
 // Une seule recherche pour tout le launcher : serveurs, Ma bibliotheque, Mes instances, amis,
 // reglages et quelques actions. Fleches pour choisir, Entree pour ouvrir, Echap pour fermer ; le ▶
 // d'un serveur le lance directement. Tout se cherche dans ce qui est deja charge (aucun appel en
@@ -9172,7 +9171,7 @@ function renderPalette() {
       lastGroup = entry.group;
       const icon = entry.server ? serverIconInner(entry.server) : escapeHtml(entry.icon || "");
       const play = entry.server && entry.group !== "instances" ? `<button type="button" class="palette-play" data-palette-play="${index}" aria-label="${escapeHtml(t("home.playOn", { name: entry.title }))}">▶</button>` : "";
-      // Option C (18/10) : pendant une partie, Installer reste possible depuis la recherche.
+      // Option C : pendant une partie, Installer reste possible depuis la recherche.
       const install = entry.server && gamePlaying ? `<button type="button" class="palette-play palette-install" data-palette-install="${index}" title="${escapeHtml(t("myInstances.menuInstall"))}" aria-label="${escapeHtml(t("myInstances.menuInstall"))}">⬇</button>` : "";
       return `${head}<div class="palette-item${index === paletteSel ? " sel" : ""}" role="option" aria-selected="${index === paletteSel}" data-palette-index="${index}"><span class="palette-icon">${icon}</span><span class="palette-text"><span>${highlightMatch(entry.title, query)}</span>${entry.sub ? `<small>${highlightMatch(entry.sub, query)}</small>` : ""}</span>${install}${play}</div>`;
     })
@@ -9259,7 +9258,7 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-// --- Fil d'Ariane et Retour qui garde la place (serie 2, idee 3, preview validee) ---------------
+// --- Fil d'Ariane et Retour qui garde la place ---------------
 // Sur une fiche, une ligne montre d'ou l'on vient (« ‹ Serveurs › Moddé › Cobblemon FR »). Le lien,
 // Echap ou le bouton « retour » de la souris ramenent au meme endroit de la liste, avec les memes
 // filtres, et la carte ouverte s'allume un instant pour qu'on la retrouve.
@@ -9327,7 +9326,7 @@ document.addEventListener("mouseup", (event) => {
   goBackFromDetail();
 });
 
-// --- Page Aide (serie 2, idee 6, version A validee) -----------------------------------------------
+// --- Page Aide -----------------------------------------------
 // Tout l'aide au meme endroit : recherche, problemes frequents expliques simplement avec des
 // boutons qui menent au bon endroit, et « Toujours bloque ? » (rapport de diagnostic, journaux,
 // console). Ces outils restent aussi dans Parametres > Debogage. F1 ouvre la page de partout.
@@ -9491,7 +9490,7 @@ document.addEventListener("keydown", (event) => {
   showHelpView();
 });
 
-// --- Suppression en masse (serie 2, idee 7, version A : corbeille + Annuler) ---------------------
+// --- Suppression en masse (corbeille + Annuler) ---------------------
 // « Sélectionner » dans Mes instances : on coche plusieurs cartes (Maj+clic pour une suite, Ctrl+A
 // pour tout, Echap pour annuler), des raccourcis « Serveurs de test » / « Pas joué depuis 30
 // jours », puis une seule confirmation. Les fichiers partent dans la corbeille, avec « Annuler »
@@ -9550,7 +9549,7 @@ function wireBulkSelection(all) {
     card.classList.toggle("bulk-disabled", !ok);
     card.classList.toggle("bulk-selected", bulk.sel.has(slug));
     const server = all.find((item) => item.slug === slug);
-    // Carte non cochable : la raison est ecrite sur la carte (retour de Rushi 17/10), pas
+    // Carte non cochable : la raison est ecrite sur la carte, pas
     // seulement au survol.
     const reason = slug === runningGameSlug ? "Playing" : server?.type !== "modded" ? "Vanilla" : "Installed";
     card.title = ok ? "" : t(`bulk.not${reason}`);
@@ -9618,7 +9617,7 @@ async function confirmBulkDelete(all) {
   else toolsToast(t("bulk.noneDone"));
 }
 
-// Bandeau « Annuler » (8 s) : a part des petits messages (toolsToast). Avant (audit 17/10, lot 1),
+// Bandeau « Annuler » (8 s) : a part des petits messages (toolsToast). Avant,
 // il portait la meme classe et le message suivant l'effacait : « Annuler » disparaissait alors que
 // la suppression partait quand meme a la fin du delai.
 function showUndoToast(result) {
@@ -9656,7 +9655,7 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-// --- Parametres plein ecran (serie 2, idee 8, version A validee) ---------------------------------
+// --- Parametres plein ecran ---------------------------------
 // Les onglets dessinent toujours leurs <section> comme avant ; ici on les re-range en cartes :
 // chaque bloc separe par un trait devient sa propre carte, le titre d'une section devient un titre
 // de groupe, et le tout tombe dans une grille qui met autant de colonnes que la largeur le permet.
@@ -9684,7 +9683,7 @@ function cardifySettings(host) {
       continue;
     }
     // Chaque section devient un groupe (titre + sa propre grille) : les cartes d'un groupe
-    // s'etirent sur toute la largeur et ont la meme hauteur sur une rangee (retour de Rushi 17/10).
+    // s'etirent sur toute la largeur et ont la meme hauteur sur une rangee.
     const danger = node.classList.contains("settings-reset");
     const group = document.createElement("div");
     group.className = "settings-group";
@@ -9859,7 +9858,7 @@ document.addEventListener("keydown", (event) => {
 });
 cardifySettings(settingsContentEl);
 
-// --- Dossier des jeux sur un autre disque (serie 2, idee 9, version validee) --------------------
+// --- Dossier des jeux sur un autre disque --------------------
 // Un seul dossier pour tout (instances, mondes, mods, Java, cache), deplace en entier par le
 // launcher : choisir le disque -> confirmer -> copier, verifier, basculer (redemarrage) -> l'ancien
 // dossier est efface au demarrage suivant. Voir gamesLocation.js et games:* dans main.js.
@@ -10150,7 +10149,7 @@ setTimeout(async () => {
   }
 }, 1800);
 
-// Coin du logo (variante D) : la barre laterale n'existe que quand #app est affiche (pas sur
+// Coin du logo : la barre laterale n'existe que quand #app est affiche (pas sur
 // l'ecran de demarrage ni sur la connexion) ; sinon le logo garde son nom.
 {
   const appBox = document.getElementById("app");
@@ -10159,8 +10158,8 @@ setTimeout(async () => {
   syncSidebarPresence();
 }
 
-// --- Fiche serveur : bouton qui dit l'action + pastille d'etat (audit 17/10, lot 3) ------------
-// Reglage en attente de Rushi : false = complet / hors ligne -> bouton grise qui dit pourquoi ;
+// --- Fiche serveur : bouton qui dit l'action + pastille d'etat ------------
+// Reglage en attente : false = complet / hors ligne -> bouton grise qui dit pourquoi ;
 // true = bouton actif « Essayer quand meme ».
 const JOIN_TRY_ANYWAY = true;
 
@@ -10175,7 +10174,7 @@ function detailJoinAction(server, { installed }) {
   return { kind: "join", label: "serverDetail.btnPlay" };
 }
 
-// Meme mot et meme couleur que la table des etats (lot 2) : « En ligne · 34 / 40 »,
+// Meme mot et meme couleur que la table des etats : « En ligne · 34 / 40 »,
 // « Presque plein », « Complet », « Hors ligne », « Inconnu ».
 function serverStatePillHtml(server) {
   const state = serverBandState(server);
@@ -10190,7 +10189,7 @@ function serverStatePillHtml(server) {
   return `<span class="detail-state detail-state-${state}">${dot}${escapeHtml(text)}</span>`;
 }
 
-// Rapport du test (lot 5, preview v3) : mods a ajouter a la main, avec ce que vivront les joueurs.
+// Rapport du test : mods a ajouter a la main, avec ce que vivront les joueurs.
 // Jamais « les joueurs ne pourront pas jouer » : le launcher les guide pas a pas.
 function selfTestReportHtml(manualList, rescuedList) {
   if (!manualList.length) return "";
@@ -10220,7 +10219,7 @@ document.getElementById("selftest-report")?.addEventListener("click", (event) =>
   if (btn) window.mchub.openModPage(btn.dataset.modPage);
 });
 
-// Badge bleu « X mods à ajouter » (lot 5) : fiche et lignes de liste. Jamais rouge, et le bouton
+// Badge bleu « X mods à ajouter » : fiche et lignes de liste. Jamais rouge, et le bouton
 // principal reste « Installer ».
 function manualModsBadgeHtml(server) {
   const count = Number(server?.manualModsCount) || 0;
@@ -10228,7 +10227,7 @@ function manualModsBadgeHtml(server) {
   return `<span class="manual-mods-badge" title="${escapeHtml(t("manualMods.badgeTip", { count }))}">ⓘ ${escapeHtml(t("manualMods.badge", { count }))}</span>`;
 }
 
-// --- « Qui peut m'ajouter en ami » (variante C validee par Rushi le 18/10) --------------------------
+// --- « Qui peut m'ajouter en ami » --------------------------
 // Meme carte en haut de la page Amis et dans Parametres > Confidentialite : changer l'un change
 // l'autre (le reglage vit sur le site). Par defaut « Seulement avec mon code ». En mode discret,
 // le code d'ami est cache (« ••• ••• » + œil), comme les adresses.
@@ -10257,7 +10256,7 @@ async function renderFriendPolicyCard(slot, { where }) {
       <input type="radio" name="friend-policy-${where}" value="${value}" ${policy === value ? "checked" : ""} />
       <span><b>${escapeHtml(t(`friends.policy_${value}`))}</b>${recommended ? `<span class="friend-policy-rec">${escapeHtml(t("friends.recommended"))}</span>` : ""}<small>${escapeHtml(t(`friends.policy_${value}D`))}</small></span>
     </label>`;
-  // Page Amis (preview de l'engrenage, 18/10) : plus de carte au milieu, seulement le rappel
+  // Page Amis : plus de carte au milieu, seulement le rappel
   // « Personne » et la ligne du code sous le champ d'ajout. Le reglage s'ouvre par l'engrenage.
   if (where === "friends") {
     slot.innerHTML = policy === "none" ? `<div class="friend-policy-banner"><span>${escapeHtml(t("friends.noneBanner"))}</span><button type="button" class="link-btn" data-friend-policy-open>${escapeHtml(t("friends.change"))}</button></div>` : "";
@@ -10401,7 +10400,7 @@ function renderPrivacyTab(contentEl, settings) {
   });
 }
 
-// --- Menus « … » (option C, 18/10) : fermeture commune ---------------------------------------
+// --- Menus « … » : fermeture commune ---------------------------------------
 function closeInstanceMenus() {
   document.querySelectorAll(".instance-menu:not([hidden])").forEach((menu) => {
     menu.hidden = true;
@@ -10418,7 +10417,7 @@ document.addEventListener("keydown", (event) => {
   }
 }, true);
 
-// --- « Tester dans le launcher » (31/10) : un pack proposé, installé en privé pour l'essayer ---------
+// --- « Tester dans le launcher » : un pack proposé, installé en privé pour l'essayer ---------
 // Le launcher (main.js, installTestPack) envoie les étapes : la question (showModal), une petite carte
 // de progression, puis le résultat. Accepter ou refuser le pack se fait sur le site.
 (function initTestPack() {

@@ -1,4 +1,4 @@
-// Petit menu de sauvegarde par-dessus le jeu (mode Jouer, 24/10, voir saveOverlay.js).
+// Petit menu de sauvegarde par-dessus le jeu (mode Jouer, voir saveOverlay.js).
 // Deux choses seulement : recevoir ce qu'il faut afficher, renvoyer le nom tapé (ou l'annulation).
 const { contextBridge, ipcRenderer } = require("electron");
 

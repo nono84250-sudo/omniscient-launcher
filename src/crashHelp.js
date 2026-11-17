@@ -1,4 +1,4 @@
-// Aide au crash, première version (26/10, Rushi) : à CHAQUE fermeture du jeu lancé depuis Jouer, le
+// Aide au crash, première version : à CHAQUE fermeture du jeu lancé depuis Jouer, le
 // launcher lit logs/latest.log et le rapport de crash de cette partie (crash-reports/), et dit le
 // problème au joueur quand il le reconnaît. Pas seulement quand le jeu plante : l'écran « mods
 // incompatibles » de Fabric/Forge est fermé par le joueur, le code de sortie peut être 0.
@@ -89,7 +89,7 @@ function analyze(logText, crashText, exitCode) {
     return { kind: "java", deps: [], lines: [], description: clean((/(\S+ has been compiled by a more recent version[^\n]*)/.exec(text) || [])[1]) };
   }
   if (/java\.lang\.OutOfMemoryError/i.test(text)) return { kind: "memory", deps: [], lines: [], description: null };
-  // « Duplicate mandatory mod ids » (31/10, catalogue de bugs) : le jeu peut se fermer avec le code 0.
+  // « Duplicate mandatory mod ids » (catalogue de bugs) : le jeu peut se fermer avec le code 0.
   if (crashText || /Duplicate mandatory mod ids/i.test(text) || (exitCode != null && exitCode !== 0 && exitCode !== 130 && exitCode !== 143)) {
     const description = clean((/^Description: (.*)$/m.exec(crashText || "") || [])[1]);
     const cause = clean((/^(?:Caused by: )?([\w.$]+(?:Exception|Error)[^\n]*)$/m.exec(crashText || logText || "") || [])[1]);
@@ -118,7 +118,7 @@ async function logsForHelp(files) {
   return parts.join("\n\n").replace(/([A-Za-z]:\\Users\\)[^\\]+/gi, "$1<joueur>").replace(/(\/(?:home|Users)\/)[^/]+/g, "$1<joueur>");
 }
 
-// Aide Discord dans les bugs (02/11, preview validée par Rushi, Laboratoire « bugDiscord ») : le rapport
+// Aide Discord dans les bugs (Laboratoire « bugDiscord ») : le rapport
 // que le joueur copie ou met dans un zip pour l'équipe. Tout passe par sanitize avant de sortir d'ici.
 const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 function sessionName() {

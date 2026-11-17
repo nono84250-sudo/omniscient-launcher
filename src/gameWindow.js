@@ -1,5 +1,5 @@
 // Position de la fenêtre de Minecraft (Windows), pour coller le petit menu de sauvegarde en haut à
-// gauche du JEU, sur le bon écran, comme l'overlay de Discord (retour de test de Rushi, 24/10).
+// gauche du JEU, sur le bon écran, comme l'overlay de Discord.
 // Electron ne voit pas les fenêtres des autres programmes : un petit PowerShell lit toutes les
 // 1,5 s le rectangle de la fenêtre principale du processus Java du jeu (GetWindowRect) et l'écrit
 // sur une ligne. Rien n'est injecté dans le jeu. Ailleurs que sous Windows : pas de suivi (null).

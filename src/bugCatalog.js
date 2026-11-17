@@ -1,4 +1,4 @@
-// Catalogue de bugs (31/10, preview validée par Rushi, Laboratoire « bugCatalog ») : les fiches viennent
+// Catalogue de bugs (Laboratoire « bugCatalog ») : les fiches viennent
 // du site (/api/launcher/bugs, avec ETag, toutes les 10 min) et restent sur le disque pour jouer hors
 // ligne. Le launcher compare un journal ou un signal avec ces fiches ; une réparation ne suit que des
 // gestes de la liste fixe, jamais un ordre libre venu du site, et ne touche jamais aux mondes.

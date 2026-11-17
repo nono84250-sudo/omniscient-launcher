@@ -1,4 +1,4 @@
-﻿; Desinstalleur : case "Supprimer mes donnees utilisateur" (demande de Rushi, 15/10).
+﻿; Desinstalleur : case "Supprimer mes donnees utilisateur".
 ; customUnInstallSection ajoute a electron-builder une page de composants au
 ; desinstalleur, avec cette section en case a cocher. /o = decochee par defaut :
 ; on garde les donnees sauf si le joueur coche la case lui-meme.

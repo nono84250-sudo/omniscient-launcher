@@ -1,4 +1,4 @@
-// Visite guidée du launcher (design A « Bulles », choisi par Rushi le 25/10) : au premier
+// Visite guidée du launcher : au premier
 // lancement, une bulle propose la visite, puis pointe chaque bouton du menu de gauche pendant que
 // la page correspondante s'ouvre derrière. « Passer », Échap ou × la ferment à tout moment ; elle
 // se rejoue depuis Paramètres > Divers (et depuis l'Aide quand la page existe).
@@ -7,7 +7,7 @@
 // étape dont le bouton n'existe pas (ex. « Jouer » sur une version sans le mode Jouer) est sautée,
 // la même visite marche donc avec ou sans les nouveautés.
 //
-// 25/10 soir (demande de Rushi) : la visite ne se propose plus en visiteur, dont le menu n'a que
+// La visite ne se propose plus en visiteur, dont le menu n'a que
 // quelques onglets. Elle attend la connexion Microsoft (et l'assistant « Qu'est-ce que tu veux
 // faire ? » qui s'ouvre juste après), puis montre le menu complet de ce compte. « Déjà vue » est
 // retenu par compte sur ce PC : un autre compte qui se connecte la verra aussi une fois.
@@ -285,7 +285,7 @@
       const sec = document.createElement("section");
       sec.className = "settings-section";
       sec.id = "tour-replay-row";
-      // 28/10 (Rushi) : « Visite de Jouer » se relance ici, à côté de la visite complète (pas dans le « ⋯ » de Jouer).
+      // « Visite de Jouer » se relance ici, à côté de la visite complète (pas dans le « ⋯ » de Jouer).
       sec.innerHTML = `<div class="settings-row"><span><span class="settings-row-label">${esc(T.replayT)}</span><p class="settings-row-desc">${esc(T.replayD)}</p></span><span style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">${PT.ready() ? `<button class="btn-secondary" type="button" data-pt>${esc(T.playReplay)}</button>` : ""}${tourOn ? `<button class="btn-secondary" type="button" data-w>${esc(T.replayBtn)}</button>` : ""}</span></div>`;
       const w = sec.querySelector("[data-w]");
       if (w) w.onclick = welcome;
@@ -309,7 +309,7 @@
     }
   }
   let replayQueued = false;
-  // Ne réagit qu'aux changements de Paramètres ou de l'Aide (audit 25/10) : avant, chaque
+  // Ne réagit qu'aux changements de Paramètres ou de l'Aide : avant, chaque
   // modification de la page (liste des serveurs, barres de progression…) relançait addReplay
   // pendant toute la session. L'observateur reste branché : l'onglet Divers est redessiné à
   // chaque ouverture et la ligne doit y revenir.
@@ -326,10 +326,10 @@
 
   // --- Premier lancement : on attend que l'appli soit prête et qu'aucune fenêtre ne soit ouverte
   // (connexion, assistant du premier lancement, choix de la mémoire…), jamais pendant le démarrage.
-  // Laboratoire (25/10) : la visite ne se propose que si l'interrupteur « tour » du site la montre.
+  // Laboratoire : la visite ne se propose que si l'interrupteur « tour » du site la montre.
   let tourOn = false;
-  let playTourOn = false; // Laboratoire « playTour » (28/10)
-  // La surveillance du premier lancement ne tourne que si la visite est ouverte (audit du 25/10).
+  let playTourOn = false; // Laboratoire « playTour »
+  // La surveillance du premier lancement ne tourne que si la visite est ouverte.
   const setTour = (state) => {
     tourOn = state?.tour?.visible === true;
     playTourOn = state?.playTour?.visible === true;
@@ -365,7 +365,7 @@
   }
 
 
-  // --- Visite de Jouer (28/10, demande de Rushi) ------------------------------------------------
+  // --- Visite de Jouer ------------------------------------------------
   // La page Jouer a beaucoup de choses (installations, tiroir des mondes, sauvegarde auto, menu ⋯ où
   // sont rangés les réglages des sauvegardes) : une visite à elle, en bulles qui pointent les vrais
   // éléments de la page. Elle se lance depuis la bulle « Jouer » de la visite générale (qui reprend
@@ -498,7 +498,7 @@
     ptWatching = true;
     let calm = 0, wasShown = false, openedAt = 0;
     const timer = setInterval(() => {
-      // 28/10 (Rushi) : la visite s'est ouverte quand sa première tuile est apparue, en plein milieu
+      // La visite s'est ouverte quand sa première tuile est apparue, en plein milieu
       // d'autre chose. On ne la propose plus que dans les 8 secondes qui suivent l'ouverture de Jouer ;
       // sinon, à la prochaine ouverture.
       const vis = shown(playPanel());

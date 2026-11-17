@@ -10,10 +10,10 @@ const { app } = require("electron");
 // parametres. On propose Eclipse Temurin (projet Eclipse Foundation,
 // build officiel d'OpenJDK, utilise par d'autres launchers du genre comme
 // Prism Launcher) plutot que de demander une installation manuelle.
-// Java telecharge suit le dossier des jeux (serie 2, idee 9, gamesLocation.js).
+// Java telecharge suit le dossier des jeux (gamesLocation.js).
 const RUNTIME_BASE = path.join(require("./gamesLocation").GAMES_BASE, "runtime");
 const RUNTIME_DIR = path.join(RUNTIME_BASE, "java");
-// Windows (historique) ou Linux (version de test personnelle de Rushi, 14/10) :
+// Windows (historique) ou Linux :
 // Adoptium sert un .zip pour Windows et un .tar.gz pour Linux, et l'executable
 // s'appelle java.exe ou java selon le systeme.
 const IS_WINDOWS = process.platform === "win32";
@@ -44,8 +44,7 @@ function parseJavaMajorVersion(versionString) {
 
 // Timeout generique pour les process externes (java -version, powershell) qui peuvent ne
 // jamais se terminer (wrapper antivirus/EDR casse, lien symbolique en boucle) — sans ca, un
-// seul binaire bloque bloquait tout le pipeline de lancement sans aucun message (audit du
-// 2026-10-10).
+// seul binaire bloque bloquait tout le pipeline de lancement sans aucun message.
 const PROCESS_TIMEOUT_MS = 15_000;
 // Extraction de l'archive Java (Windows comme Linux), voir extractZip.
 const JAVA_EXTRACT_TIMEOUT_MS = 120_000;
@@ -132,7 +131,7 @@ function extractZip(zipPath, destDir) {
       clearTimeout(timer);
       fn();
     };
-    // 2 min partout (audit 25/10) : 15 s sous Windows ne suffisaient pas a Expand-Archive sur un
+    // 2 min partout : 15 s sous Windows ne suffisaient pas a Expand-Archive sur un
     // disque lent ou avec un antivirus qui scanne chaque fichier de l'archive.
     const timer = setTimeout(() => {
       proc.kill();
@@ -159,7 +158,7 @@ function findExtractedJavaExe(destDir) {
 // Verrou par destDir : deux appels concurrents pour le meme major (ex. deux "Jouer" sur deux
 // serveurs necessitant tous les deux Java 21, avant que le premier ait fini) ecrivaient sinon
 // dans le MEME tmpZip et faisaient chacun un rmSync(destDir) sur le dossier de l'autre —
-// corruption ou suppression croisee (course trouvee par l'audit du 2026-10-10). Le second
+// corruption ou suppression croisee. Le second
 // appelant attend simplement le resultat du premier au lieu de relancer son propre telechargement.
 const downloadLocks = new Map();
 
@@ -214,8 +213,7 @@ async function downloadAndInstallJavaLocked(onProgress, { major = MIN_JAVA_MAJOR
   try {
     await extractZip(tmpZip, destDir);
   } finally {
-    // Nettoye le zip temporaire meme si l'extraction echoue (auparavant
-    // seul le chemin "checksum invalide" le supprimait).
+    // Nettoye le zip temporaire meme si l'extraction echoue.
     fs.rmSync(tmpZip, { force: true });
   }
 

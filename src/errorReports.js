@@ -1,5 +1,5 @@
-// Idee 3 du lancement (19/10) : rapports d'erreurs du launcher envoyes a Sentry (region UE).
-// Inactif sans SENTRY_DSN (dans launcher/.env, que Rushi remplit lui-meme ; fige au build par
+// Idee 3 du lancement : rapports d'erreurs du launcher envoyes a Sentry (region UE).
+// Inactif sans SENTRY_DSN (dans launcher/.env, fige au build par
 // scripts/generate-env.js comme les autres valeurs). Inactif aussi si le module n'est pas encore
 // installe (npm install pas fait) : le launcher demarre comme avant.
 // Jamais de pseudo, d'adresse IP, de nom du PC ni de chemin avec le nom de la session Windows.
@@ -28,7 +28,7 @@ function scrub(event) {
   return scrubStrings(JSON.parse(cleaned));
 }
 
-// Audit du 01/11 : un lien signé (mondes, packs) ou un UUID Minecraft ne part jamais dans un rapport.
+// Un lien signé (mondes, packs) ou un UUID Minecraft ne part jamais dans un rapport.
 // La partie après « ? » ou « # » d'une adresse est retirée, les UUID sont masqués. Les identifiants
 // propres à Sentry restent intacts (sans eux, le rapport serait refusé).
 const SENTRY_ID_KEYS = new Set(["event_id", "trace_id", "span_id", "parent_span_id", "debug_id", "sid", "replay_id"]);

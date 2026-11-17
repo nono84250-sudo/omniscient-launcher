@@ -49,7 +49,7 @@ function redact(message) {
   return text;
 }
 
-// Adresse (IP ou domaine) d'un serveur rejoint (audit 25/10) : le site ne la donne qu'au launcher,
+// Adresse (IP ou domaine) d'un serveur rejoint : le site ne la donne qu'au launcher,
 // elle ne doit pas finir en clair dans les journaux (fichiers joints au support, rapport de
 // diagnostic). Un domaine garde un debut lisible (« play.exa*** ») pour s'y retrouver ; une IP
 // est entierement masquee.
@@ -82,7 +82,7 @@ function addSensitiveAddress(address) {
   maskedAddresses.set(host.toLowerCase(), { pattern, masked: maskAddress(host) });
 }
 
-// Fichiers du dossier logs plus vieux que 14 jours effaces au demarrage (audit 25/10) : journaux
+// Fichiers du dossier logs plus vieux que 14 jours effaces au demarrage : journaux
 // du launcher et rapports de diagnostic, rien d'autre.
 const LOG_RETENTION_MS = 14 * 24 * 60 * 60 * 1000;
 
@@ -117,7 +117,7 @@ function appendToFile(entry) {
   else if (!flushTimer) flushTimer = setTimeout(flushLogFile, FLUSH_MS);
 }
 
-// Audit du 01/11 (L2) : un gros modpack écrit des milliers de lignes au démarrage. Les écrire une par
+// Un gros modpack écrit des milliers de lignes au démarrage. Les écrire une par
 // une bloquait le launcher : elles partent maintenant groupées, une fois par seconde, sans le bloquer.
 const FLUSH_MS = 1000;
 const pendingLines = [];
@@ -144,7 +144,7 @@ process.on("exit", () => {
 });
 
 function pushLog({ level = "info", source = "launcher", message }) {
-  // Traces de débogage (14/10, demande de Rushi) : masquées partout (console de debug comprise)
+  // Traces de débogage : masquées partout (console de debug comprise)
   // sauf si le joueur choisit « Debug » dans Paramètres > Débogage > Niveau de log. Les erreurs,
   // avertissements et messages utiles (niveau info) restent toujours visibles.
   if (level === "debug" && minFileLevel !== "debug") return null;

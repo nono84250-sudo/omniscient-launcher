@@ -2,13 +2,13 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<!-- Content-Security-Policy (audit 14/10, L1) : l'en-tete pose par main.js
+<!-- Content-Security-Policy : l'en-tete pose par main.js
      (setContentSecurityPolicy) ne s'applique pas aux pages chargees en file://, il faut cette
      balise. Images : https et data: partout, http seulement pour le site en local (dev). -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data: http://localhost:* http://127.0.0.1:*; frame-src https://www.youtube-nocookie.com; object-src 'none'; base-uri 'none'; form-action 'none'" />
 <title>Omniscient Launcher</title>
 <style>
-  /* Police Inter partout (serie 2, idee 5) : fichiers locaux (fonts/, licence SIL OFL jointe),
+  /* Police Inter partout : fichiers locaux (fonts/, licence SIL OFL jointe),
      aucune requete vers internet. Segoe UI reste en secours si le fichier ne charge pas. */
   @font-face {
     font-family: "Inter";
@@ -46,7 +46,7 @@
        voir debug-console.html, seul endroit qui en avait besoin jusqu'ici).
        Remonte ici pour rester partage si un autre ecran en a besoin. */
     --muted2: color-mix(in srgb, var(--foreground) 50%, transparent);
-    /* Re-sature la meme nuance (2026-10-11) suite a la comparaison avec
+    /* Re-sature la meme nuance suite a la comparaison avec
        Modrinth — le ton pastel d'origine faisait moins ressortir les
        elements importants. */
     --accent: #2792dd;
@@ -57,27 +57,27 @@
        jamais l'accent lui-même en aplat. */
     --accent-fill: color-mix(in srgb, var(--accent) 45%, black);
     --accent-foreground: #f5f4ff;
-    /* Turquoise secondaire (passe 2026-10-11) : reserve aux touches
+    /* Turquoise secondaire : reserve aux touches
        ponctuelles (badges, highlights) a cote de --accent, jamais pour les
        memes usages que lui (meme logique "un seul accent dominant"). */
     --accent-secondary: #78e2d9;
     --danger: #e08a8a;
     --warn: #e0c28a;
     --success: #5fd3a0;
-    /* Notifications (audit 17/10, lot 1) : info (violet) et gel (bleu), avec une version lisible en
+    /* Notifications : info (violet) et gel (bleu), avec une version lisible en
        theme clair ; avant, le jaune #e8c547 et ces pastels etaient illisibles en clair. */
     --notif-info: #9184d9;
-    /* Table des etats commune site + launcher (audit 17/10, lot 2) : presque plein en vrai orange,
+    /* Table des etats commune site + launcher : presque plein en vrai orange,
        hors ligne en gris (le rouge reste pour « Complet »), gele en bleu. --warn ne bouge pas. */
     --state-busy: #f0a040;
     --state-off: #8a8c9a;
     --frozen: #8ac3e0;
     --pending: #e0c28a;
     --notif-frozen: var(--frozen);
-    /* Elevation par defaut des cartes/rangees (passe 2026-10-11) : une ombre
+    /* Elevation par defaut des cartes/rangees : une ombre
        douce plutot qu'une bordure marquee — voir .row/.home-continue-card. */
     --elevation-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 20px -14px rgba(0, 0, 0, 0.55);
-    /* Design 17/10, point 5 : focus clavier jaune bien visible, et 4 arrondis seulement
+    /* Focus clavier jaune bien visible, et 4 arrondis seulement
        (petit, moyen, grand, pilule) + une seule ombre pour tous les menus et panneaux. */
     --focus-ring: #f0c94a;
     --radius-s: 6px;
@@ -110,7 +110,7 @@
     --state-busy: #a05a10;
     --state-off: #64667a;
     --frozen: #226a8c;
-    /* Clair aligne sur le site (lot 8, 18/10) : tous au-dessus de 4,5:1 sur #f3f3f6 et #fff. */
+    /* Clair aligne sur le site : tous au-dessus de 4,5:1 sur #f3f3f6 et #fff. */
     --pending: #7d5b0e;
     --notif-frozen: var(--frozen);
     --focus-ring: #b8860b;
@@ -121,13 +121,13 @@
   /* Inter aussi dans les boutons et champs (Chromium ne leur fait pas heriter la police). */
   button, input, select, textarea { font-family: inherit; }
   [hidden] { display: none !important; }
-  /* Focus clavier (design 17/10, point 5, L7-A) : un contour jaune net sur tout ce qu'on atteint
+  /* Focus clavier : un contour jaune net sur tout ce qu'on atteint
      avec Tab. Seulement au clavier (:focus-visible), jamais au clic de souris. */
   :where(button, a, select, summary, [role="button"], [tabindex]:not([tabindex="-1"]), input[type="checkbox"], input[type="radio"]):focus-visible {
     outline: 2px solid var(--focus-ring) !important;
     outline-offset: 2px;
   }
-  /* Reduire les animations (Parametres > Apparence, point 5, L7-B) : coupe clignotements, reflets
+  /* Reduire les animations (Parametres > Apparence) : coupe clignotements, reflets
      et zooms. Classe posee par theme.js selon le reglage (ou celui de Windows). */
   html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after {
     animation-duration: 0.001ms !important;
@@ -136,7 +136,7 @@
     scroll-behavior: auto !important;
   }
   html.reduce-motion .activity-ring, html.reduce-motion .bootstrap-spinner .arc { animation: none !important; }
-  /* Poids differencie par niveau (passe 2026-10-11) : avant, h1/h2/h3
+  /* Poids differencie par niveau : avant, h1/h2/h3
      partageaient tous 500, aucun rythme de lecture entre un titre d'ecran et
      un sous-titre. h3 reste a 500 ici car la plupart des usages reels (titres
      de ligne serveur, carte d'instance) le surchargent deja en 600 localement. */
@@ -164,7 +164,7 @@
      fenêtre en cliquant cette zone ; les boutons doivent explicitement
      repasser en no-drag sinon leurs clics sont interceptés par le drag. */
   /* Chrome plus clair que le contenu, pas plus sombre, et fondu avec la
-     sidebar sans coupure (2026-10-11, suite a la comparaison avec Modrinth :
+     sidebar sans coupure (suite a la comparaison avec Modrinth :
      meme teinte que #sidebar, aucune bordure entre les deux — la difference
      de clarté avec #app-content suffit a les distinguer). */
   #titlebar {
@@ -176,15 +176,15 @@
     -webkit-app-region: drag;
     padding-left: 0;
   }
-  /* Coin du logo (serie 2, variante D) : il suit la largeur de la barre laterale (56 px repliee,
+  /* Coin du logo : il suit la largeur de la barre laterale (56 px repliee,
      196 px depliee), sans trait entre les deux. Sans barre laterale (demarrage, connexion), le
      logo et le nom reprennent leur place normale. */
-  /* Audit 17/10, lot 1 : le losange reste toujours au meme endroit (centre sur les icones) et le
+  /* Le losange reste toujours au meme endroit (centre sur les icones) et le
      nom glisse au lieu de sauter pendant l'animation ; « Omniscient » commence sur la meme verticale
      que les libelles de la barre (il etait 2 px trop a gauche). */
   #titlebar-corner { flex: 0 0 auto; width: 56px; height: 100%; display: flex; align-items: center; justify-content: flex-start; padding-left: 20px; overflow: visible; transition: width 0.18s ease; }
   #titlebar-corner .logo { gap: 0; }
-  /* Nom toujours affiche, menu replie ou deplie (version A choisie par Rushi le 18/10) : replie,
+  /* Nom toujours affiche, menu replie ou deplie : replie,
      il deborde sur la barre du haut, de la meme couleur. */
   #titlebar-corner .logo-name { display: inline-block; color: inherit; white-space: nowrap; margin-left: 13px; }
   body.sidebar-expanded #titlebar-corner { width: 196px; }
@@ -197,7 +197,7 @@
      fenetre n'ont aucun sens tant que rien n'est encore charge — masques le
      temps du bootstrap, le titre reprend toute la largeur et se centre.
      La pilule d'activite (Pret / telechargements) et le trait separateur
-     sont aussi caches (demande de Rushi du 26/10 : barre du haut propre). */
+     sont aussi caches (barre du haut propre). */
   body.bootstrapping .search-trigger,
   body.bootstrapping .discreet-toggle,
   body.bootstrapping .mc-status-menu,
@@ -250,7 +250,7 @@
     cursor: pointer;
   }
   .sidebar-btn svg { width: 20px; height: 20px; flex: 0 0 auto; }
-  /* Barre laterale depliable (serie 2, idee 1) : repliee = 56 px d'icones (comme avant), depliee =
+  /* Barre laterale depliable : repliee = 56 px d'icones (comme avant), depliee =
      196 px avec le nom de chaque page. Sous 900 px elle se replie seule ; depliee a la main, elle
      passe alors par-dessus la page et se referme quand on choisit une page. */
   #sidebar { transition: width 0.18s ease; z-index: 6; }
@@ -267,26 +267,26 @@
   #sidebar.overlay { position: fixed; top: 36px; bottom: 0; left: 0; box-shadow: var(--shadow-pop); }
   .sidebar-scrim { position: fixed; inset: 36px 0 0 0; background: rgba(0, 0, 0, 0.35); z-index: 5; }
   .sidebar-btn:hover { background: var(--surface-raised); color: var(--foreground); }
-  /* Mode visiteur (2026-10-11) : #nav-settings (qui porte normalement le
+  /* Mode visiteur : #nav-settings (qui porte normalement le
      margin-top:auto poussant Parametres+avatar vers le bas) est cache par
      renderGuestHeader() — sans element pousseur restant, le bouton injecte
      dans #ms-account restait colle en haut avec les autres icones au lieu
      de prendre la place de l'avatar absent. Applique la meme poussee a
      #ms-account UNIQUEMENT quand #nav-settings est cache, pour ne pas
      affecter le mode connecte (qui garde son propre margin-top:auto). */
-  /* Depuis la page Aide (serie 2, idee 6), c'est #nav-help qui pousse le bas de la barre : une
+  /* Depuis la page Aide, c'est #nav-help qui pousse le bas de la barre : une
      deuxieme poussee ici partageait la place et laissait « ? » flotter au milieu en mode visiteur
-     (retour de Rushi 17/10). */
+. */
   #nav-settings[hidden] + #ms-account { margin-top: 0; }
-  /* Mode visiteur (2026-10-15) : bouton "Se connecter" au-dessus de Parametres dans
+  /* Mode visiteur : bouton "Se connecter" au-dessus de Parametres dans
      #ms-account, pour qu'un visiteur puisse se connecter sans passer par "Jouer". */
   #ms-account:has(.signin-btn) { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-  /* Barre depliee en mode visiteur (retour de Rushi 17/10) : « Se connecter » et « Parametres »
+  /* Barre depliee en mode visiteur : « Se connecter » et « Parametres »
      prennent toute la largeur comme les autres entrees, icone et texte sur la meme verticale. */
   #sidebar.expanded #ms-account:has(.signin-btn) { align-items: stretch; }
   .sidebar-btn.signin-btn { color: var(--accent); background: color-mix(in srgb, var(--accent) 16%, transparent); }
   .sidebar-btn.signin-btn:hover { color: var(--accent); background: color-mix(in srgb, var(--accent) 26%, transparent); }
-  /* Bandeau visiteur en haut de l'annuaire (2026-10-15) : voir updateGuestBanner() dans renderer.js. */
+  /* Bandeau visiteur en haut de l'annuaire : voir updateGuestBanner() dans renderer.js. */
   .guest-banner {
     display: flex;
     align-items: center;
@@ -299,11 +299,11 @@
     border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
   }
   .guest-banner[hidden] { display: none; }
-  /* 25/10 : maintenance d'un seul systeme (voir applyDisruption dans renderer.js) — memes couleurs
+  /* Maintenance d'un seul systeme (voir applyDisruption dans renderer.js) — memes couleurs
      que .friend-policy-banner (orange « occupe »). */
   .disruption-banner { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; margin-bottom: 16px; border-radius: 10px; font-size: 13px; background: color-mix(in srgb, var(--state-busy) 12%, var(--surface)); border: 1px solid color-mix(in srgb, var(--state-busy) 40%, transparent); }
   .disruption-banner[hidden] { display: none; }
-  /* Ecran de maintenance (25/10) : plein ecran, au-dessus de tout, avec un halo orange « occupe ». */
+  /* Ecran de maintenance : plein ecran, au-dessus de tout, avec un halo orange « occupe ». */
   /* .modal-overlay.maint-screen : la regle .modal-overlay (fond semi-transparent) est plus bas dans?
      la feuille, il faut une specificite plus forte pour qu on ne voie rien derriere. */
   .modal-overlay.maint-screen { background: var(--background); z-index: 200; overflow-y: auto; padding: 40px 20px; }
@@ -361,7 +361,7 @@
   }
   .guest-banner-later:hover { color: var(--foreground); background: var(--surface-raised); }
   .sidebar-btn.active { background: var(--accent-fill); color: var(--accent-foreground); position: relative; }
-  /* Page active (design 17/10, point 5) : un trait d'accent colle au bord gauche de la barre. */
+  /* Page active : un trait d'accent colle au bord gauche de la barre. */
   .sidebar-btn.active::before {
     content: ""; position: absolute; left: -9px; top: 8px; bottom: 8px; width: 4px;
     border-radius: 0 4px 4px 0; background: var(--accent);
@@ -433,7 +433,7 @@
     cursor: pointer;
     transition: border-color 0.18s ease, background-color 0.18s ease;
   }
-  /* Secondaires en gris discret (design 17/10, point 5) : seul le bouton principal est plein. */
+  /* Secondaires en gris discret : seul le bouton principal est plein. */
   button.btn-secondary:hover { border-color: color-mix(in srgb, var(--foreground) 30%, transparent); background: var(--surface-raised); }
   button.btn-secondary:disabled { color: var(--muted); cursor: default; }
   .ms-pending { color: var(--muted); }
@@ -459,7 +459,7 @@
     justify-content: center;
   }
   .account-trigger:hover { background: var(--surface-raised); }
-  /* Pseudo dans la barre depliee (retour de Rushi 17/10) : couleur d'accent choisie dans
+  /* Pseudo dans la barre depliee : couleur d'accent choisie dans
      Parametres > Apparence, au lieu du noir par defaut d'un bouton. Meme couleur dans le menu. */
   .account-trigger { color: var(--foreground); }
   .account-trigger .sidebar-label { color: var(--accent); font-weight: 600; }
@@ -486,8 +486,8 @@
     z-index: 10;
   }
 
-  /* Page "Amis" (systeme d'amis, phase 1, 2026-10-14) : une vraie vue plein ecran comme
-     Favoris/Recents/Mes instances (retour utilisateur 2026-10-14 : le petit panneau deroulant
+  /* Page "Amis" (systeme d'amis, phase 1) : une vraie vue plein ecran comme
+     Favoris/Recents/Mes instances (le petit panneau deroulant
      accroche a la sidebar faisait trop "popup"). En-tete repris de .instances-header, cartes
      de la meme famille que .instance-card. */
   .friends-add-card {
@@ -521,7 +521,7 @@
   .friends-item-status.online { color: var(--success); }
   .friends-item.offline .friends-item-avatar { opacity: 0.55; }
   .friends-item-remove { flex-shrink: 0; }
-  /* Demandes d'ami (demande puis accord, 2026-10-14) : recue = bord accent pour attirer l'oeil,
+  /* Demandes d'ami (demande puis accord) : recue = bord accent pour attirer l'oeil,
      envoyee = bord pointille et nom attenue (en attente, rien a faire). */
   .friends-request.incoming { border-color: color-mix(in srgb, var(--accent) 55%, var(--border)); }
   .friends-request.outgoing { border-style: dashed; background: transparent; }
@@ -658,7 +658,7 @@
     outline: 2px solid var(--focus-ring);
     outline-offset: 2px;
   }
-  /* Carte serveur a deux niveaux (design 17/10, point 5, L6-E) : le nom et l'essentiel d'abord,
+  /* Carte serveur a deux niveaux : le nom et l'essentiel d'abord,
      le reste en petites puces, et un fin bandeau aux couleurs du serveur (sa banniere, sinon une
      teinte tiree de son nom). */
   .row.row-2l { position: relative; overflow: hidden; padding-top: 14px; }
@@ -666,7 +666,7 @@
     content: ""; position: absolute; left: 0; right: 0; top: 0; height: 5px;
     background: var(--row-band, var(--accent));
   }
-  /* Bande = etat du serveur (17/10, variante A) : zone de survol un peu plus haute que la bande
+  /* Bande = etat du serveur : zone de survol un peu plus haute que la bande
      pour sa bulle, et le « ? » qui ouvre la legende des couleurs. */
   .row-band-hit { position: absolute; left: 0; right: 0; top: 0; height: 8px; z-index: 1; cursor: help; }
   .band-legend-anchor { position: relative; display: inline-flex; }
@@ -696,7 +696,7 @@
   .chipx.unknown { color: var(--muted); }
   .status-dot.unknown { background: transparent; border: 1.5px dashed var(--muted); box-sizing: border-box; }
   .chipx .status-dot { margin: 0; }
-  /* Serveur presque plein / plein (17/10, meme logique que le site) : orange des 80 %, rouge et
+  /* Serveur presque plein / plein (meme logique que le site) : orange des 80 %, rouge et
      « Complet » a 100 %. Sur les puces, les libelles de joueurs et la jauge de la fiche. */
   .chipx.busy { background: color-mix(in srgb, var(--state-busy) 18%, transparent); color: var(--state-busy); }
   .chipx.full { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); font-weight: 600; }
@@ -728,7 +728,7 @@
   }
   .badge.modded { background: var(--accent-fill); color: var(--accent-foreground); border: none; }
 
-  /* Teams (19/10) : meme affichage que le site (« Par la team X », « Proposé par Omniscient »). */
+  /* Teams : meme affichage que le site (« Par la team X », « Proposé par Omniscient »). */
   .team-avatar {
     display: inline-grid; place-items: center; flex: 0 0 auto; overflow: hidden;
     border-radius: 22%; color: #fff; font-weight: 700; line-height: 1; vertical-align: middle;
@@ -739,7 +739,7 @@
     font-size: 11.5px; color: var(--muted); white-space: nowrap; flex: 0 1 auto;
   }
   .row-team b { font-weight: 500; color: var(--foreground); overflow: hidden; text-overflow: ellipsis; }
-  /* Team cliquable (19/10, version C) : mene a la liste filtree sur elle. */
+  /* Team cliquable : mene a la liste filtree sur elle. */
   .row-team-btn { padding: 0; border: 0; background: none; font: inherit; font-weight: 500; color: var(--foreground); cursor: pointer; overflow: hidden; text-overflow: ellipsis; text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 2px; }
   .row-team-btn:hover { color: var(--accent); text-decoration-color: currentColor; }
   .team-filter-banner { display: flex; align-items: center; gap: 14px; margin-top: 10px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); }
@@ -811,9 +811,9 @@
   .row-body { flex: 1 1 auto; min-width: 0; }
   .row-title-line { display: flex; align-items: center; gap: 8px; min-width: 0; }
   .row-title-line h3 { margin: 0; font-size: 14.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  /* Version A des cartes (19/10) : nom seul sur sa ligne, « Nouveau » en coin de l'icone. */
+  /* Version A des cartes : nom seul sur sa ligne, « Nouveau » en coin de l'icone. */
   .row-icon-wrap { position: relative; display: inline-flex; flex: none; }
-  /* « Mes serveurs », variante B (19/10) : pastille joueurs / etat sur la ligne d'infos. */
+  /* « Mes serveurs » : pastille joueurs / etat sur la ligne d'infos. */
   .instance-card-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; }
   /* Nom jamais coupe : la ligne passe a la suivante (badges, pastille) plutot que de le tronquer. */
   .instance-card-title h3 { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; min-width: 0; }
@@ -824,7 +824,7 @@
   .instance-players.off { color: var(--state-off); }
   .instance-players.off .status-dot, .instance-players.busy .status-dot, .instance-players.full .status-dot { background: currentColor; }
   .instance-players.unknown { color: var(--muted); }
-  /* Fiche disparue ou partielle (19/10). */
+  /* Fiche disparue ou partielle. */
   .detail-missing { max-width: 560px; margin: 24px 0; }
   .detail-missing h2 { margin: 0 0 8px; }
   .detail-missing p { margin: 0 0 14px; color: var(--muted); }
@@ -836,7 +836,7 @@
     background: var(--accent); color: #fff; box-shadow: 0 0 0 2px var(--surface);
   }
   .row-chips .row-sep, .row-title-line .row-sep { color: var(--muted); flex: none; }
-  /* Disposition A du site (19/10) : la team se raccourcit avant le nom ; etiquettes principales
+  /* Disposition A du site : la team se raccourcit avant le nom ; etiquettes principales
      puis secondaires, cachees en entier ; joueurs et langue dans la colonne de droite. */
   .row-title-line h3 { flex: 0 1 auto; min-width: 4em; }
   .row-title-line .row-team { flex: 0 6 auto; }
@@ -850,7 +850,7 @@
   .row-side .players-fill.full { color: var(--danger, #e08a8a); }
   .row-side .players-fill.busy { color: var(--state-busy); }
   .row-langs { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; margin-top: 5px; }
-  /* Etiquette de langue, variante A (20/10, choisie par Rushi, meme style que le site) : le code
+  /* Etiquette de langue (meme style que le site) : le code
      FR / EN, mais avec la taille d'un mot ecrit en entier. */
   .lang-code, .row-langs .row-lang {
     display: inline-block; min-width: 48px; padding: 0 0.6rem; border-radius: 0.4rem; text-align: center;
@@ -868,10 +868,10 @@
   body.compact-list .row-side b { font-size: 15px; }
   .row-chips .badge, .row-chips .owner-tag { flex: none; }
   .row-body p { margin: 2px 0 0; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  /* Page Recents (preview validee par Rushi le 14/10) : jour et heure de la derniere partie. */
+  /* Page Recents : jour et heure de la derniere partie. */
   .row-played { flex: 0 0 auto; min-width: 104px; text-align: right; font-size: 12.5px; color: var(--foreground); white-space: nowrap; }
   .row-played small { display: block; font-size: 11.5px; color: var(--muted); }
-  /* Recents (16/10) : « Il y a 2 jours · 22:44 » sur une ligne ; en petite fenetre la date passe
+  /* Recents : « Il y a 2 jours · 22:44 » sur une ligne ; en petite fenetre la date passe
      sous le nom du serveur pour laisser le statut lisible a droite. */
   .row-played-inline { display: none; }
   @media (max-width: 820px) {
@@ -911,10 +911,10 @@
   .top-pager .pager-label { white-space: nowrap; font-size: 13px; color: var(--muted); }
   .instances-filters .sort-chip .count { opacity: 0.7; margin-left: 4px; }
 
-  /* Filtres des listes de serveurs (16/10, option C, preview validee par Rushi). */
+  /* Filtres des listes de serveurs. */
   .sort-chip .count { opacity: 0.7; margin-left: 4px; }
   .list-sort-label { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); }
-  /* Tri inversable (19/10, variante A) : menu « Trier » puis ↑↓ avec le sens, a droite de « Filtres ». */
+  /* Tri inversable : menu « Trier » puis ↑↓ avec le sens, a droite de « Filtres ». */
   .list-sort-group { display: inline-flex; align-items: center; gap: 4px; }
   .list-sort-group:empty { display: none; }
   .list-sort-dir { display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; }
@@ -935,7 +935,7 @@
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35); display: flex; flex-direction: column; gap: 8px;
   }
   .list-filters-panel-title { font-size: 12.5px; font-weight: 600; }
-  /* Panneau « Filtres » complet (19/10, preview version C) : sections, Team avec recherche. */
+  /* Panneau « Filtres » complet : sections, Team avec recherche. */
   .list-filters-panel { max-height: min(70vh, 560px); overflow-y: auto; }
   .list-filters-section { display: flex; flex-direction: column; gap: 6px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
   .list-filters-section:last-of-type { border-bottom: 0; }
@@ -961,7 +961,7 @@
   .filters-empty h3 { margin: 0 0 6px; color: var(--foreground); font-size: 15px; }
   .filters-empty p { margin: 0 0 12px; font-size: 13px; }
   .filters-empty-actions { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
-  /* Liste injoignable (idee 2 du lancement, 19/10) : meme bloc que « aucun resultat », icone ambre. */
+  /* Liste injoignable : meme bloc que « aucun resultat », icone ambre. */
   .list-error-state .empty-state-icon { color: var(--warn); }
   .list-error-detail { display: block; margin-top: 10px; font-size: 11px; color: var(--muted); opacity: 0.8; word-break: break-word; }
   .badge.badge-new { border-color: var(--success); color: var(--success); }
@@ -975,7 +975,7 @@
 
   /* 2 colonnes au plus : cartes d'au moins 34rem dans 1120 px de large (voir #my-instances-panel). */
   .instance-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(34rem, 100%), 1fr)); gap: 8px; }
-  /* Option C (validee par Rushi, 2026-10-14) : boutons compacts a droite, en icones avec une
+  /* Option C : boutons compacts a droite, en icones avec une
      infobulle ; titre, etiquettes et code d'invitation passent a la ligne au lieu d'etre coupes. */
   .instance-card {
     display: flex; flex-direction: row; align-items: center; gap: 14px;
@@ -1031,7 +1031,7 @@
   .instance-action:hover, .instance-action:focus-visible { border-color: var(--accent); }
   .instance-action:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .instance-action:disabled { opacity: 0.5; cursor: default; }
-  /* Menu « … » des cartes et des lignes (option C, 18/10) : Installer y marche meme pendant une partie. */
+  /* Menu « … » des cartes et des lignes : Installer y marche meme pendant une partie. */
   .instance-more { position: relative; display: inline-flex; }
   .instance-menu { position: absolute; right: 0; top: calc(100% + 4px); z-index: 30; min-width: 210px; padding: 4px; display: flex; flex-direction: column; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); box-shadow: var(--shadow-pop); }
   .instance-menu-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border: 0; border-radius: 7px; background: none; color: var(--foreground); font: inherit; font-size: 13px; text-align: left; cursor: pointer; white-space: nowrap; }
@@ -1041,16 +1041,16 @@
   .instance-menu-item span { display: flex; flex-direction: column; }
   .instance-menu-item small { font-size: 11px; color: var(--muted); }
   .row-more { align-self: center; }
-  /* Ligne dont le menu « … » est ouvert : le menu deborde sous la ligne au lieu d'etre coupe (Rushi 25/10). */
+  /* Ligne dont le menu « … » est ouvert : le menu deborde sous la ligne au lieu d'etre coupe. */
   .row.row-2l:has(.instance-menu:not([hidden])) { overflow: visible; z-index: 30; }
   .row-more-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; font-size: 15px; line-height: 1; }
   .row-more-btn:hover { color: var(--foreground); border-color: var(--accent); }
   .palette-play.palette-install { background: var(--surface-raised); color: var(--accent); margin-right: 4px; }
-  /* « Arrêter le jeu » (16/10) : remplace « Rejoindre » pendant une partie. */
+  /* « Arrêter le jeu » : remplace « Rejoindre » pendant une partie. */
   .instance-action.is-stop { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 55%, transparent); }
   .instance-action.is-stop svg { fill: currentColor; stroke: none; }
   .instance-action.is-stop:hover, .instance-action.is-stop:focus-visible { border-color: var(--danger); background: color-mix(in srgb, var(--danger) 10%, transparent); }
-  /* Section « Fichiers de l'instance » de la fenetre Reglages (option B, 16/10). */
+  /* Section « Fichiers de l'instance » de la fenetre Reglages. */
   #modal-overlay .modal-box:has(.instance-files) { max-width: 470px; }
   .instance-files { margin-top: 6px; display: flex; flex-direction: column; gap: 10px; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-raised, var(--background)); }
   .instance-files h4 { margin: 0; font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
@@ -1116,7 +1116,7 @@
     transform: translateY(-2px);
     box-shadow: 0 10px 28px -16px color-mix(in srgb, var(--accent) 40%, transparent), var(--elevation-1);
   }
-  /* Banniere pleine (choix de Rushi, 2026-10-15) : la banniere du serveur
+  /* Banniere pleine : la banniere du serveur
      remplit toute la carte, nette, et le nom + le bouton sont poses dessus
      en bas, avec l'icone a cote du nom. Un degrade vers le bas garde le
      texte lisible. Remplace l'ancienne icone qui debordait de la banniere
@@ -1159,7 +1159,7 @@
   .home-continue-txt p { margin: 0; font-size: 12.5px; color: var(--muted); }
   .home-continue-play { flex: none; }
 
-  /* Carte « Reprendre » (design 17/10, point 3) : compacte, le dernier serveur + un gros Jouer,
+  /* Carte « Reprendre » : compacte, le dernier serveur + un gros Jouer,
      les favoris en puces juste en dessous (.home-fav-chips). */
   .home-resume {
     display: flex; align-items: center; gap: 16px;
@@ -1212,7 +1212,7 @@
   .home-fav-chip-icon img { width: 100%; height: 100%; object-fit: cover; }
   .home-fav-chip-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .home-fav-chip-play { color: var(--accent-2); font-size: 11px; }
-  /* ▶ direct sur les lignes Favoris et Récents (point 3, L2-C) : lance sans ouvrir la fiche. */
+  /* ▶ direct sur les lignes Favoris et Récents : lance sans ouvrir la fiche. */
   .row-play {
     flex: 0 0 auto; width: 34px; height: 30px; border-radius: 8px; cursor: pointer;
     border: 1px solid var(--accent); background: var(--accent); color: var(--accent-foreground);
@@ -1232,19 +1232,19 @@
   /* Trois largeurs de lecture centrees (au lieu des 640 px colles a gauche) :
      720 px pour les pages de lecture (Compte), 1120 px pour fiche/listes/Mes instances,
      1600 px pour les pages composees (Accueil, Parametres). Au-dela, la place en trop
-     devient une marge egale de chaque cote. Amis et Aide sont centrees aussi (demande de Rushi 17/10). */
+     devient une marge egale de chaque cote. Amis et Aide sont centrees aussi. */
   #account-panel.detail { max-width: 720px; margin-inline: auto; }
-  /* Par id seul (audit 14/10, K4) : le renderer remplace la classe de Favoris/Recents
+  /* Par id seul (K4) : le renderer remplace la classe de Favoris/Recents
      (server-list) et de Mes instances (instances-view), la largeur max ne s'appliquait plus. */
   #detail, #favorites-panel, #recent-panel, #my-instances-panel, #friends-panel { max-width: 1120px; margin-inline: auto; }
-  /* Aide (serie 2, idee 6) : colonne de lecture centree comme les autres pages. */
+  /* Aide : colonne de lecture centree comme les autres pages. */
   #help-panel.detail { max-width: 760px; margin-inline: auto; }
   #home-panel.detail { max-width: 1600px; margin-inline: auto; container-type: inline-size; }
-  /* Parametres : bloc centre comme les autres pages (retour de Rushi 17/10), le contenu remplit
+  /* Parametres : bloc centre comme les autres pages, le contenu remplit
      toute la largeur a droite du menu des sections. */
   #settings-panel.detail { max-width: 1280px; margin-inline: auto; container-type: inline-size; }
 
-  /* Accueil en deux colonnes (design A, 25/10) : « Jouer » + favoris a gauche, « Mes serveurs » et
+  /* Accueil en deux colonnes : « Jouer » + favoris a gauche, « Mes serveurs » et
      « A la une » a droite des 52rem. Plus etroit, la colonne de droite passe dessous (jamais cachee). */
   .home-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
   .home-main { min-width: 0; }
@@ -1264,7 +1264,7 @@
   }
   .home-empty-card { border: 1px dashed var(--border); border-radius: 14px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
   .home-empty-card p { flex: 1; min-width: 14ch; margin: 0; color: var(--muted); font-size: 13px; }
-  /* Favoris / Recents vides (preview validee le 2026-10-14) : un grand bloc grise centre
+  /* Favoris / Recents vides : un grand bloc grise centre
      qui occupe la hauteur restante de la page, au lieu d'une ligne de texte en haut a gauche. */
   #favorites-panel.is-empty, #recent-panel.is-empty { display: flex; flex-direction: column; min-height: 100%; }
   #favorites-panel.is-empty > h2, #recent-panel.is-empty > h2 { margin-bottom: 16px; }
@@ -1334,7 +1334,7 @@
   .settings-nav-btn:hover { color: var(--foreground); background: var(--surface-raised); }
   .settings-nav-btn.active { background: var(--surface-raised); color: var(--foreground); }
   .settings-content { flex: 1 1 auto; min-width: 0; max-width: 480px; padding-left: 28px; display: flex; flex-direction: column; gap: 20px; }
-  /* Parametres plein ecran (serie 2, idee 8, version A validee) : sections a gauche, une section a
+  /* Parametres plein ecran : sections a gauche, une section a
      la fois, ses reglages en cartes posees en colonnes (autant que la largeur le permet), une
      recherche qui fouille toutes les sections. En petite fenetre, les sections passent en onglets
      au-dessus et les cartes en une colonne. Les reglages s'enregistrent toujours tout de suite. */
@@ -1360,7 +1360,7 @@
   .settings-group-title { font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0; }
   .settings-cards .settings-field { max-width: none; }
   .settings-cards .join-note:empty { display: none; }
-  /* Dossier des jeux sur un autre disque (serie 2, idee 9). */
+  /* Dossier des jeux sur un autre disque. */
   .games-folder-warn { margin: 6px 0 0; font-size: 12px; color: var(--warn); }
   .games-disks { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
   .games-disk {
@@ -1524,7 +1524,7 @@
   .lang-list-row.active { background: var(--surface-raised); }
   .lang-list-row:disabled { color: var(--muted); opacity: 0.6; cursor: default; }
   .lang-list-row:disabled .lang-soon { font-size: 11px; }
-  /* Fil d'Ariane (serie 2, idee 3) : remplace « ← Retour à la liste ». */
+  /* Fil d'Ariane : remplace « ← Retour à la liste ». */
   .detail-crumb { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); margin-bottom: 10px; }
   .detail-crumb-back { border: 0; background: none; color: var(--accent-2); font: inherit; font-weight: 600; padding: 2px 4px; border-radius: 4px; cursor: pointer; }
   .detail-crumb-back:hover { background: var(--surface-raised); }
@@ -1567,7 +1567,7 @@
     border: 3px solid var(--background);
   }
   .detail-header { padding-left: 0; min-height: 34px; margin-bottom: 14px; }
-  /* Pastille d'etat a droite du nom (lot 3), memes mots et couleurs que la table du lot 2. */
+  /* Pastille d'etat a droite du nom, memes mots et couleurs que la table des etats. */
   .detail-state { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 500; white-space: nowrap; background: var(--surface-raised); color: var(--muted); }
   .detail-state-ok { color: var(--success); background: color-mix(in srgb, var(--success) 14%, transparent); }
   .detail-state-busy { color: var(--state-busy); background: color-mix(in srgb, var(--state-busy) 16%, transparent); }
@@ -1575,7 +1575,7 @@
   .detail-state-off { color: var(--state-off); background: color-mix(in srgb, var(--state-off) 16%, transparent); }
   /* Icône du serveur à côté du titre (et non en surimpression sur la bannière). */
   .detail-icon.detail-icon-inline { position: static; width: 44px; height: 44px; border-radius: 12px; border: none; font-size: 18px; flex: 0 0 auto; }
-  /* En-tete variante A (19/10) : icone a gauche, colonne nom / team / etiquettes a droite. */
+  /* En-tete variante A : icone a gauche, colonne nom / team / etiquettes a droite. */
   .detail-header.detail-header-col { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
   .detail-head-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
   .detail-head-title { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; min-width: 0; }
@@ -1606,7 +1606,7 @@
     color: var(--foreground);
   }
 
-  /* Bouton principal plein (design 17/10, point 5, L6-A) : Jouer / Rejoindre et l'action
+  /* Bouton principal plein : Jouer / Rejoindre et l'action
      principale d'une fenetre. Avant, tout etait en contour : Jouer pesait autant qu'un secondaire. */
   .join-btn {
     background: var(--accent);
@@ -1622,7 +1622,7 @@
   .join-btn:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
   .join-btn:disabled { cursor: not-allowed; opacity: 0.45; }
   .join-note { margin-top: 8px; font-size: 12px; color: var(--muted); }
-  /* Bouton Rejoindre qui suit l'etat de la pilule (design 17/10, point 2) : progression des mods,
+  /* Bouton Rejoindre qui suit l'etat de la pilule : progression des mods,
      demarrage, puis « Arrêter · 12 min » en rouge pendant la partie, « Réessayer » apres un echec. */
   .join-btn.join-progress, .join-btn.join-starting { cursor: default; opacity: 1; }
   .detail-actions .join-btn.join-progress { display: flex; flex-direction: column; align-items: stretch; gap: 6px; background: var(--surface-raised); color: var(--foreground); border-color: var(--border); text-align: left; font-size: 12.5px; }
@@ -1630,7 +1630,7 @@
   .detail-actions .join-btn.join-stop { background: none; color: var(--danger); border-color: var(--danger); }
   .detail-actions .join-btn.join-stop:hover:not(:disabled) { background: color-mix(in srgb, var(--danger) 14%, transparent); }
 
-  /* Fiche personnalisable (16/10, disposition « deux colonnes ») : sections du proprietaire a
+  /* Fiche personnalisable (disposition « deux colonnes ») : sections du proprietaire a
      gauche, colonne qui reste visible a droite (Rejoindre, Installer, Favori, Signaler, infos).
      En fenetre etroite, une seule colonne avec les boutons en premier. */
   .detail-columns { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
@@ -1640,7 +1640,7 @@
     .detail-columns { grid-template-columns: minmax(0, 1fr); }
     .detail-side { order: -1; position: static; }
   }
-  /* Mon cloud (03/11) : carte « Modpack du serveur » de la fiche. */
+  /* Mon cloud : carte « Modpack du serveur » de la fiche. */
   #cloud-pack-card { display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
   #cloud-pack-card[hidden] { display: none; }
   #cloud-pack-card p { margin: 0; }
@@ -1661,10 +1661,10 @@
   .detail-actions { display: flex; flex-direction: column; gap: 8px; }
   .detail-actions .join-btn-wide { width: 100%; background: var(--accent); color: var(--accent-foreground); border-color: var(--accent); }
   .detail-actions .join-btn-wide:hover:not(:disabled) { background: var(--accent-hover); }
-  /* Comme la preview validee : « Rejoindre » sur toute la largeur, puis Installer, Favori et
+  /* « Rejoindre » sur toute la largeur, puis Installer, Favori et
      Signaler cote a cote, chacun avec son libelle. */
   .detail-actions-row { display: flex; flex-wrap: wrap; gap: 8px; }
-  /* Liste Multijoueur desactivee par le proprietaire (21/10) : une ligne discrete sous Jouer. */
+  /* Liste Multijoueur desactivee par le proprietaire : une ligne discrete sous Jouer. */
   .detail-list-note { display: flex; gap: 8px; align-items: flex-start; margin: 0; font-size: 12.5px; line-height: 1.45; color: var(--muted); }
   .detail-list-note i { flex: 0 0 auto; width: 8px; height: 8px; margin-top: 5px; border-radius: 50%; background: var(--warn); }
   .detail-actions-row .btn-secondary {
@@ -1729,7 +1729,7 @@
   .page-video-box .page-video { max-width: none; height: 100%; }
   .page-video-box iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
   .page-video-note { margin: 8px 0 0; font-size: 12px; color: var(--muted); }
-  /* Video centree dans sa carte (19/10, bug vu par Rushi : collee a gauche, vide a droite). */
+  /* Video centree dans sa carte (collee a gauche, vide a droite). */
   .page-video, .page-video-box { margin-inline: auto; }
   .page-video-note, .page-video-autonote { text-align: center; }
   .page-video-open { padding: 0; border: 0; background: none; font: inherit; color: var(--accent); cursor: pointer; }
@@ -1799,7 +1799,7 @@
   }
   .gate-message { font-size: 13px; max-width: 360px; }
 
-  /* Barre du haut allegee (design 17/10, point 1) : pastille seule quand tout va bien (le detail
+  /* Barre du haut allegee : pastille seule quand tout va bien (le detail
      est dans le panneau), pastille + mot court seulement en cas de panne ou de ralentissement. */
   .mc-status-menu { position: relative; -webkit-app-region: no-drag; margin-right: 4px; }
   .mc-status-trigger {
@@ -1822,9 +1822,8 @@
   .mc-status-trigger.down { border-color: var(--danger); background: color-mix(in srgb, var(--danger) 14%, var(--surface)); padding: 0 11px; }
   .mc-status-trigger.slow { border-color: var(--warn); background: color-mix(in srgb, var(--warn) 12%, var(--surface)); padding: 0 11px; }
   .mc-status-trigger .status-dot { margin: 0; }
-  /* Recherche globale Ctrl+K : loupe a droite (variante C, 17/10), meme hauteur que ses voisines
-     (cloche, pilule), fond visible au repos et raccourci « Ctrl K » affiche dedans (audit 17/10,
-     lot 1). Un clic ou Ctrl+K ouvre la recherche au milieu de l'ecran. */
+  /* Recherche globale Ctrl+K : loupe a droite, meme hauteur que ses voisines
+     (cloche, pilule), fond visible au repos et raccourci « Ctrl K » affiche dedans. Un clic ou Ctrl+K ouvre la recherche au milieu de l'ecran. */
   .search-trigger {
     -webkit-app-region: no-drag; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     height: 30px; min-width: 30px; padding: 0 7px; margin: 0 6px 0 auto; border-radius: 8px;
@@ -1859,7 +1858,7 @@
   .palette-foot { display: flex; gap: 14px; flex-wrap: wrap; padding: 8px 14px; border-top: 1px solid var(--border); color: var(--muted); font-size: 11.5px; }
   .palette-none { padding: 22px 14px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
   .palette-none b { color: var(--foreground); }
-  /* Mode discret (point 6) : interrupteur discret dans la barre du haut. */
+  /* Mode discret : interrupteur discret dans la barre du haut. */
   .discreet-toggle {
     -webkit-app-region: no-drag; margin-right: 4px; height: 26px; padding: 0 10px; border-radius: var(--radius-pill);
     border: 1px solid transparent; background: none; color: var(--muted); font: 500 12px "Inter", "Segoe UI", Arial, sans-serif; cursor: pointer; white-space: nowrap;
@@ -2034,7 +2033,7 @@
     cursor: pointer;
   }
   .notif-footer-btn:hover { color: var(--foreground); background: var(--surface-raised); }
-  /* Centre de notifications (25/10) : onglets, perturbation epinglee, type de message, article. */
+  /* Centre de notifications : onglets, perturbation epinglee, type de message, article. */
   .notif-badge.busy { background: var(--state-busy); }
   .notif-head { padding: 12px 14px 6px; font-size: 14px; font-weight: 600; color: var(--foreground); }
   .notif-tabs { display: flex; gap: 2px; padding: 0 8px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
@@ -2056,12 +2055,12 @@
   .notif-news-body { white-space: pre-line; color: var(--foreground); line-height: 1.5; margin-top: 4px; padding: 10px; border-radius: 8px; background: var(--surface-raised); overflow-wrap: anywhere; }
   .notif-news-wait { color: var(--muted); }
 
-  /* Panneau de taches "Download Manager" (2026-10-11, inspire de Modrinth) :
+  /* Panneau de taches "Download Manager" (inspire de Modrinth) :
      icone compacte dans la barre de titre qui affiche une vitesse + un
      anneau de progression bleu pendant un telechargement, et ouvre la liste
      des taches actives/terminees au clic. Un seul flux pour "Installer" et
      "Rejoindre" — voir window.mchub.tasks/onTasksUpdate. */
-  /* Pilule d'etat (design 17/10, point 2) : remplace l'ancien indicateur de telechargements ET la
+  /* Pilule d'etat : remplace l'ancien indicateur de telechargements ET la
      barre du bas. Un seul endroit pour tout : « Prêt », « Installation 42 % · 1 min », « Démarrage… »,
      « En jeu · Serveur · 12 min », « Échec · Voir ». Arrêter vit uniquement dans le panneau, avec
      confirmation. Sous 900 px, seuls un point et un mot court restent (.activity-pill-short). */
@@ -2085,7 +2084,7 @@
   .activity-pill.hl { color: var(--foreground); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 16%, var(--surface)); }
   .activity-pill.err { color: var(--foreground); border-color: var(--danger); background: color-mix(in srgb, var(--danger) 16%, var(--surface)); }
   .activity-pill-text { overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
-  /* « En jeu · <nom> · 12 min » : seul le nom se coupe (…), le temps reste visible (28/10). */
+  /* « En jeu · <nom> · 12 min » : seul le nom se coupe (…), le temps reste visible. */
   .activity-pill-text.split { display: inline-flex; min-width: 0; white-space: pre; }
   .activity-pill-name { overflow: hidden; text-overflow: ellipsis; min-width: 0; max-width: 190px; }
   .activity-pill-short { display: none; font-variant-numeric: tabular-nums; }
@@ -2129,12 +2128,12 @@
   .activity-btn.danger-full { background: var(--danger); border-color: var(--danger); color: #2d0909; }
   .activity-errbox { display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: 8px; border: 1px solid color-mix(in srgb, var(--danger) 55%, transparent); background: color-mix(in srgb, var(--danger) 12%, var(--surface)); }
   .activity-errbox b { color: var(--danger); font-size: 12.5px; }
-  /* Detail technique replie sous une erreur (lot 5 bis). */
+  /* Detail technique replie sous une erreur. */
   .activity-tech summary { cursor: pointer; font-size: 11.5px; color: var(--muted); }
   .activity-tech code { display: block; margin-top: 4px; max-height: 90px; overflow: auto; padding: 6px 8px; border-radius: 6px; background: var(--background); font: 11px ui-monospace, Consolas, monospace; color: var(--muted); white-space: pre-wrap; word-break: break-word; }
   .activity-confirm { display: flex; flex-direction: column; gap: 8px; padding-top: 10px; border-top: 1px solid var(--border); }
   .tasks-list-scroll.empty { display: none; }
-  /* « Prévenir le serveur » et message du proprietaire (design 17/10, point 6). */
+  /* « Prévenir le serveur » et message du proprietaire. */
   .activity-list { margin: 0; padding-left: 18px; display: grid; gap: 2px; color: var(--foreground); }
   .activity-okbox { padding: 10px; border-radius: var(--radius-m); border: 1px solid color-mix(in srgb, var(--success) 50%, transparent); background: color-mix(in srgb, var(--success) 12%, transparent); color: var(--success); font-weight: 600; }
   .owner-message {
@@ -2143,12 +2142,12 @@
     font-size: 12.5px; color: var(--foreground); white-space: pre-wrap; overflow-wrap: anywhere;
   }
   .owner-message-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent-2); }
-  /* Ma bibliotheque (planche L5-C) : onglets Favoris / Recents / Installes en haut de la page. */
+  /* Ma bibliotheque : onglets Favoris / Recents / Installes en haut de la page. */
   .library-tabs { align-self: flex-start; display: inline-flex; gap: 2px; padding: 3px; margin: 10px 0 14px; border-radius: var(--radius-m); border: 1px solid var(--border); background: var(--surface); }
   .library-tabs button { border: 0; background: none; color: var(--muted); font: inherit; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 6px; cursor: pointer; }
   .library-tabs button:hover { color: var(--foreground); }
   .library-tabs button[aria-selected="true"] { background: var(--accent-fill); color: var(--accent-foreground); }
-  /* Page Aide (serie 2, idee 6). */
+  /* Page Aide. */
   .help-page { max-width: 760px; }
   .help-search { display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin: 14px 0 18px; border-radius: var(--radius-m); border: 1px solid var(--border); background: var(--surface); }
   .help-search:focus-within { border-color: var(--accent); }
@@ -2168,7 +2167,7 @@
   .help-version { display: flex; align-items: center; gap: 10px; margin-top: 12px; font: 12px ui-monospace, Consolas, monospace; color: var(--muted); }
   .help-none { padding: 14px; border-radius: var(--radius-m); border: 1px dashed var(--border); font-size: 13px; color: var(--muted); }
   .help-none b { display: block; color: var(--foreground); margin-bottom: 4px; }
-  /* Suppression en masse (serie 2, idee 7). */
+  /* Suppression en masse. */
   .instances-header-actions { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
   .bulk-chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
   .bulk-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 8px 12px; margin-bottom: 10px; border-radius: var(--radius-m); border: 1px solid var(--border); background: var(--surface); }
@@ -2178,9 +2177,9 @@
   .instance-card.bulk-disabled { opacity: 0.6; cursor: default; }
   .bulk-reason { flex: none; align-self: center; font-size: 10.5px; padding: 2px 8px; border-radius: var(--radius-pill, 999px); background: var(--surface-raised); color: var(--muted); white-space: nowrap; }
   .bulk-bar.bulk-none { justify-content: flex-start; }
-  /* Ma bibliotheque > Installes (lot 3) : taille de chaque serveur a droite de la ligne. */
+  /* Ma bibliotheque > Installes : taille de chaque serveur a droite de la ligne. */
   .row-size { flex: none; align-self: center; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
-  /* Case « Serveur retiré » (Installés, 23/10) : bande grise, bord en pointillés, pas de survol. */
+  /* Case « Serveur retiré » (Installés) : bande grise, bord en pointillés, pas de survol. */
   .row.row-removed { --row-band: var(--state-off); border-style: dashed; cursor: default; }
   .row.row-removed:hover { transform: none; border-color: var(--border); box-shadow: var(--elevation-1); }
   .row-removed .server-icon { filter: grayscale(1); opacity: 0.6; }
@@ -2212,7 +2211,7 @@
   .motion-options { display: inline-flex; border: 1px solid var(--border); border-radius: var(--radius-m); overflow: hidden; margin-top: 8px; }
   .motion-options button { border: 0; background: none; color: var(--foreground); font: inherit; font-size: 12.5px; padding: 7px 12px; cursor: pointer; }
   .motion-options button.active { background: var(--accent); color: var(--accent-on, #fff); }
-  /* Etats vides (design 17/10, point 6) : une phrase, un seul bouton plein, different par page. */
+  /* Etats vides : une phrase, un seul bouton plein, different par page. */
   .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px; padding: 36px 16px; }
   .empty-state-icon { width: 48px; height: 48px; border-radius: var(--radius-l); display: grid; place-items: center; background: var(--surface-raised); color: var(--accent-2); }
   .empty-state-icon svg { width: 22px; height: 22px; }
@@ -2221,7 +2220,7 @@
   .empty-state .join-btn { margin-top: 8px; }
   .notif-empty-state { padding: 18px 12px; }
   .notif-empty-state h3 { font-size: 14px; }
-  /* Assistant du premier lancement (point 6, L5-I) : trois gros choix, une seule fois. */
+  /* Assistant du premier lancement : trois gros choix, une seule fois. */
   .wizard-options { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 14px 0 4px; }
   .wizard-option {
     width: 150px; padding: 14px 10px; border-radius: var(--radius-l); border: 1px solid var(--border); background: var(--surface);
@@ -2230,7 +2229,7 @@
   .wizard-option[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
   .wizard-option .wiz-ico { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; color: #fff; font-size: 18px; }
   .wizard-option small { color: var(--muted); font-size: 11.5px; }
-  /* File d'attente des installations (serie 2, idee 4). */
+  /* File d'attente des installations. */
   .activity-section { font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
   .activity-btn.sm { padding: 3px 8px; font-size: 11.5px; }
   .queue-row { display: flex; align-items: center; gap: 8px; padding: 6px; border-radius: 6px; border: 1px solid transparent; }
@@ -2242,7 +2241,7 @@
   .queue-empty { display: flex; flex-direction: column; gap: 4px; padding: 10px; border-radius: 8px; border: 1px dashed var(--border); }
   .activity-btn.ghost { border-color: transparent; color: var(--muted); padding-left: 4px; }
   .activity-btn.ghost:hover { color: var(--foreground); background: none; }
-  /* Etapes visibles « étape 3 sur 6 » (design 17/10, point 4, L3-A). */
+  /* Etapes visibles « étape 3 sur 6 ». */
   .activity-stepof { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
   .activity-steps { display: flex; flex-direction: column; gap: 5px; }
   .activity-step { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); }
@@ -2258,7 +2257,7 @@
   .activity-eta { font-size: 14px; font-variant-numeric: tabular-nums; }
   .activity-check { cursor: pointer; }
   .task-play { padding: 4px 10px; margin-left: 4px; }
-  /* Ecran avant la 1re installation (point 4, L3-H). */
+  /* Ecran avant la 1re installation. */
   #instance-tools-body .first-install-line { margin: 0 0 10px; font-size: 13px; color: var(--foreground); }
   #instance-tools-body .first-install-line.ok { color: var(--success); }
   #instance-tools-body .first-install-line.activity-tip { color: var(--accent-2); }
@@ -2337,7 +2336,7 @@
   .modal-box p { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
 
   .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
-  /* Fenetre de confirmation unique (audit 17/10, lot 4) : 3 tons, meme couleur pour le filet du
+  /* Fenetre de confirmation unique : 3 tons, meme couleur pour le filet du
      haut, l'icone et le bouton. ok = rien n'est perdu, warn = ca se refait mais ca derange,
      danger = perdu ou difficile a refaire. */
   .modal-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
@@ -2351,8 +2350,8 @@
   .modal-box.tone-danger .modal-icon { background: var(--danger); }
   .join-btn.tone-warn { background: var(--state-busy); border-color: var(--state-busy); color: #1d1205; }
   .join-btn.tone-danger { background: var(--danger); border-color: var(--danger); color: #fff; }
-  /* Lot 5 : mods a ajouter a la main (rapport du test, aide guidee, badge). */
-  /* « Qui peut m'ajouter en ami » (variante C, 18/10). */
+  /* Mods a ajouter a la main (rapport du test, aide guidee, badge). */
+  /* « Qui peut m'ajouter en ami ». */
   .friend-policy { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); margin-bottom: 14px; }
   .settings-cards .friend-policy { margin: 0; padding: 0; border: 0; background: none; }
   .settings-cards .friend-policy h3 { display: none; }
@@ -2406,7 +2405,7 @@
   .modal-typed input { padding: 7px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--background); color: var(--foreground); font: inherit; }
   .modal-typed input:focus { outline: none; border-color: var(--accent); }
   /* Mods qu'un modpack CurseForge interdit de telecharger (renderer.js, showManualModsModal) :
-     preview validee par Rushi le 14/10. */
+     preview validee. */
   #manual-mods-overlay .modal-box { max-width: 520px; border-top-color: var(--accent); }
   .manual-mods-steps { margin: 12px 0 0; padding-left: 20px; font-size: 13px; color: var(--muted); display: grid; gap: 4px; }
   .manual-mods-steps b { color: var(--foreground); font-weight: 500; }
@@ -2424,7 +2423,7 @@
   .manual-mod-chip.todo { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }
   .manual-mod-chip.gone { color: var(--danger); background: color-mix(in srgb, var(--danger) 14%, transparent); }
   .manual-mod-wrong { font-size: 11.5px; line-height: 1.4; color: var(--danger); overflow-wrap: anywhere; }
-  /* Nom du fichier + « Mauvaise version » sous la ligne du mod, sur toute la largeur (26/10). */
+  /* Nom du fichier + « Mauvaise version » sous la ligne du mod, sur toute la largeur. */
   .manual-mods-list .manual-mod { flex-wrap: wrap; row-gap: 4px; }
   .manual-mods-list { max-height: min(340px, 42vh); }
   .manual-mods-list .manual-mod-name { white-space: normal; }
@@ -2439,7 +2438,7 @@
   #manual-mods-overlay .modal-actions .push { margin-left: auto; }
   .modal-box p.manual-mods-note { margin-top: 12px; font-size: 12px; }
   .modal-box p.manual-mods-note.ok { color: var(--success); font-weight: 600; }
-  /* Mods qui se cochent seuls (point 4, L3-F) et liste « Installés depuis Modrinth ». */
+  /* Mods qui se cochent seuls et liste « Installés depuis Modrinth ». */
   .manual-mod.received .manual-mod-name { color: var(--success); }
   .manual-mod-chip.done { color: var(--success); border-color: color-mix(in srgb, var(--success) 45%, transparent); background: color-mix(in srgb, var(--success) 12%, transparent); }
   .manual-mods-via { margin-top: 12px; border: 1px solid var(--border); border-radius: 10px; max-height: 160px; overflow-y: auto; }
@@ -2447,7 +2446,7 @@
   .btn-ghost { background: none; border: 1px solid transparent; color: var(--muted); border-radius: 8px; padding: 6px 10px; font: inherit; font-size: 12px; cursor: pointer; }
   .btn-ghost:hover { color: var(--foreground); border-color: var(--border); }
   /* Fenetre Reglages d'une instance (renderer.js, showInstanceSettingsModal) : pendant le
-     chargement, le losange Omniscient qui pulse (variante B validee par Rushi, 2026-10-14). */
+     chargement, le losange Omniscient qui pulse. */
   .settings-loader, .settings-error {
     min-height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 14px; text-align: center;
@@ -2536,7 +2535,7 @@
     position: relative; width: 220px; height: 4px; border-radius: 999px; overflow: hidden;
     background: var(--surface); border: 1px solid var(--border);
   }
-  /* Ecran de demarrage honnete (point 4) : barre qui tourne tant qu'on ne connait pas la duree. */
+  /* Ecran de demarrage honnete : barre qui tourne tant qu'on ne connait pas la duree. */
   .bootstrap-progress-track.indeterminate #bootstrap-progress { width: 35% !important; animation: activity-slide 1.3s ease-in-out infinite; }
   #bootstrap-progress {
     position: absolute; inset: 0; width: 15%; border-radius: 999px;
@@ -2545,7 +2544,7 @@
   #bootstrap-version { position: relative; font-size: 11px; color: var(--muted); letter-spacing: 0.02em; }
   @keyframes boot-spin { to { transform: rotate(360deg); } }
   @keyframes boot-pulse { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
-/* Demarrage rapide (18/10) : l'accueil affiche le dernier etat connu pendant la reconnexion ;
+/* Demarrage rapide : l'accueil affiche le dernier etat connu pendant la reconnexion ;
    ses boutons attendent qu'elle aboutisse (une fraction de seconde), rien ne change a l'oeil. */
 body.boot-preview #home-panel { pointer-events: none; }
 </style>
@@ -2553,10 +2552,10 @@ body.boot-preview #home-panel { pointer-events: none; }
 <body class="bootstrapping">
   <div id="titlebar">
     <div id="titlebar-drag">
-      <!-- Coin du logo (variante D, choisie par Rushi le 17/10) : meme largeur que la barre laterale,
+      <!-- Coin du logo : meme largeur que la barre laterale,
            replie = logo seul centre au-dessus des icones, deplie = logo + nom. -->
       <div id="titlebar-corner"><div class="logo"><span class="logo-mark"></span><span class="logo-name">Omniscient</span></div></div>
-      <!-- Recherche globale Ctrl+K (serie 2, idee 2, planche L5-D) : voir openCommandPalette(). -->
+      <!-- Recherche globale Ctrl+K : voir openCommandPalette(). -->
       <button type="button" class="search-trigger" id="search-trigger" data-i18n-title="search.iconTitle" title="Rechercher (Ctrl+K)" aria-label="Rechercher (Ctrl+K)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
         <span class="search-trigger-text" data-i18n="search.button">Rechercher…</span>
@@ -2574,11 +2573,11 @@ body.boot-preview #home-panel { pointer-events: none; }
         <div class="palette-foot"><span data-i18n="search.hintMove">↑↓ choisir</span><span data-i18n="search.hintEnter">Entrée ouvrir</span><span data-i18n="search.hintEsc">Échap fermer</span></div>
       </div>
     </div>
-    <!-- Mode discret (design 17/10, point 6) : cache adresses, codes d'invitation, pseudos des amis
+    <!-- Mode discret : cache adresses, codes d'invitation, pseudos des amis
          et notifications pendant un live. Meme reglage que Parametres > Apparence. -->
     <button class="discreet-toggle" id="discreet-toggle" type="button" aria-pressed="false"></button>
     <div class="mc-status-menu">
-      <!-- Barre du haut allegee (design 17/10, point 1) : une simple pastille quand tout va bien,
+      <!-- Barre du haut allegee : une simple pastille quand tout va bien,
            un mot ne revient qu'en cas de panne (voir renderMcStatus). -->
       <button class="mc-status-trigger" id="mc-status-trigger" type="button" data-i18n-title="titlebar.mcStatus">
         <span class="status-dot" id="mc-status-dot"></span>
@@ -2589,7 +2588,7 @@ body.boot-preview #home-panel { pointer-events: none; }
       </div>
     </div>
     <div class="tasks-menu">
-      <!-- Pilule d'etat (design 17/10, point 2) : remplace l'indicateur de telechargements et la
+      <!-- Pilule d'etat : remplace l'indicateur de telechargements et la
            barre du bas. Un seul endroit pour suivre installation, demarrage, partie et echec —
            voir renderActivity() dans renderer.js. -->
       <button class="activity-pill" id="tasks-trigger" type="button" aria-haspopup="dialog" aria-expanded="false">
@@ -2690,7 +2689,7 @@ body.boot-preview #home-panel { pointer-events: none; }
     <p class="gate-message" id="gate-countdown" style="color: var(--muted); font-size: 12px;" hidden></p>
   </div>
 
-  <!-- 25/10 : ecran plein refait (preview validee par Rushi, https://claude.ai/artifact/Mu1whvFmqzjDiykfFUmxuu). -->
+  <!-- Ecran plein refait. -->
   <div class="modal-overlay maint-screen" id="maintenance-overlay" hidden>
     <button type="button" class="maint-close" id="maintenance-close" data-i18n-title="maintenance.close" title="Fermer" aria-label="Fermer">✕</button>
     <div class="maint-panel">
@@ -2879,7 +2878,7 @@ body.boot-preview #home-panel { pointer-events: none; }
 
   <div id="app" hidden style="flex: 1 1 auto; display: flex; min-height: 0;">
     <nav id="sidebar">
-      <!-- Barre laterale depliable (serie 2, idee 1, planche L5-A) : bouton en haut, au-dessus
+      <!-- Barre laterale depliable : bouton en haut, au-dessus
            d'Accueil ; les noms des pages sont ajoutes par renderer.js (applySidebarLabels). -->
       <button id="nav-home" class="sidebar-btn active" data-i18n-title="nav.home">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2892,7 +2891,7 @@ body.boot-preview #home-panel { pointer-events: none; }
           <rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
         </svg>
       </button>
-      <!-- « Ma bibliothèque » (planche L5-C) : Favoris, Récents et Installés dans une seule page à
+      <!-- « Ma bibliothèque » : Favoris, Récents et Installés dans une seule page à
            onglets, une icône de moins dans la barre. #nav-recent reste dans le DOM (caché) pour le code
            qui le référence. -->
       <button id="nav-favorites" class="sidebar-btn" data-i18n-title="nav.library">
@@ -2911,16 +2910,15 @@ body.boot-preview #home-panel { pointer-events: none; }
           <rect x="3" y="3" width="18" height="4" rx="1" /><rect x="3" y="10" width="18" height="4" rx="1" /><rect x="3" y="17" width="18" height="4" rx="1" />
         </svg>
       </button>
-      <!-- Systeme d'amis, phase 1 (2026-10-14) : vue plein ecran #friends-panel comme les
-           boutons ci-dessus (etait un panneau deroulant jusqu'au retour utilisateur du
-           2026-10-14), voir showFriendsView() dans renderer.js. -->
+      <!-- Systeme d'amis, phase 1 : vue plein ecran #friends-panel comme les
+           boutons ci-dessus, voir showFriendsView() dans renderer.js. -->
       <button id="nav-friends" class="sidebar-btn" type="button" data-i18n-title="nav.friends">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
           <path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
         </svg>
       </button>
-      <!-- Page Aide (serie 2, idee 6, version A) : au-dessus de Parametres ; F1 l'ouvre aussi. -->
+      <!-- Page Aide : au-dessus de Parametres ; F1 l'ouvre aussi. -->
       <button id="nav-help" class="sidebar-btn" type="button" data-i18n-title="nav.help" style="margin-top: auto;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14" /><path d="M12 17.5h.01" /></svg>
       </button>
@@ -2931,7 +2929,7 @@ body.boot-preview #home-panel { pointer-events: none; }
         </svg>
       </button>
       <div id="ms-account"></div>
-      <!-- « >> » en bas de la barre (audit 17/10, lot 3) : depliee = « << Reduire ». -->
+      <!-- « >> » en bas de la barre : depliee = « << Reduire ». -->
       <button id="sidebar-toggle" class="sidebar-btn sidebar-toggle" type="button" aria-expanded="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path class="chev-open" d="m6 6 6 6-6 6M12 6l6 6-6 6" /></svg>
       </button>
@@ -3015,7 +3013,7 @@ body.boot-preview #home-panel { pointer-events: none; }
             <h2 data-i18n="nav.friends">Amis</h2>
             <p class="join-note" data-i18n="friends.header">Envoie une demande avec un pseudo ou un code d'ami. Une fois acceptée, vous voyez chacun si l'autre est en ligne.</p>
           </div>
-          <!-- « Qui peut m'ajouter en ami » derriere un engrenage (preview validee par Rushi le 18/10) :
+          <!-- « Qui peut m'ajouter en ami » derriere un engrenage :
                le panneau s'ouvre ici ; le reglage complet est aussi dans Parametres > Confidentialite. -->
           <button type="button" class="friends-gear" id="friends-gear" aria-expanded="false" aria-controls="friends-policy-pop" data-i18n-title="friends.gearLabel" title="Réglages des amis"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg></button>
         </div>

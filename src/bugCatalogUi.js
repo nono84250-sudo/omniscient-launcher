@@ -1,4 +1,4 @@
-// Catalogue de bugs (31/10, preview validée par Rushi) : les fenêtres du launcher quand une fiche est
+// Catalogue de bugs : les fenêtres du launcher quand une fiche est
 // reconnue (voir bugCatalog.js). « consent » propose « Corriger », « manual » montre la marche à suivre,
 // « auto » affiche au plus un petit message. Les textes des fiches viennent du site, en français et en anglais.
 (function () {
@@ -131,7 +131,7 @@
     copy?.addEventListener("click", () => copyLogs(copy));
     window.__bugHelp?.bind(box, hint);
   }
-  // Aide Discord (02/11, Laboratoire « bugDiscord ») : le bloc à 3 boutons remplace « Copier les logs ».
+  // Aide Discord (Laboratoire « bugDiscord ») : le bloc à 3 boutons remplace « Copier les logs ».
   const helpOn = (hasLogs) => hasLogs && window.__bugHelp?.isOn();
   const helpBlock = (hasLogs) => (helpOn(hasLogs) ? `${window.__bugHelp.html()}<p class="bc-why">${esc(window.__bugHelp.safe())}</p>` : "");
 

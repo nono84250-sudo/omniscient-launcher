@@ -41,7 +41,7 @@ function loadAccounts() {
 // accounts.bin tronque — avale silencieusement au redemarrage par le catch de loadAccounts()
 // (repart sur une liste vide), et le PROCHAIN "se souvenir de moi" reussi reecrivait alors le
 // fichier depuis cet etat vide, effacant definitivement les autres comptes memorises sans
-// aucune trace (voir audit 2026-10-10, §3.7).
+// aucune trace (§3.7).
 function saveAccounts(state) {
   if (!encryptionAvailable()) return false;
   const encrypted = safeStorage.encryptString(JSON.stringify(state));

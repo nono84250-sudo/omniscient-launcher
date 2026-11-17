@@ -15,9 +15,9 @@ if (missing.length > 0) {
   process.exit(1);
 }
 
-// Audit 14/10 (B8) : sans MCHUB_SITE_URL, le launcher distribue visait http://localhost:3000
+// Sans MCHUB_SITE_URL, le launcher distribue visait http://localhost:3000
 // sans prevenir. Un build publie doit viser une adresse https publique.
-// Audit 25/10 : un build publie vise EXACTEMENT le site officiel (sans www, un seul slash final
+// Un build publie vise EXACTEMENT le site officiel (sans www, un seul slash final
 // tolere puis retire). Toute autre adresse (faute de frappe, ancien domaine vercel.app, site de
 // test) est refusee, sauf build de test explicite avec MCHUB_ALLOW_CUSTOM_SITE=1.
 const OFFICIAL_SITE_URL = "https://omniscientlauncher.com";

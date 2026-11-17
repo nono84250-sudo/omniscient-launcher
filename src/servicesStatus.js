@@ -62,7 +62,7 @@ const GROUPS = [
       { id: "curseforgeCdn", url: "https://edge.forgecdn.net/", method: "HEAD" },
     ],
   },
-  // FTB (21/10) : liste des fichiers des packs FTB et leurs propres fichiers (voir modpack.js).
+  // FTB : liste des fichiers des packs FTB et leurs propres fichiers (voir modpack.js).
   {
     id: "ftb",
     name: "FTB",
@@ -98,8 +98,8 @@ async function checkOne(service) {
   }
 }
 
-// Un seul essai lent ou rate ne suffit plus a mettre le point en orange/rouge (bug signale par
-// Rushi le 18/10) : le premier appel paie la resolution DNS et la poignee de main TLS, souvent
+// Un seul essai lent ou rate ne suffit plus a mettre le point en orange/rouge : le premier appel
+// paie la resolution DNS et la poignee de main TLS, souvent
 // pendant que tout le launcher demarre. On refait donc un essai un instant plus tard et on garde
 // le meilleur des deux.
 const STATE_RANK = { ok: 0, degraded: 1, offline: 2 };

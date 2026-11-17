@@ -1,7 +1,7 @@
 require("dotenv").config({ path: require("node:path").join(__dirname, "..", ".env") });
 const { app, BrowserWindow, ipcMain, dialog, shell, globalShortcut, session, screen, nativeImage } = require("electron");
 
-// Verrou de navigation (audit 14/10, L1). Avant : un lien glisse sur la fenetre, ou un
+// Verrou de navigation. Avant : un lien glisse sur la fenetre, ou un
 // window.open, chargeait une page distante DANS la fenetre du launcher, avec le preload, donc
 // avec toute l'API window.mchub (lancer un serveur piege, envoyer des demandes d'ami...).
 //  - Aucune page ne peut ouvrir de nouvelle fenetre (toutes les webContents, celle de la
@@ -43,24 +43,24 @@ function isLocalSender(event) {
   }
 }
 
-// Laboratoire (25/10) : chaque canal d'une fonctionnalité cachée répond « feature_off » sans
+// Laboratoire : chaque canal d'une fonctionnalité cachée répond « feature_off » sans
 // rien lancer (cloud:* = mondes en ligne, play:* = mode Jouer, friends:* = amis). Voir features.js.
 const FEATURE_IPC = [
   ["cloud:", "worlds"],
   ["play:", "play"],
   ["friends:", "friends"],
-  // Page d'une version (27/10) : Mon pack, version vanilla (« vanillaPage ») ou Pack Omniscient.
+  // Page d'une version : Mon pack, version vanilla (« vanillaPage ») ou Pack Omniscient.
   ["myPack:", ["myPack", "vanillaPage", "omniPack"]],
-  // 03/11 (Rushi) : l'export « Pour un ami » suit l'interrupteur « packExport » (bêta publique), pas
+  // L'export « Pour un ami » suit l'interrupteur « packExport » (bêta publique), pas
   // « omniPack » (bêta fermée). Avant, il ne marchait que pour les bêta testeurs. Ces trois lignes
   // passent avant « omniPack: » (la première qui correspond compte).
   ["omniPack:exportFriend", ["packExport", "omniPack"]],
   ["omniPack:friendPlan", ["packExport", "omniPack"]],
   ["omniPack:exportPreview", ["packExport", "omniPack"]],
   ["omniPack:", "omniPack"],
-  // « Importer un pack » (27/10) : export CurseForge ou pack Modrinth, l'un des deux suffit.
+  // « Importer un pack » : export CurseForge ou pack Modrinth, l'un des deux suffit.
   ["cfPack:", ["cfImport", "mrImport"]],
-  // Aide Discord dans les bugs (02/11) : copier tout, zip, lien du Discord.
+  // Aide Discord dans les bugs : copier tout, zip, lien du Discord.
   ["bugHelp:", "bugDiscord"],
 ];
 const registerIpcHandler = ipcMain.handle.bind(ipcMain);
@@ -82,10 +82,10 @@ ipcMain.handle = (channel, listener) =>
 // sur le meme GAME_ROOT, ecritures concurrentes sans verrou sur settings.json/accounts.bin,
 // double enregistrement du raccourci global de debug). Doit etre demande avant toute autre
 // initialisation (avant meme la creation de la premiere fenetre).
-// Icone de la barre des taches Windows (17/10, vu par Rushi : logo Electron en dev). Sans
+// Icone de la barre des taches Windows (logo Electron en dev). Sans
 // AppUserModelId, Windows range la fenetre sous electron.exe et prend son icone ; avec le meme id
 // que electron-builder (build.appId), la fenetre garde l'icone Omniscient, en dev comme installe.
-// 18/10 : en npm start, l'id seul ne suffisait pas (toujours logo Electron, notifications
+// En npm start, l'id seul ne suffisait pas (toujours logo Electron, notifications
 // « Electron »). Windows tire le nom et l'icone des notifications d'un raccourci du menu Demarrer
 // portant cet id : l'installateur le cree, en dev voir ensureDevStartMenuShortcut. Id a part en dev
 // pour ne pas se melanger avec une version installee sur le meme PC.
@@ -130,10 +130,10 @@ const fsp = require("node:fs/promises");
 const crypto = require("node:crypto");
 const logStore = require("./logStore");
 
-// Liens « Ouvrir dans le launcher » de la fiche serveur du site (16/10) :
-//   omniscient://server/<slug>  ouvre la fiche de ce serveur ;
-//   omniscient://join/<CODE>    rejoint un serveur prive par son code d'invitation, puis l'ouvre ;
-//   omniscient://team/<slug>    ouvre la page Serveurs filtree sur cette team.
+// Liens « Ouvrir dans le launcher » de la fiche serveur du site :
+//   omniscient://server/<slug> ouvre la fiche de ce serveur ;
+//   omniscient://join/<CODE> rejoint un serveur prive par son code d'invitation, puis l'ouvre ;
+//   omniscient://team/<slug> ouvre la page Serveurs filtree sur cette team.
 // Rien d'autre n'est accepte : le lien vient d'une page web, donc seul un slug ou un code au
 // format attendu passe, et il ne fait qu'ouvrir une fiche (jamais lancer le jeu tout seul).
 // Le renderer recupere le lien en attente quand il est pret (app:takeServerLink) ; ensuite les
@@ -154,18 +154,18 @@ function parseServerLink(raw) {
   const value = url.pathname.replace(/^\/+|\/+$/g, "");
   if (url.hostname === "server" && /^[a-z0-9](?:[a-z0-9-]{0,58}[a-z0-9])?$/.test(value)) return { kind: "server", value };
   if (url.hostname === "join" && /^[A-Za-z0-9]{4,16}$/.test(value)) return { kind: "join", value: value.toUpperCase() };
-  // omniscient://team/<slug> (19/10) : la page Serveurs filtree sur cette team.
+  // omniscient://team/<slug> : la page Serveurs filtree sur cette team.
   if (url.hostname === "team" && /^[a-z0-9-]{1,80}$/.test(value)) return { kind: "team", value };
-  // omniscient://test-pack/<jeton> (31/10) : « Tester dans le launcher » de l'admin du site. Le jeton
+  // omniscient://test-pack/<jeton> : « Tester dans le launcher » de l'admin du site. Le jeton
   // est signé par le site (10 min, pour UN pack proposé) ; le lien n'installe qu'une copie privée.
   if (url.hostname === "test-pack" && /^[\w-]{8,64}\.\d{9,11}\.[\w-]{32}$/.test(value)) return { kind: "test-pack", value };
-  // omniscient://test-bug/<slug> (31/10) : « Essayer dans le launcher » de l'admin. Montre la fenêtre d'une
+  // omniscient://test-bug/<slug> : « Essayer dans le launcher » de l'admin. Montre la fenêtre d'une
   // fiche déjà reçue, sans jamais réparer ni compter : rien à protéger par un jeton.
   if (url.hostname === "test-bug" && /^[a-z0-9-]{1,80}$/.test(value)) return { kind: "test-bug", value };
   return null;
 }
 
-// Double-clic sur un .omnipack (audit du 01/11) : le fichier arrive dans la ligne de commande, et la
+// Double-clic sur un .omnipack : le fichier arrive dans la ligne de commande, et la
 // fenêtre habituelle d'import s'ouvre. Elle montre le pack et attend une confirmation : rien ne
 // s'installe tout seul, et l'import ne garde que les fichiers permis (voir omniPack.js).
 let pendingPackFile = null;
@@ -205,7 +205,7 @@ if (process.defaultApp && process.argv.length >= 2) {
 } else {
   app.setAsDefaultProtocolClient(SERVER_LINK_SCHEME);
 }
-// Fichiers .omnipack avec le logo Omniscient (28/10, Rushi). Version installée : l'installateur s'en
+// Fichiers .omnipack avec le logo Omniscient. Version installée : l'installateur s'en
 // charge (fileAssociations de package.json). En développement (electron .) : écrit pour ce compte
 // Windows seulement (HKCU), le logo seul (l'ouverture par double-clic demande la version installée).
 if (process.platform === "win32" && process.defaultApp) {
@@ -232,14 +232,14 @@ if (process.platform === "win32" && process.defaultApp) {
 // chacun leur chemin via app.getPath("userData") des le chargement du module.
 //
 // Dev et production ont CHACUN leur propre dossier (".omniscient-launcher-dev" vs
-// ".omniscient-launcher", distingues via app.isPackaged) — decision du 2026-10-10, pour que
+// ".omniscient-launcher", distingues via app.isPackaged) — decision, pour que
 // tester en dev ne touche jamais aux vrais comptes/reglages de production, et inversement.
 // Avant cette separation, les deux environnements partageaient le meme dossier, ce qui rendait
 // impossible de "repartir de zero" en dev sans affecter la prod (et vice-versa).
 const isDev = !app.isPackaged;
 const defaultUserDataPath = app.getPath("userData");
 // MCHUB_USER_DATA_DIR (dev seulement) : profil jetable pour tester sans toucher au dossier dev
-// habituel (ex. deplacement du dossier des jeux, serie 2 idee 9).
+// habituel (ex. deplacement du dossier des jeux).
 const dottedUserDataPath =
   (isDev && process.env.MCHUB_USER_DATA_DIR) || path.join(path.dirname(defaultUserDataPath), isDev ? ".omniscient-launcher-dev" : ".omniscient-launcher");
 // Migration ponctuelle de l'ancien dossier par defaut d'Electron — uniquement en production :
@@ -256,7 +256,7 @@ if (!isDev && !fs.existsSync(dottedUserDataPath) && fs.existsSync(defaultUserDat
 }
 app.setPath("userData", dottedUserDataPath);
 
-// Dossier des jeux (serie 2, idee 9) : a lire avant mcLaunch et javaManager.
+// Dossier des jeux : a lire avant mcLaunch et javaManager.
 const gamesLocation = require("./gamesLocation");
 const msAuth = require("./msAuth");
 const { launchMinecraft, GAME_ROOT, getRunningGame, stopGame } = require("./mcLaunch");
@@ -310,11 +310,11 @@ try {
 
 // URL du site Omniscient, source de vérité (voir cahier des charges, section
 // "modèle de synchronisation").
-// Plus d'adresse de secours ni de sonde au démarrage (audit 25/10) : l'ancienne adresse
+// Plus d'adresse de secours ni de sonde au démarrage : l'ancienne adresse
 // vercel.app est retirée, et la fenêtre ne doit plus attendre jusqu'à 4 s par adresse avant de
 // s'ouvrir. Un build publié vise toujours https://omniscientlauncher.com (vérifié au build par
 // scripts/generate-env.js) ; en dev, MCHUB_SITE_URL=http://localhost:3000 reste accepté.
-// Audit du 01/11 : le launcher installé ignore la variable, elle ne sert qu'aux tests en local.
+// Le launcher installé ignore la variable, elle ne sert qu'aux tests en local.
 const SITE_URL = ((!app.isPackaged && process.env.MCHUB_SITE_URL) || generatedEnv.MCHUB_SITE_URL || "http://localhost:3000").trim().replace(/\/$/, "");
 // Pose la Content-Security-Policy (SITE_URL est fixe dès le chargement) : les images
 // de serveur (bannerUrl/iconUrl) viennent du site et doivent pouvoir se charger, mais
@@ -358,7 +358,7 @@ const LAUNCHER_API_KEY = process.env.LAUNCHER_API_KEY || generatedEnv.LAUNCHER_A
 // Optionnel (voir discordPresence.js) : Rich Presence desactivee proprement
 // si absent, jamais une erreur bloquante comme LAUNCHER_API_KEY ci-dessus.
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || generatedEnv.DISCORD_CLIENT_ID;
-// Optionnel aussi (idee 3 du lancement, 19/10) : rapports d'erreurs Sentry, voir errorReports.js.
+// Optionnel aussi : rapports d'erreurs Sentry, voir errorReports.js.
 const errorReports = require("./errorReports");
 errorReports.init({ dsn: process.env.SENTRY_DSN || generatedEnv.SENTRY_DSN, release: app.getVersion(), isEnabled: () => settingsStore.loadSettings().errorReports !== false });
 const REQUEST_TIMEOUT_MS = 8000;
@@ -367,11 +367,11 @@ const REQUEST_TIMEOUT_MS = 8000;
 // (Mes instances, notifications, signalement) : LAUNCHER_API_KEY prouve que
 // c'est ce launcher, X-Minecraft-Token (le vrai jeton d'acces Mojang de la
 // session, verifie cote site aupres de Mojang) prouve QUI joue — avant, le
-// site croyait sur parole le minecraftUuid envoye en parametre (faille IDOR,
-// audit de securite du 2026-09-28). Les deux se cumulent, l'un ne remplace
+// site croyait sur parole le minecraftUuid envoye en parametre (faille IDOR). Les deux se
+// cumulent, l'un ne remplace
 // pas l'autre. Pas de session => pas de jeton a envoyer (les appelants
 // verifient deja currentSession avant d'appeler ceci).
-// Jeton de session (point 3) : le site echange le jeton Mojang contre un jeton
+// Jeton de session : le site echange le jeton Mojang contre un jeton
 // signe valable 15 min (POST /api/launcher/session). Quand il est utilisable, on
 // l'envoie dans X-Launcher-Session a la place de X-Minecraft-Token, qui n'est
 // alors plus transmis a chaque requete. Tant qu'il n'y en a pas (premier appel,
@@ -429,7 +429,7 @@ function requestLauncherSession() {
       if (currentSession?.profile.id !== uuid) return;
       launcherSession = { uuid, token: data.token, expiresAt: data.expiresAt };
       // Laboratoire : ce joueur est peut-être testeur, on relit ses fonctionnalités (une fois par
-      // compte : le rafraîchissement des 10 min suffit ensuite, audit du 25/10).
+      // compte : le rafraîchissement des 10 min suffit ensuite).
       if (featuresSessionUuid !== uuid) {
         featuresSessionUuid = uuid;
         features.refresh();
@@ -469,7 +469,7 @@ function launcherAuthHeaders() {
   if (sessionToken) {
     return { Authorization: `Bearer ${LAUNCHER_API_KEY}`, "X-Launcher-Session": sessionToken, "X-Launcher-Version": app.getVersion() };
   }
-  // Pas encore connecte (2026-10-11 : "Installer" peut maintenant s'utiliser
+  // Pas encore connecte ("Installer" peut maintenant s'utiliser
   // sans compte, voir server:install) — la cle du launcher seule suffit pour
   // les endpoints publics (fiche serveur public, fichiers de modpack) ;
   // X-Minecraft-Token n'est qu'une preuve d'identite en plus, jamais lu que
@@ -500,7 +500,7 @@ function setSession(profile, authorization, { freshLogin = false } = {}) {
   setTimeout(() => {
     try {
       // État relu d'abord : la synchro ne démarre jamais sur un état ancien.
-      // Audit du 28/10 (correctif 6) : réponse reçue il y a moins d'une minute pour ce compte
+      // Réponse reçue il y a moins d'une minute pour ce compte
       // (écran de chargement, jeton de session) : reprise telle quelle, pas de 3e lecture.
       features.recent(60_000).then(() => features.visible("worlds") && worldCloud.start()).catch(() => {});
     } catch {
@@ -577,7 +577,7 @@ async function withSessionRetry(send) {
 }
 
 const SITE_BUSY_MESSAGE = "Le site Omniscient est très demandé : réessaie dans une minute.";
-// Site sature (audit 25/10) : quand la base du site deborde, il repond 503 avec { busy: true } et
+// Site sature : quand la base du site deborde, il repond 503 avec { busy: true } et
 // Retry-After (ou 429 quand un frein par adresse saute). Jusqu'a siteBusyUntil, les appels de fond
 // periodiques (presence, amis des listes, notifications, maintenance, liste des serveurs) ne
 // partent plus du tout : des milliers de launchers qui reessaient chaque minute empecheraient le
@@ -605,7 +605,7 @@ function markSiteBusy(res) {
 }
 
 // `options.background` : appel de fond periodique, saute tant que le site est sature.
-// Laboratoire (25/10) : fonctionnalités visibles pour ce launcher, voir features.js.
+// Laboratoire : fonctionnalités visibles pour ce launcher, voir features.js.
 const features = createFeatures({
   cacheDir: app.getPath("userData"),
   siteUrl: SITE_URL,
@@ -624,7 +624,7 @@ const features = createFeatures({
   },
 });
 ipcMain.handle("features:get", () => features.all());
-// Écran de chargement (retour de Rushi du 25/10 : une icône surgissait 3 s après l'affichage) :
+// Écran de chargement (une icône surgissait 3 s après l'affichage) :
 // le menu attend les droits de CE compte. Compte mémorisé : on laisse d'abord sa reprise de
 // session aboutir (au plus 1,5 s), puis au plus 3,5 s en tout ; sinon le dernier état connu.
 ipcMain.handle("features:ready", async () => {
@@ -639,7 +639,7 @@ ipcMain.handle("features:ready", async () => {
   return features.ready(Math.max(500, 3500 - (Date.now() - start)));
 });
 app.whenReady().then(() => features.start());
-// Catalogue de bugs (31/10, Laboratoire « bugCatalog ») : fiches reçues du site, voir bugCatalog.js.
+// Catalogue de bugs (Laboratoire « bugCatalog ») : fiches reçues du site, voir bugCatalog.js.
 const bugCatalog = createBugCatalog({
   cacheDir: app.getPath("userData"),
   siteUrl: SITE_URL,
@@ -657,12 +657,12 @@ async function fetchJson(url, { background = false, ...options } = {}, { withEta
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
     const res = await fetch(url, { ...options, signal: controller.signal });
-    // 21/10 : « pas de changement » (le site a compare l'ETag envoye) : l'appelant garde ce qu'il a.
+    // « pas de changement » (le site a compare l'ETag envoye) : l'appelant garde ce qu'il a.
     if (res.status === 304) return { notModified: true };
     if (!res.ok) {
       // Le site renvoie un message et parfois un code (ex. « frozen ») : on les garde.
       const body = await res.json().catch(() => null);
-      // Audit de charge du 19/10 (B5) + audit 25/10 : site saturé (503 « busy », ou 429 du frein
+      // + : site saturé (503 « busy », ou 429 du frein
       // par adresse) -> appels de fond en pause et message clair au lieu de « Réponse 500 ».
       const busy = res.status === 429 || (res.status === 503 && (body?.busy === true || body?.code === "busy"));
       if (busy) {
@@ -840,7 +840,7 @@ function createWindow() {
   });
 
   // Ctrl+Shift+D (Cmd+Shift+D sur macOS) : console de debug. Seulement quand la fenetre du
-  // launcher a le focus (audit 25/10) : l'ancien raccourci global (globalShortcut) volait cette
+  // launcher a le focus : l'ancien raccourci global (globalShortcut) volait cette
   // combinaison a toutes les autres applis du PC, Minecraft compris.
   win.webContents.on("before-input-event", (event, input) => {
     const modifier = process.platform === "darwin" ? input.meta : input.control;
@@ -929,8 +929,8 @@ function wireAutoUpdater(win) {
   autoUpdater.on("checking-for-update", () => send({ phase: "checking" }));
   autoUpdater.on("update-available", (info) => {
     // Canal bêta : la dernière bêta publiée est prise si son numéro est plus récent
-    // (electron-updater écarte déjà les numéros plus bas, allowDowngrade étant faux sur ce
-    // canal depuis l'audit 25/10, voir checkForUpdates). Canal stable : seule une version plus
+    // (electron-updater écarte déjà les numéros plus bas, voir checkForUpdates). Canal stable :
+    // seule une version plus
     // récente est prise, SAUF quand le joueur vient de décocher le canal bêta
     // alors qu'une bêta tourne (ex. 0.4.0-beta.1) : il revient alors sur la
     // dernière version stable publiée (ex. 0.3.3), même si son numéro est plus bas.
@@ -1016,7 +1016,7 @@ function checkForUpdates() {
     autoUpdater.allowPrerelease = betaChannel;
     // Le setter de channel active déjà allowDowngrade ; on le fixe explicitement après.
     // Retour à un numéro plus bas autorisé SEULEMENT pendant le retour bêta -> stable choisi
-    // par le joueur (case décochée alors qu'une bêta tourne). Avant (audit 25/10), il était
+    // par le joueur (case décochée alors qu'une bêta tourne). Avant, il était
     // permis en permanence, donc aussi sur le canal bêta : n'importe quelle version plus
     // ancienne publiée pouvait y être réinstallée.
     const leavingBeta = !betaChannel && app.getVersion().includes("-");
@@ -1073,13 +1073,13 @@ ipcMain.handle("diagnostics:exportReport", async () => {
   return { ok: true, path: reportPath };
 });
 
-// Infos systeme + dossier des jeux et sa place libre (serie 2, idee 9).
+// Infos systeme + dossier des jeux et sa place libre.
 ipcMain.handle("diagnostics:getSystemInfo", async () => ({
   ...(await diagnostics.getSystemInfo({ ...settingsStore.loadSettings(), gameRoot: GAME_ROOT, appVersion: app.getVersion() })),
   ...(await gamesFolderInfo()),
 }));
 ipcMain.handle("diagnostics:getCacheSizeBytes", () => diagnostics.getCacheSizeBytes());
-// Refuses pendant une partie, un lancement ou une installation (audit 25/10) : versions/,
+// Refuses pendant une partie, un lancement ou une installation : versions/,
 // libraries/ et assets/ sont partages par tous les serveurs, les effacer a ce moment-la casse le
 // jeu en cours ou laisse une installation a moitie ecrite. Meme garde que « Supprimer les
 // fichiers » d'une instance (instanceBusy, ici pour n'importe quel serveur).
@@ -1101,7 +1101,7 @@ ipcMain.handle("diagnostics:clearCache", () => {
 // Toutes les requêtes réseau vers le site passent par le processus principal
 // (jamais par le renderer) : évite le CORS et garde le renderer sans accès
 // réseau direct, conformément aux bonnes pratiques Electron.
-// Cache des lectures « serveurs » (règle de Rushi, 14/10) : le launcher ne redemande pas au site
+// Cache des lectures « serveurs » : le launcher ne redemande pas au site
 // ce qu'il sait depuis moins d'une minute. Un « introuvable » ou « gelé » (404/403) est gardé
 // 30 s, pour ne plus refaire à chaque page la rafale de 404 des serveurs privés ou en pause.
 // Une panne réseau n'est jamais gardée. Vidé quand le joueur agit (rejoindre, quitter,
@@ -1110,7 +1110,7 @@ ipcMain.handle("diagnostics:clearCache", () => {
 const SERVER_CACHE_MS = REFRESH.SERVER_DETAIL_CACHE_MS;
 const SERVER_MISS_CACHE_MS = 30_000;
 // Liste d'amis lue pour les listes de serveurs (« Un ami y joue », appel de fond) : gardée
-// 5 minutes (audit 25/10, charge du site). La page Amis, elle, reste à une minute.
+// 5 minutes (charge du site). La page Amis, elle, reste à une minute.
 const FRIENDS_BACKGROUND_CACHE_MS = 5 * 60_000;
 const serverCache = new Map();
 // Demandes en cours : deux pages qui veulent la même fiche au même moment n'en font qu'une.
@@ -1168,7 +1168,7 @@ ipcMain.handle("servers:clearCache", () => {
   return { ok: true };
 });
 
-// 21/10 (cache des fiches) : le site repond 304 « pas de changement » si la liste n'a pas bouge
+// Cache des fiches : le site repond 304 « pas de changement » si la liste n'a pas bouge
 // depuis la derniere recue (lastServerList, avec son empreinte ETag) : on garde alors celle-ci,
 // sans la retelecharger. Gardee en memoire REFRESH.LIST_CACHE_MS (3 min) ; « Actualiser » vide tout.
 async function fetchServerListFromSite({ background = false } = {}) {
@@ -1203,11 +1203,11 @@ async function fetchOwnerServer(slug) {
   );
   const { ip: _ip, ...server } = data.server || {};
   // Cette route ne renvoie pas le slug : sans lui, « Jouer » partait avec un slug
-  // undefined (GET /api/launcher/servers/undefined vu dans les logs du 14/10).
+  // undefined.
   return data.server ? { ...server, slug } : null;
 }
 
-// « Petit serveur du jour » (19/10, variante A validee par Rushi) : choisi par le site, un par jour
+// « Petit serveur du jour » : choisi par le site, un par jour
 // (heure de Bruxelles). server peut etre null ; le renderer retombe alors sur l'ancien choix.
 ipcMain.handle("servers:featured", async () => {
   try {
@@ -1218,12 +1218,12 @@ ipcMain.handle("servers:featured", async () => {
   }
 });
 
-// Serveur retiré du site (20/10, Bubule Land en 404 à chaque ouverture de Ma bibliothèque : son
+// Serveur retiré du site (Bubule Land en 404 à chaque ouverture de Ma bibliothèque : son
 // instance est encore sur le disque, donc l'onglet Installés redemandait sa fiche à chaque fois).
 // Un vrai 404 (joueur connecté, route propriétaire essayée aussi) est retenu dans
 // settings.removedServers et la fiche n'est redemandée qu'une fois toutes les 12 h. Le serveur
 // redevient normal dès qu'il revient dans l'annuaire. Les fichiers de l'instance ne sont jamais touchés.
-// 23/10 (Rushi : « pas de demandes à la con au site ») : une fois par jour au plus, et sans
+// Une fois par jour au plus, et sans
 // session le 404 public est retenu en mémoire jusqu'à la fermeture du launcher (pas enregistré :
 // le serveur privé d'un propriétaire déconnecté ne doit pas passer pour retiré au démarrage suivant).
 const REMOVED_SERVER_RECHECK_MS = 24 * 60 * 60 * 1000;
@@ -1261,8 +1261,8 @@ function forgetRemovedServers(servers) {
 
 ipcMain.handle("servers:get", async (_event, slug) => {
   if (isRecentlyRemoved(slug)) return { ok: false, error: "Serveur retiré", frozen: false, notFound: true, removed: true };
-  // Fiche complete d'un de SES serveurs pas encore dans l'annuaire (19/10, Hypixel « en attente »
-  // vu vide par Rushi) : la route propriétaire ne renvoie que de quoi lancer (ni bannière, ni
+  // Fiche complete d'un de SES serveurs pas encore dans l'annuaire : la route propriétaire ne
+  // renvoie que de quoi lancer (ni bannière, ni
   // description, ni page). La fiche publique est donc demandée avec la preuve du propriétaire
   // (jeton de session) ; la route propriétaire ne sert plus que de secours, marquée « partielle ».
   const asOwner = Boolean(currentSession && ownerOnlySlugs.has(slug));
@@ -1278,7 +1278,7 @@ ipcMain.handle("servers:get", async (_event, slug) => {
     return { ok: true, server: data.server };
   } catch (publicError) {
     let error = publicError;
-    // 404 public sur un serveur que le joueur connecté peut quand même voir (14/10, bug « Récents
+    // 404 public sur un serveur que le joueur connecté peut quand même voir (bug « Récents
     // vide ») : le SIEN (privé, en pause, en attente de vérification), absent de l'annuaire
     // public. Sans ce second essai, le renderer le croyait supprimé et l'effaçait des Récents et
     // des Favoris (pruneDeadSlug), alors que le menu rapide le montrait encore. Même route que
@@ -1312,7 +1312,7 @@ ipcMain.handle("servers:get", async (_event, slug) => {
   }
 });
 
-// Le bouton "Installer" d'une fiche (2026-10-11) : une fois CE serveur precis
+// Le bouton "Installer" d'une fiche : une fois CE serveur precis
 // pret (moddé OU vanilla — un vanilla vaut aussi la peine d'etre prepare a
 // l'avance), plus besoin de le reafficher — jamais une desactivation
 // globale, juste pour ce slug-la (voir renderDetail cote renderer.js).
@@ -1374,7 +1374,7 @@ ipcMain.handle("servers:mine", async () => {
   }
 });
 
-// "Mes instances" sans session Microsoft active (2026-10-12, jouer en solo hors ligne) :
+// "Mes instances" sans session Microsoft active (jouer en solo hors ligne) :
 // servers:mine ci-dessus exige currentSession (refuse tout sans ça, voir son premier
 // controle) — dans ce cas, le renderer bascule sur cette liste a la place, qui ne lit QUE le
 // disque local (listInstalledInstances, voir modpack.js), jamais le site. Volontairement
@@ -1394,7 +1394,7 @@ ipcMain.handle("instances:listInstalled", async () => {
 // Rien n'est configurable dans le launcher : la console de gestion d'un
 // serveur (Mes instances) et la creation d'une nouvelle instance ouvrent
 // toujours le site dans le navigateur par defaut, jamais une fenetre interne.
-// 26/10 : section « reports » = page Signalements du serveur (clic sur une notification de
+// Section « reports » = page Signalements du serveur (clic sur une notification de
 // nouveau signalement). Seule valeur acceptee, jamais une adresse venue du renderer.
 ipcMain.handle("servers:openManage", (_event, serverId, section) => {
   if (typeof serverId !== "string" || !serverId) return;
@@ -1402,8 +1402,8 @@ ipcMain.handle("servers:openManage", (_event, serverId, section) => {
   shell.openExternal(`${SITE_URL}/manage/${encodeURIComponent(serverId)}${suffix}`);
 });
 
-// Teams (19/10) : le renderer ne donne qu'un type et un slug (verifie ici), jamais une adresse.
-//   team  : page de la team (/team/<slug>) ;
+// Teams : le renderer ne donne qu'un type et un slug (verifie ici), jamais une adresse.
+//   team : page de la team (/team/<slug>) ;
 //   claim : page Contact avec le sujet « C'est mon serveur » et la fiche deja indiquee.
 ipcMain.handle("site:openTeamLink", (_event, kind, slug) => {
   if (typeof slug !== "string" || !/^[a-z0-9-]{1,80}$/.test(slug)) return;
@@ -1420,7 +1420,7 @@ const LEGAL_URLS = {
   privacy: "https://omniscientlauncher.com/confidentialite",
 };
 ipcMain.handle("app:openLegal", (_event, page) => {
-  // « Récupérer mes données » (Mon compte, 23/10) : la page Paramètres du site, où le bouton existe
+  // « Récupérer mes données » (Mon compte) : la page Paramètres du site, où le bouton existe
   // déjà (même logique que « Supprimer mon compte », qui vit sur le site). SITE_URL pour suivre
   // le site local pendant les tests.
   if (page === "myData") return shell.openExternal(`${SITE_URL}/dashboard/parametres#mes-donnees`);
@@ -1480,7 +1480,7 @@ ipcMain.handle("servers:openPageLink", (_event, kind, value) => {
   if (isValidPageLink(kind, value)) shell.openExternal(new URL(value.trim()).href);
 });
 
-// Mods qu'un modpack CurseForge interdit de telecharger par les autres launchers (14/10) : le
+// Mods qu'un modpack CurseForge interdit de telecharger par les autres launchers : le
 // joueur les telecharge lui-meme et les laisse dans son dossier Telechargements, ou
 // installModpack les retrouve (taille + empreinte SHA-1, voir modpack.js/findManualFiles).
 function manualModsSearchDirs() {
@@ -1497,7 +1497,7 @@ function modpackErrorFields(error) {
   if (error?.code !== "manual_mods" || !Array.isArray(error.manualMods)) return {};
   return {
     code: "manual_mods",
-    // Noms des mods bloques retrouves sur Modrinth (liste « Installés depuis Modrinth », point 4).
+    // Noms des mods bloques retrouves sur Modrinth (liste « Installés depuis Modrinth »).
     fromModrinthMods: Array.isArray(error.fromModrinthMods) ? error.fromModrinthMods.slice(0, 200).map((name) => String(name).slice(0, 120)) : [],
     manualMods: error.manualMods.slice(0, 200).map((mod) => ({
       fileId: mod.fileId,
@@ -1507,15 +1507,15 @@ function modpackErrorFields(error) {
       reason: mod.reason === "removed" ? "removed" : "blocked",
       kind: mod.kind === "rp" || mod.kind === "sh" ? mod.kind : "mod",
     })),
-    // Mods bloques deja pris sur Modrinth (bandeau de la fenetre, repere B de la preview du 16/10).
+    // Mods bloques deja pris sur Modrinth (bandeau de la fenetre).
     fromModrinth: Number.isInteger(error.fromModrinth) && error.fromModrinth > 0 ? error.fromModrinth : 0,
   };
 }
 
 // Page CurseForge d'un mod bloque : uniquement https://www.curseforge.com. Le lien vient de
 // modpack.js (page exacte du fichier donnee par le site, sinon page du projet par son id). Plus
-// de recherche par nom (14/10, Rushi) : plusieurs mods peuvent porter le meme nom.
-// Lien de page de mod accepte seulement vers https://www.curseforge.com (lot 5, rapport au site).
+// de recherche par nom : plusieurs mods peuvent porter le meme nom.
+// Lien de page de mod accepte seulement vers https://www.curseforge.com (rapport au site).
 function safeModPageUrl(pageUrl) {
   try {
     const parsed = new URL(String(pageUrl || ""));
@@ -1538,7 +1538,7 @@ ipcMain.handle("modpack:openDownloads", () => {
   const [downloads] = manualModsSearchDirs();
   if (downloads) shell.openPath(downloads);
 });
-// Petite fenetre "Reglages" d'une instance (Mes instances, 2026-10-13) : lit/modifie le canal
+// Petite fenetre "Reglages" d'une instance (Mes instances) : lit/modifie le canal
 // du modpack (release/beta, voir server.modpackChannel et /api/launcher/servers/[slug]/channel)
 // SANS ouvrir le site — nouveau bouton distinct de "Gerer" ci-dessus, qui continue d'ouvrir le
 // navigateur comme avant. Meme pattern reseau que selftest:report (pas de retry de session,
@@ -1565,7 +1565,7 @@ ipcMain.handle("servers:setChannel", async (_event, { slug, modpackChannel }) =>
     return { ok: false, error: error instanceof Error ? error.message : "Erreur inconnue" };
   }
 });
-// Case "Me prevenir du changement de statut de cette instance" (point 9, meme petite fenetre
+// Case "Me prevenir du changement de statut de cette instance" (meme petite fenetre
 // "Reglages" que getChannel/setChannel ci-dessus, voir INSTANCE_SETTINGS_FIELDS cote renderer).
 // Contrairement au canal du modpack, PAS reserve au proprietaire : s'applique a TOUTE instance
 // de "Mes instances" (possedee OU rejointe) — exige donc juste une session Microsoft active
@@ -1605,7 +1605,7 @@ ipcMain.handle("servers:setWatch", async (_event, { slug, notifyOnStatusChange }
   }
 });
 
-// Systeme d'amis (2026-10-14, demande puis accord) : page "Amis" de la sidebar (voir nav-friends dans
+// Systeme d'amis (demande puis accord) : page "Amis" de la sidebar (voir nav-friends dans
 // index.html / wireFriends dans renderer.js). Comme servers:getWatch/setWatch ci-dessus, exige
 // juste une session Microsoft active (pas de preuve de propriete a verifier ici) — l'UUID et le
 // pseudo envoyes au site sont ceux du profil DEJA connu du launcher (currentSession), jamais
@@ -1622,7 +1622,7 @@ ipcMain.handle("friends:list", async (_event, opts) => {
     const data = await cachedFetch(
       `friends:${uuid}`,
       () => fetchJson(`${SITE_URL}/api/launcher/friends?minecraftUuid=${encodeURIComponent(uuid)}`, { headers: launcherAuthHeaders(), background }),
-      // Audit du 28/10 (correctif 2) : un nombre. Avant, un objet { maxAgeMs } : la comparaison
+      // Un nombre. Avant, un objet { maxAgeMs } : la comparaison
       // de cachedFetch etait toujours fausse et la liste etait redemandee au site a chaque fois.
       background ? FRIENDS_BACKGROUND_CACHE_MS : SERVER_CACHE_MS,
     );
@@ -1646,7 +1646,7 @@ ipcMain.handle("friends:add", async (_event, minecraftUsername) => {
     await fetchJson(`${SITE_URL}/api/launcher/friends`, {
       method: "POST",
       headers: { ...launcherAuthHeaders(), "Content-Type": "application/json" },
-      // `query` = pseudo OU code d'ami (reglage « Qui peut m'ajouter », 18/10) ; targetUsername garde
+      // `query` = pseudo OU code d'ami (reglage « Qui peut m'ajouter ») ; targetUsername garde
       // pour un site plus ancien.
       body: JSON.stringify({ minecraftUuid: uuid, minecraftUsername: currentSession.profile.name, targetUsername: minecraftUsername, query: minecraftUsername }),
     });
@@ -1656,7 +1656,7 @@ ipcMain.handle("friends:add", async (_event, minecraftUsername) => {
     return { ok: false, error: error instanceof Error ? error.message : "Erreur inconnue" };
   }
 });
-// « Qui peut m'ajouter en ami » (variante C, 18/10) : meme reglage que sur le site (page Amis et
+// « Qui peut m'ajouter en ami » : meme reglage que sur le site (page Amis et
 // Parametres > Confidentialite). friendPolicy = "all" | "code" | "none", friendCode = « K7Q-9XM ».
 ipcMain.handle("friends:getSettings", async () => {
   if (!currentSession) return { ok: false, error: "Pas de compte Microsoft connecté." };
@@ -1727,14 +1727,14 @@ ipcMain.handle("friends:remove", async (_event, friendUserId) => {
   }
 });
 // Heartbeat de presence (voir lib/presence.ts cote site) : envoye par le renderer
-// (schedulePresence : 3 min hors partie, 5 min fenetre reduite ou en jeu, depuis le 28/10).
+// (schedulePresence : 3 min hors partie, 5 min fenetre reduite ou en jeu).
 // Echec silencieux cote renderer (voir sendPresenceHeartbeat la-bas) : un heartbeat rate
 // ne fait que retarder un peu le passage "hors ligne" d'un ami, jamais a signaler au joueur.
-// Idee 2 du lancement (19/10) : ce meme appel passe par /api/launcher/pulse, qui renvoie en plus
+// Idee 2 du lancement : ce meme appel passe par /api/launcher/pulse, qui renvoie en plus
 // l'etat de maintenance (lu en cache cote site) et, si withNotifications, les notifications.
 // Le renderer evite ainsi deux appels separes. Site pas encore a jour (404) : ancienne route
 // /api/launcher/presence, retenue pour toute la session.
-// Correctif 3 de l'audit du 28/10 : si withFriends, le site renvoie aussi la liste d'amis (meme
+// Si withFriends, le site renvoie aussi la liste d'amis (meme
 // forme que GET /api/launcher/friends), gardee dans le meme cache que friends:list. Un site plus
 // ancien ignore la demande : le renderer garde alors l'appel a part.
 let pulseUnsupported = false;
@@ -1744,7 +1744,7 @@ ipcMain.handle("presence:heartbeat", async (_event, opts) => {
   }
   try {
     const uuid = currentSession.profile.id;
-    // playingSlug (16/10, « Un ami y joue ») : le serveur du jeu lancé, dans le même appel que
+    // playingSlug (« Un ami y joue ») : le serveur du jeu lancé, dans le même appel que
     // d'habitude. Le site ne le garde que s'il est dans l'annuaire public (jamais un privé).
     const payload = { minecraftUuid: uuid, minecraftUsername: currentSession.profile.name, playingSlug: publicPlayingSlug() };
     const post = (route, body) =>
@@ -1833,8 +1833,8 @@ ipcMain.handle("app:restart", () => {
 // Ces deux appels n'ont besoin QUE de la cle API (comme joinServerByCode plus bas) : la
 // route /api/launcher/maintenance n'exige aucune identite joueur cote site, et
 // launcherAuthHeaders() dereferencerait currentSession (null avant toute connexion) —
-// exactement le moment ou l'ecran de maintenance doit pouvoir bloquer (voir audit 2026-10-10,
-// §3.3 : le TypeError resultant etait avale par le catch ci-dessous, fail-open silencieux).
+// exactement le moment ou l'ecran de maintenance doit pouvoir bloquer (§3.3 : le TypeError
+// resultant etait avale par le catch ci-dessous, fail-open silencieux).
 ipcMain.handle("maintenance:check", async (_event, opts) => {
   try {
     const data = await fetchJson(`${SITE_URL}/api/launcher/maintenance`, {
@@ -1945,11 +1945,11 @@ ipcMain.handle("servers:leaveJoined", (_event, slug) => {
   return { ok: true };
 });
 
-// --- Menu « ⋯ » des cartes d'instance + « Arrêter le jeu » (16/10, choix A de Rushi) ---------
+// --- Menu « ⋯ » des cartes d'instance + « Arrêter le jeu » ---------
 // Serveur moddé : son dossier instances/<slug>. Vanilla : les fichiers du jeu sont partagés
 // (GAME_ROOT), instances/<slug> ne contient qu'un marqueur — rien de propre à supprimer.
 const INSTANCE_SLUG_RE = /^[a-z0-9][a-z0-9_-]{0,80}$/i;
-// Tout handler qui construit instances/<slug> verifie d'abord le slug (audit 25/10) : un slug
+// Tout handler qui construit instances/<slug> verifie d'abord le slug : un slug
 // comme "../x" sortirait sinon du dossier des instances.
 function isValidInstanceSlug(slug) {
   return typeof slug === "string" && INSTANCE_SLUG_RE.test(slug);
@@ -2052,7 +2052,7 @@ ipcMain.handle("instances:openLogsFolder", async (_event, slug) => {
   }
 });
 
-// Taille sur le disque de chaque serveur installe (Ma bibliotheque > Installes, lot 3). Lue en
+// Taille sur le disque de chaque serveur installe (Ma bibliotheque > Installes). Lue en
 // arriere-plan apres l'affichage de la liste.
 ipcMain.handle("instances:sizes", async (_event, slugs) => {
   const out = {};
@@ -2087,9 +2087,9 @@ ipcMain.handle("instances:deleteFiles", async (_event, slug, { keepPersonal = tr
     const busy = instanceBusy(slug);
     if (busy) return { ok: false, code: busy };
     const { instanceDir, modded } = await instanceDirs(slug);
-    // Serveur vanilla retiré du site (23/10) : son dossier n'a que le marqueur « prêt » ; le retirer
+    // Serveur vanilla retiré du site : son dossier n'a que le marqueur « prêt » ; le retirer
     // suffit pour qu'il quitte Ma bibliothèque. Jamais pour un serveur encore en ligne, sauf
-    // « Désinstaller » (26/10, demande de Rushi) : les fichiers du jeu sont partagés, seul le
+    // « Désinstaller » : les fichiers du jeu sont partagés, seul le
     // marqueur part ; mondes, réglages et dossier partagé ne sont pas touchés.
     if (!modded && (uninstall || isKnownRemoved(slug))) {
       await fsp.rm(path.join(instanceDir, ".omniscient-ready.json"), { force: true });
@@ -2113,7 +2113,7 @@ ipcMain.handle("instances:deleteFiles", async (_event, slug, { keepPersonal = tr
   }
 });
 
-// --- Suppression en masse avec corbeille et Annuler (serie 2, idee 7, version A) ---------------
+// --- Suppression en masse avec corbeille et Annuler ---------------
 // Les fichiers de chaque instance cochee partent d'abord dans GAME_ROOT/.corbeille/<lot>/<slug>
 // (simple deplacement sur le meme disque : instantane, et « Annuler » les remet en place). Passe
 // le delai d'Annuler, le lot part dans la corbeille de Windows (encore recuperable tant qu'on ne
@@ -2249,9 +2249,9 @@ ipcMain.handle("reports:submit", async (_event, { slug, category, issue, behavio
   }
 });
 
-// « Prévenir le serveur » (design 17/10, point 6) : rapport d'echec d'installation/lancement envoye
+// « Prévenir le serveur » : rapport d'echec d'installation/lancement envoye
 // au proprietaire, seulement apres le clic du joueur sur « Envoyer » ou « Prévenir le serveur ».
-// Audit du 19/10 (L-B1) : plus aucune ligne du journal (il contenait le chat du jeu, l'adresse
+// Plus aucune ligne du journal (il contenait le chat du jeu, l'adresse
 // d'autres serveurs, parfois prives, et le nom de la session Windows). Ne partent que le type
 // d'erreur, une phrase lisible, un court detail nettoye (mod concerne, message d'erreur) et les
 // versions. Jamais l'e-mail ni le compte Microsoft : seul l'UUID Minecraft sert a compter les
@@ -2332,7 +2332,7 @@ ipcMain.handle("notifications:markRead", async (_event, id) => {
   }
 });
 
-// Article complet d'une actualite (centre de notifications, 25/10) :
+// Article complet d'une actualite (centre de notifications) :
 // site/src/app/api/launcher/news/[id]/route.ts.
 ipcMain.handle("news:get", async (_event, id) => {
   try {
@@ -2427,8 +2427,7 @@ ipcMain.handle("auth:tryRestore", async () => {
   } catch (error) {
     // N'oublier le compte que s'il est vraiment invalide/révoqué côté
     // Microsoft ("invalid_grant") — pas sur une panne réseau passagère, ni
-    // sur le blocage temporaire "en attente d'approbation" (les identifiants
-    // Microsoft/Xbox restent valides dans ce cas).
+    // sur le blocage temporaire "en attente d'approbation".
     if (error.code === "invalid_grant") {
       try {
         sessionStore.forgetAccount(active.id);
@@ -2592,7 +2591,7 @@ require("./skinsMain").register({ getSession: () => currentSession, setSession }
 // Boutons de la barre de titre custom (fenêtre sans cadre natif, voir
 // createWindow) — chaque handler agit sur la fenêtre de l'appelant, jamais
 // une fenêtre codée en dur, au cas où plusieurs fenêtres existeraient.
-// Clic sur une notification Windows (« prêt à jouer », point 4) : ramene la fenetre devant.
+// Clic sur une notification Windows (« prêt à jouer ») : ramene la fenetre devant.
 ipcMain.handle("window:focus", (event) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   if (!win || win.isDestroyed()) return;
@@ -2601,7 +2600,7 @@ ipcMain.handle("window:focus", (event) => {
   win.focus();
 });
 
-// Place libre sur le disque du dossier du jeu (ecran avant la 1re installation, point 4).
+// Place libre sur le disque du dossier du jeu (ecran avant la 1re installation).
 ipcMain.handle("system:diskFree", async () => {
   try {
     await fsp.mkdir(GAME_ROOT, { recursive: true });
@@ -2620,10 +2619,10 @@ function modFileStem(fileName) {
   return stem.length >= 3 ? stem : null;
 }
 
-// Mods a ajouter a la main (point 4, L3-F) : quels fichiers attendus sont deja arrives dans le
+// Mods a ajouter a la main : quels fichiers attendus sont deja arrives dans le
 // dossier Telechargements. Seul le nom est regarde ici (pour cocher la ligne) ; « Réessayer »
 // verifie ensuite taille et empreinte avant de s'en servir.
-// 26/10 (Rushi, pack FTB) : le joueur prenait le gros bouton Download de CurseForge et recevait une
+// Pack FTB : le joueur prenait le gros bouton Download de CurseForge et recevait une
 // autre version, refusee sans explication. `wrong` donne, pour chaque fichier attendu, le fichier
 // du meme mod mais d'une autre version trouve dans Telechargements, pour que la fenetre le dise.
 // Un doublon renomme par le navigateur (« nom (1).jar ») compte comme trouve.
@@ -2722,7 +2721,7 @@ ipcMain.handle("window:expandFromBootstrap", (event) => {
 // Suggestion simple et prudente : la moitie de la RAM systeme, plafonnee a
 // 8 Go (rarement utile pour du Minecraft vanilla meme sur une grosse
 // machine) et jamais en dessous de 2 Go pour la valeur max suggeree.
-// Audit du 01/11 : au lancement, jamais plus que la RAM du PC moins 2 Go (un PC de 8 Go pouvait partir
+// Au lancement, jamais plus que la RAM du PC moins 2 Go (un PC de 8 Go pouvait partir
 // en -Xmx32G : échec ou blocage). Le réglage du joueur n'est pas modifié, seul ce lancement est borné.
 function launchMemory(minGB, maxGB) {
   const totalGB = os.totalmem() / 1024 ** 3;
@@ -2732,12 +2731,12 @@ function launchMemory(minGB, maxGB) {
   return { min: `${Math.min(Number(minGB) || 1, max)}G`, max: `${max}G` };
 }
 
-// RAM par pack (01/11, Laboratoire « packRam ») : la RAM de l'installation (auto, Paramètres ou
+// RAM par pack (Laboratoire « packRam ») : la RAM de l'installation (auto, Paramètres ou
 // choisie), ou `ramGB` pour CE lancement seulement (« Lancer avec X Go cette fois »).
 function playLaunchMemory(version, settings, ramGB) {
   if (!features.visible("packRam")) return launchMemory(settings.memoryMinGB, settings.memoryMaxGB);
   const gb = packRam.intGB(ramGB) || packRam.resolveGB(playMode.getVersion(version?.id) || version, settings.memoryMaxGB);
-  // 02/11 (test ram7) : la ligne donne la RAM vraiment passée au jeu, après le plafond du PC.
+  // La ligne donne la RAM vraiment passée au jeu, après le plafond du PC.
   const mem = launchMemory(Math.min(settings.memoryMinGB, gb), gb);
   const given = parseInt(mem.max, 10);
   logStore.pushLog({ level: "info", source: "launcher", message: `Jouer : ${given} Go de RAM (${packRam.intGB(ramGB) ? "juste cette fois" : version?.ram?.mode || "auto"}${given < gb ? `, ${gb} Go demandés, limité par la RAM du PC` : ""}).` });
@@ -2833,8 +2832,8 @@ ipcMain.handle("status:getServicesStatus", async (_event, force) => {
   return statusCache;
 });
 
-// Test de debit : une seule mesure a la fois, et une seule par jour (demande de
-// Rushi, 15/10 : le test lourd a chaque ouverture faisait ramer le launcher).
+// Test de debit : une seule mesure a la fois, et une seule par jour (le test lourd a
+// chaque ouverture faisait ramer le launcher).
 // Le dernier resultat est garde sur disque : au lancement ou a l'ouverture du
 // panneau, on le reaffiche s'il date d'aujourd'hui (jour local), sinon on refait
 // la mesure. Seul "Actualiser" (`force`) la relance le meme jour. La progression
@@ -2898,7 +2897,7 @@ ipcMain.handle("status:getConnection", (event, force) => {
 
 let gameLaunchInProgress = false;
 
-// Registre des telechargements en cours (2026-10-11, panneau "Taches" façon
+// Registre des telechargements en cours (panneau "Taches" façon
 // Modrinth) — plusieurs installations en parallele pour des serveurs
 // differents sont volontairement permises (modpack.js protege deja chaque
 // instance/fichier individuellement : installLocks/downloadFileLocks). Ce
@@ -2919,7 +2918,7 @@ function serializeTask(task) {
     // "launch" (Rejoindre), "install" (bouton Installer) ou "selftest" — la pilule ne propose
     // « Lancer le jeu quand c'est fini » que pour une simple installation.
     kind: task.kind,
-    // Etapes visibles du panneau de la pilule (design 17/10, point 4).
+    // Etapes visibles du panneau de la pilule.
     step: task.step,
     modded: task.modded,
     blocked: task.blocked,
@@ -2934,7 +2933,7 @@ function serializeTask(task) {
   };
 }
 
-// File d'attente des installations (serie 2, idee 4, version A validee) : les boutons « Installer »
+// File d'attente des installations : les boutons « Installer »
 // passent un par un, dans l'ordre des clics. « Passer en premier » place un serveur juste apres
 // celui en cours (qui continue), ✕ le retire de la file. « Rejoindre » n'attend pas dans cette file.
 const installQueue = [];
@@ -3001,7 +3000,7 @@ function createInstallTask(slug, name, kind = "launch") {
     speedBps: 0,
     error: null,
     controller: new AbortController(),
-    // Pause cooperative (2026-10-11) : le worker de telechargement (modpack.js)
+    // Pause cooperative : le worker de telechargement (modpack.js)
     // attend cette promesse entre deux fichiers — resolue au clic sur Reprendre.
     pausePromise: null,
     resumeResolve: null,
@@ -3021,7 +3020,7 @@ function updateTaskFromProgress(task, status) {
   if (typeof status.modded === "boolean") task.modded = status.modded;
   if (status.name) task.name = status.name;
   if (status.blocked) task.blocked = status.blocked;
-  // Pack FTB (21/10) : nombre de mods venus de CurseForge / Modrinth / serveurs FTB (modpack.js).
+  // Pack FTB : nombre de mods venus de CurseForge / Modrinth / serveurs FTB (modpack.js).
   if (status.origins) task.origins = status.origins;
   if (status.type === "mods" && typeof status.task === "number") {
     task.modsDone = status.task;
@@ -3104,13 +3103,13 @@ ipcMain.handle("tasks:clearCompleted", () => {
 // Prepare les fichiers d'un serveur (modpack + Java requis) sans jamais lancer
 // le jeu — partagee par "Installer" (server:install, aucune connexion requise)
 // et "Rejoindre" (game:launch, qui enchaine avec launchMinecraft). Extraite le
-// 2026-10-11 (audit onboarding) : avant, les deux etaient fusionnes dans
+// Avant, les deux etaient fusionnes dans
 // game:launch, qui exigeait donc une session Microsoft rien que pour
 // telecharger un modpack.
 async function prepareServerFiles(slug, { memoryOverride, onProgress, signal, waitIfPaused }) {
-  // Deux routes possibles (2026-10-11, bouton "Installer" sans connexion) :
-  // /api/launcher/servers/[slug] exige desormais un joueur identifie (audit
-  // securite, "Point 3") car elle renvoie l'IP reelle du serveur — jamais
+  // Deux routes possibles (bouton "Installer" sans connexion) :
+  // /api/launcher/servers/[slug] exige desormais un joueur identifie car elle renvoie
+  // l'IP reelle du serveur — jamais
   // utile pour une simple installation, seulement pour launchMinecraft() plus
   // bas. Sans session, on prend donc /api/public/servers/[slug] (memes infos
   // utiles a l'installation, jamais d'IP, aucune identite requise). Avec
@@ -3126,12 +3125,12 @@ async function prepareServerFiles(slug, { memoryOverride, onProgress, signal, wa
         headers: inviteHeaders(slug),
       });
   const server = data.server;
-  // Mon cloud (03/11) : modpack relie par le proprietaire. « Obligatoire pour rejoindre » : installe
+  // Mon cloud : modpack relie par le proprietaire. « Obligatoire pour rejoindre » : installe
   // avant de se connecter ; « Conseillé » : seulement si le joueur l'a choisi sur la fiche. Il
   // remplace alors le modpack du serveur pour ce lancement (meme dossier d'instance).
   const cloudPack = await fetchCloudPack(slug);
   const useCloud = Boolean(cloudPack && (cloudPack.mode === "required" || cloudChoice(slug) === true));
-  // Choix « juste cette fois » : il ne sert qu'à ce lancement (03/11, bug vu par Rushi : sans
+  // Choix « juste cette fois » : il ne sert qu'à ce lancement (sans
   // « Retenir mon choix », la question ne revenait plus jusqu'à la fermeture du launcher).
   cloudChoiceOnce.delete(slug);
   // Nom et type du serveur pour le panneau de la pilule (etapes moddé / vanilla).
@@ -3185,7 +3184,7 @@ async function prepareServerFiles(slug, { memoryOverride, onProgress, signal, wa
         preferredPath: settings.javaPath || undefined,
         onProgress: (text) => onProgress({ text }),
       });
-      // Marqueur de "pret" pour un serveur vanilla (2026-10-11, bouton
+      // Marqueur de "pret" pour un serveur vanilla (bouton
       // "Installer" ouvert a tous les serveurs, pas seulement les moddes —
       // meme un vanilla vaut la peine d'etre prepare a l'avance, par exemple
       // avant un evenement programme, pour qui a une connexion lente). Les
@@ -3206,7 +3205,7 @@ async function prepareServerFiles(slug, { memoryOverride, onProgress, signal, wa
   return { server, settings, modded, gameJava, memoryMinGB, memoryMaxGB };
 }
 
-// Mon cloud (03/11) : modpack relie au serveur par son proprietaire (voir
+// Mon cloud : modpack relie au serveur par son proprietaire (voir
 // site/src/app/api/launcher/cloud-pack). null s'il n'y en a pas, si l'interrupteur
 // du Laboratoire est cache pour ce joueur, ou si le site ne repond pas (le serveur se lance alors
 // comme avant).
@@ -3221,7 +3220,7 @@ async function fetchCloudPack(slug) {
   }
 }
 
-// Choix du joueur pour un modpack « Conseillé » (03/11, preview « Modpack relié au serveur ») :
+// Choix du joueur pour un modpack « Conseillé » :
 // true = avec le modpack, false = sans (vanilla), absent = lui demander au clic sur Jouer.
 // « Retenir mon choix » l'écrit dans les réglages (modifiable dans ⋯ › Réglages) ; sinon il ne vaut
 // que pour le lancement qui suit, et la question revient au prochain clic sur Jouer.
@@ -3258,7 +3257,7 @@ ipcMain.handle("cloudPack:choose", (_event, slug, withPack, remember) => {
   return true;
 });
 
-// « Envoyer dans le cloud » (03/11, Rushi) : le modpack se fait dans le launcher. Trois envois :
+// « Envoyer dans le cloud » : le modpack se fait dans le launcher. Trois envois :
 //   1. un .mrpack : mods Modrinth en liens, configs, packs de ressources et shaders de l'installation ;
 //   2. la liste des mods CurseForge (une REFERENCE projet + fichier : chaque joueur le telecharge
 //      depuis CurseForge, Omniscient ne garde jamais le fichier) et des mods perso (.jar hors
@@ -3266,9 +3265,9 @@ ipcMain.handle("cloudPack:choose", (_event, slug, withPack, remember) => {
 //   3. chaque mod perso, directement vers le stockage (lien signe), puis le site les controle un par
 //      un (programme cache, vrai mod, virus connus) et dit ce qu'il a garde.
 // Modpack PRIVE, relie au serveur du proprietaire : CurseForge y est permis en liens. Le jour ou des
-// modpacks seront publies sur Omniscient, CurseForge y sera bloque (decision de Rushi, 03/11).
+// modpacks seront publies sur Omniscient, CurseForge y sera bloque.
 const CLOUD_PACK_MAX = 100 * 1000 * 1000;
-// Traces de débogage (03/11, test de Rushi) : dans la console du launcher et dans ses journaux.
+// Traces de débogage : dans la console du launcher et dans ses journaux.
 // Jamais la signature d'un lien signé : seulement l'hôte et le chemin (bucket/clé).
 function cloudDebug(step, url, status, detail) {
   let where = String(url || "");
@@ -3343,7 +3342,7 @@ ipcMain.handle("cloudPack:upload", async (event, id, opts = {}) => {
       return data;
     };
     const name = String(v.name || v.pack?.name || `Minecraft ${v.minecraftVersion}`).slice(0, 60);
-    // Le fichier part directement vers le stockage (lien signé), jamais par le site (Rushi, 03/11).
+    // Le fichier part directement vers le stockage (lien signé), jamais par le site.
     progress("pack", 0, r.size);
     const slot = await withSessionRetry(async () => send(`${base}&start=1`, "{}", "application/json"));
     if (typeof slot.url !== "string" || !/^https:\/\/[a-z0-9-]+\.r2\.cloudflarestorage\.com\//.test(slot.url)) throw new Error("Lien de stockage refusé.");
@@ -3399,7 +3398,7 @@ ipcMain.handle("cloudPack:setOptIn", (_event, slug, on) => {
 });
 
 // Installe un serveur (modpack + Java) sans le lancer : le bouton "Installer"
-// a cote de "Rejoindre" (2026-10-11, audit onboarding) — aucune connexion
+// a cote de "Rejoindre" — aucune connexion
 // Microsoft requise, juste le telechargement des fichiers. Ne partage PAS
 // gameLaunchInProgress (reserve au lancement du jeu) : plusieurs installations
 // peuvent tourner en parallele pour des serveurs differents, affichees comme
@@ -3457,7 +3456,7 @@ ipcMain.handle("game:launch", async (event, slug, memoryOverride) => {
   }
   gameLaunchInProgress = true;
 
-  // Meme registre de taches que "Installer" (2026-10-11) : "Rejoindre" telecharge
+  // Meme registre de taches que "Installer" : "Rejoindre" telecharge
   // aussi (voir prepareServerFiles), donc apparait dans le meme panneau — la tache
   // se termine des que les fichiers sont prets, avant launchMinecraft() (qui, lui,
   // reste suivi par la barre de progression existante, pas une tache de telechargement).
@@ -3491,7 +3490,7 @@ ipcMain.handle("game:launch", async (event, slug, memoryOverride) => {
         for (const win of BrowserWindow.getAllWindows()) {
           if (!win.isDestroyed()) win.webContents.send("game:state", running, exitCode ?? null);
         }
-        // Jeu ferme : Discord revient sur « Parcourt les serveurs » (audit 14/10, K3).
+        // Jeu ferme : Discord revient sur « Parcourt les serveurs » (K3).
         if (!running) discordPresence.setBrowsingActivity();
         // Le launcher s'était caché pendant la partie (réglage « garder le launcher ouvert » décoché) :
         // il se réaffiche tout seul quand le jeu se ferme.
@@ -3547,7 +3546,7 @@ ipcMain.handle("game:launch", async (event, slug, memoryOverride) => {
   }
 });
 
-// Lancement solo hors ligne (2026-10-12) : pour une instance DEJA installee (voir
+// Lancement solo hors ligne : pour une instance DEJA installee (voir
 // instances:listInstalled), sans session Microsoft, sans jamais contacter SITE_URL ni le
 // serveur distant du proprietaire — juste ouvrir le jeu avec les mods deja presents sur le
 // disque pour jouer a son propre monde local. Condition d'activation cote renderer : pas de
@@ -3702,7 +3701,7 @@ ipcMain.handle("game:launchOffline", async (event, slug, memoryOverride) => {
   }
 });
 
-// --- Mode « Jouer » (bêta, 24/10) ---------------------------------------------------------
+// --- Mode « Jouer » (bêta) ---------------------------------------------------------
 // Jouer à n'importe quelle version sans serveur, en vanilla ou avec un pack officiel, et garder
 // ses mondes sauvegardés. Tout le travail sur le disque est dans playMode.js ; ici : les appels
 // du renderer, le lancement (même verrou et même panneau de tâches que « Rejoindre ») et les
@@ -3830,12 +3829,12 @@ const rawWorldCloud = createWorldCloud({
   installVersion: installVersionInBackground,
   device: loadDevice(),
 });
-// Laboratoire (25/10) : « Mondes en ligne » coupé pour ce joueur = aucune méthode de la synchro ne
+// Laboratoire : « Mondes en ligne » coupé pour ce joueur = aucune méthode de la synchro ne
 // tourne (aucun appel au site, aucun minuteur, aucun téléchargement), d'où qu'elle soit appelée.
 const worldCloud = new Proxy(rawWorldCloud, {
   get(target, prop) {
     const value = target[prop];
-    // setGameRunning ne fait que noter l'état du jeu (audit du 25/10) : toujours transmis, sinon il
+    // setGameRunning ne fait que noter l'état du jeu : toujours transmis, sinon il
     // restait « en jeu » si l'interrupteur changeait pendant une partie.
     if (typeof value !== "function" || prop === "suspend" || prop === "setGameRunning") return value;
     return (...args) => {
@@ -3883,7 +3882,7 @@ ipcMain.handle("cloud:remove", (_event, key) => worldCloud.remove(String(key || 
 ipcMain.handle("cloud:pause", () => worldCloud.pause());
 ipcMain.handle("cloud:resume", () => worldCloud.resume());
 ipcMain.handle("cloud:stop", () => worldCloud.stop());
-// « Versions en ligne » (25/10) : ☁ Envoyer / ✕ Retirer du cloud sur une sauvegarde.
+// « Versions en ligne » : ☁ Envoyer / ✕ Retirer du cloud sur une sauvegarde.
 ipcMain.handle("cloud:sendBackup", (_e, key, backupId) => worldCloud.sendBackup(String(key || ""), String(backupId || "")));
 ipcMain.handle("cloud:uncloudBackup", (_e, key, backupId) => worldCloud.uncloudBackup(String(key || ""), String(backupId || "")));
 // Plusieurs PC (voir worldCloud.js) : vérification avant « Jouer », récupération de la dernière
@@ -3983,7 +3982,7 @@ async function installPublishedOmni(p, minecraftVersion) {
     await fsp.rm(tmp, { force: true });
   }
 }
-// « Tester dans le launcher » (31/10) : l'admin du site clique sur un pack proposé par un joueur, le
+// « Tester dans le launcher » : l'admin du site clique sur un pack proposé par un joueur, le
 // site ouvre omniscient://test-pack/<jeton>. Une fenêtre du launcher demande « Installer ce pack pour
 // le tester ? » : Annuler = rien ne se passe ; Installer = téléchargement vérifié (SHA-256, avec une
 // barre de progression), puis le pack apparaît dans Jouer avec la mention « Test Omnipack ».
@@ -4080,7 +4079,7 @@ ipcMain.handle("play:createVersion", async (_event, { minecraftVersion, packId =
       const p = (data.packs || []).find((x) => x.id === packId);
       const v = p?.versions?.find((x) => x.minecraftVersion === minecraftVersion);
       if (!p || !v) return { ok: false, error: "Ce pack n'est pas encore prêt pour cette version." };
-      // Pack Omniscient publié (27/10) : son archive vient du site, on installe cette version.
+      // Pack Omniscient publié : son archive vient du site, on installe cette version.
       if (p.kind === "omni") {
         if (!features.visible("omniPack")) return pageOff;
         const created = await installPublishedOmni(p, minecraftVersion);
@@ -4100,7 +4099,7 @@ ipcMain.handle("play:createVersion", async (_event, { minecraftVersion, packId =
 ipcMain.handle("play:renameVersion", async (_event, id, name) => ({ ok: await playMode.renameVersion(id, name) }));
 ipcMain.handle("play:removeVersion", async (_event, id, worlds) => {
   if (playRunning?.versionId === id) return { ok: false, error: "Cette version est en train de tourner." };
-  // Case « Retirer aussi ses mondes » (27/10) : chaque monde part à la Corbeille avec ses sauvegardes,
+  // Case « Retirer aussi ses mondes » : chaque monde part à la Corbeille avec ses sauvegardes,
   // sans sauvegarde avant (rien ne reste dans le launcher, sauf une Version d'origine).
   let removed = 0;
   try {
@@ -4116,7 +4115,7 @@ ipcMain.handle("play:removeVersion", async (_event, id, worlds) => {
   if (removed) sendAll("play:worldsChanged");
   return { ok, worlds: removed };
 });
-// Séparation stricte (Laboratoire « strictDirs », 26/10) : la première fois qu'elle est active
+// Séparation stricte (Laboratoire « strictDirs ») : la première fois qu'elle est active
 // pendant ce démarrage (jeu fermé), chaque monde qui a déjà une version va dans le dossier de cette
 // version, après une sauvegarde. Les autres seront rangés à leur premier lancement.
 let strictMigration = null;
@@ -4136,7 +4135,7 @@ function ensureStrictLayout() {
 ipcMain.handle("play:listWorlds", async () => {
   try {
     await ensureStrictLayout();
-    // gone : mondes supprimés dans le jeu dont les sauvegardes sont encore sur le PC (26/10).
+    // gone : mondes supprimés dans le jeu dont les sauvegardes sont encore sur le PC.
     const [worlds, gone] = await Promise.all([playMode.listWorlds(), playMode.listGone().catch(() => [])]);
     return { ok: true, worlds, gone, running: playRunning ? { versionId: playRunning.versionId } : null };
   } catch (error) {
@@ -4150,7 +4149,7 @@ ipcMain.handle("play:setWorldBackup", async (_event, key, on, opts) => {
     return playError(error);
   }
 });
-// Mettre à jour une installation (27/10, preview validée par Rushi, Laboratoire « versionGuard ») :
+// Mettre à jour une installation (Laboratoire « versionGuard ») :
 // ses mondes sont sauvegardés 🛡 « Avant X » et vérifiés AVANT, puis l'installation change de version.
 ipcMain.handle("play:updateCheck", async (_event, id, mc) => {
   if (!features.visible("versionGuard")) return { ok: false, error: "Fonction pas encore disponible." };
@@ -4195,7 +4194,7 @@ ipcMain.handle("play:testOverlay", async (event) => {
   await liveSave.testOverlay(BrowserWindow.fromWebContents(event.sender)?.getBounds() || null);
   return { ok: true };
 });
-// Réglages des sauvegardes, les mêmes pour tous les mondes (25/10) : `key` n'est plus utilisé.
+// Réglages des sauvegardes, les mêmes pour tous les mondes : `key` n'est plus utilisé.
 ipcMain.handle("play:setBackupLimit", async (_event, _key, cfg) => {
   if (!cfg || typeof cfg !== "object") return { ok: false, error: "Réglage invalide." };
   try {
@@ -4210,12 +4209,12 @@ ipcMain.handle("play:setBackupLimit", async (_event, _key, cfg) => {
 });
 // Une sauvegarde ou une restauration ne touche jamais un monde pendant que le jeu tourne.
 function playGameBusy() {
-  // Audit du 25/10 : pendant le déplacement du dossier des jeux, rien n'écrit dans les mondes
+  // Pendant le déplacement du dossier des jeux, rien n'écrit dans les mondes
   // (l'ancien dossier est vidé à la fin).
   if (gamesMove.active) return { ok: false, error: GAMES_MOVE_BUSY };
   return getRunningGame() || gameLaunchInProgress ? { ok: false, code: "gameRunning", error: "Ferme Minecraft d'abord : on ne touche pas à un monde ouvert." } : null;
 }
-// Sauvegarde en cours, montrée dans la pilule en haut à droite (play.js, retour de Rushi du 25/10).
+// Sauvegarde en cours, montrée dans la pilule en haut à droite (play.js).
 function sendSaveActivity(activity) {
   for (const win of BrowserWindow.getAllWindows()) if (!win.isDestroyed()) win.webContents.send("play:saveActivity", activity);
 }
@@ -4224,7 +4223,7 @@ ipcMain.handle("play:backupNow", async (_event, key, label) => {
   if (busy) return busy;
   sendSaveActivity({ key, label: label || null, phase: "start" });
   try {
-    // Dans la file des sauvegardes (audit du 25/10) : jamais en même temps que celle de fin de partie.
+    // Dans la file des sauvegardes : jamais en même temps que celle de fin de partie.
     const result = await liveSave.enqueue(() => playMode.backupWorld(key, { reason: "manual", label, force: true }));
     if (result.backup) worldCloud.queueBackup(key, result.backup);
     sendSaveActivity({ key, label: label || null, phase: result.backup ? "done" : "skip" });
@@ -4278,7 +4277,7 @@ ipcMain.handle("play:pickImportDir", async (event) => {
   return { ok: true, dir: result.filePaths[0] };
 });
 // Version d'origine en cours d'écriture, par monde : « Jouer » attend qu'elle soit finie, pour
-// qu'elle soit toujours le monde tel qu'il était à l'import (26/10).
+// qu'elle soit toujours le monde tel qu'il était à l'import.
 const importBackups = new Map();
 ipcMain.handle("play:import", async (event, dir, folders) => {
   try {
@@ -4299,7 +4298,7 @@ ipcMain.handle("play:import", async (event, dir, folders) => {
     return playError(error);
   }
 });
-// Copie d'essai d'un monde modé, ouverte à la place de l'original (26/10).
+// Copie d'essai d'un monde modé, ouverte à la place de l'original.
 ipcMain.handle("play:copyWorld", async (_event, key, opts) => {
   const busy = playGameBusy();
   if (busy) return busy;
@@ -4311,9 +4310,9 @@ ipcMain.handle("play:copyWorld", async (_event, key, opts) => {
     return playError(error);
   }
 });
-// Suppression définitive (26/10) : monde, toutes ses sauvegardes (Version d'origine comprise) et
+// Suppression définitive : monde, toutes ses sauvegardes (Version d'origine comprise) et
 // ses versions dans le cloud. La fenêtre a déjà demandé le mot et attendu 10 secondes.
-// Audit du 28/10 (correctif 4) : suppression de plusieurs mondes d'un coup : l'etat du cloud est
+// Suppression de plusieurs mondes d'un coup : l'etat du cloud est
 // lu une fois pour tout le lot (avant, une lecture forcee par monde : ~6 appels a la base chacun).
 // `sameBatch` : envoye par la selection multiple a partir du 2e monde ; au-dela de 2 min, relu.
 let foreverCloudStatus = null;
@@ -4349,7 +4348,7 @@ ipcMain.handle("play:openCrashFolder", () => {
   const f = lastCrash?.files?.crash || lastCrash?.files?.log;
   if (f) shell.showItemInFolder(f);
 });
-// Aide Discord dans les bugs (02/11, preview validée par Rushi, Laboratoire « bugDiscord ») : rapport
+// Aide Discord dans les bugs (Laboratoire « bugDiscord ») : rapport
 // nettoyé à copier ou à zipper (voir crashHelp.js). L'interface ne donne jamais d'adresse ni de chemin.
 const BUG_DISCORD_URL = "https://discord.gg/HGXN34umC2";
 async function bugHelpReport(lang) {
@@ -4460,7 +4459,7 @@ ipcMain.handle("play:openWorldFolder", async (_event, key) => {
   return shell.openPath(found ? found.dir : playMode.SAVES);
 });
 
-// --- Mon pack et import d'un pack CurseForge (26/10, Laboratoire « myPack », « myPackCf », « cfImport ») ---
+// --- Mon pack et import d'un pack CurseForge (Laboratoire « myPack », « myPackCf », « cfImport ») ---
 // Mon pack : mods de Modrinth (téléchargés), plus une liste CurseForge que le JOUEUR télécharge :
 // « Ouvrir la page », il télécharge, le launcher trouve le fichier dans Téléchargements, le vérifie
 // (empreinte SHA-1 quand on la connaît, sinon le contenu du .jar) et le range dans le pack. Jamais
@@ -4484,7 +4483,7 @@ ipcMain.handle("myPack:searchModrinth", async (_event, q, opts) => {
   }
 });
 // Recherche CurseForge par le site (clé de l'API CurseForge côté site) : nom, page, fichier conseillé.
-// Audit du 28/10 (correctif 5) : la fenêtre « Créer Mon pack » se redessine à chaque clic (ajouter,
+// La fenêtre « Créer Mon pack » se redessine à chaque clic (ajouter,
 // changer de version...) et relançait la même recherche : réponse gardée 5 min par recherche.
 const cfSearchCache = new Map();
 const CF_SEARCH_CACHE_MS = 5 * 60_000;
@@ -4580,13 +4579,13 @@ function watchDownloads(watchKey, want) {
           if (seen.get(file) === sig) continue;
           seen.set(file, sig);
           const plain = name.replace(/ \(\d+\)(\.\w+)$/i, "$1");
-          // Autre version du même mod (30/10) : jamais prise, mais signalée au joueur, une fois par fichier.
+          // Autre version du même mod : jamais prise, mais signalée au joueur, une fois par fichier.
           if (want.onWrong && want.fileName && st.mtimeMs >= started - 10 * 60_000 && plain !== want.fileName && modFileStem(plain) && modFileStem(plain) === modFileStem(want.fileName)) {
             want.onWrong(plain);
             continue;
           }
           if (want.sha1) {
-            // Seule l'empreinte compte (31/10 : une taille annoncée fausse d'un octet refusait le bon fichier).
+            // Seule l'empreinte compte (une taille annoncée fausse d'un octet refusait le bon fichier).
             const sha1 = await sha1Of(file).catch(() => null);
             if (sha1 !== want.sha1) continue;
             return { file, sha1, size: st.size, fileName: want.fileName || plain, meta: want.ext ? null : await playPacks.readJarMeta(file).catch(() => null) };
@@ -4624,11 +4623,11 @@ async function cfFileInfo(fileId) {
   }).catch(() => null);
   return data?.files?.find((f) => f.id === Number(fileId)) || null;
 }
-// « Corriger le pack » (30/10, Rushi : « il ouvre la page normale, pas celle de la bonne version ») :
+// « Corriger le pack » :
 // fichiers CurseForge d'un mod pour la version et le chargeur du pack (route du site, avec la page
 // exacte et l'empreinte de chaque fichier). Gardés 10 min.
 const cfModFilesCache = new Map();
-// Petits caches de session (audit du 01/11, L7) : au-delà de `max` entrées, la plus ancienne part.
+// Petits caches de session : au-delà de `max` entrées, la plus ancienne part.
 function rememberCapped(map, key, value, max) {
   if (map.size >= max && !map.has(key)) map.delete(map.keys().next().value);
   map.set(key, value);
@@ -4696,7 +4695,7 @@ ipcMain.handle("myPack:openCurseForge", async (_event, arg) => {
   try {
     const packId = typeof arg?.packId === "string" ? arg.packId : null;
     let info = packId && arg.modId ? playMode.cfPending(packId, String(arg.modId)) : null;
-    // 30/10 : un fichier précis (liste des versions), ou le bon fichier d'une mise à jour, plutôt que
+    // Un fichier précis (liste des versions), ou le bon fichier d'une mise à jour, plutôt que
     // le fichier déjà dans le pack (avant : page de l'ancien fichier, et c'est lui qu'on attendait).
     const target = packId && arg.modId && !arg.fileId ? cfTargets.get(`${packId}|${arg.modId}`) : null;
     if (info && target) info = { ...info, fileId: target.fileId, fileName: target.fileName, sha1: target.sha1, size: target.size, pageUrl: target.pageUrl };
@@ -4732,7 +4731,7 @@ ipcMain.handle("myPack:openCurseForge", async (_event, arg) => {
     return playError(error);
   }
 });
-// 03/11 (Rushi) : une installation impossible est bloquée avant la création. La fenêtre « Nouveau
+// Une installation impossible est bloquée avant la création. La fenêtre « Nouveau
 // pack » demande si le chargeur existe pour cette version de Minecraft (ex. un chargeur pas encore
 // sorti) et ne propose pas ces cases. Réponse gardée 30 min ; site injoignable = pas de blocage.
 const loaderOkCache = new Map();
@@ -4760,7 +4759,7 @@ ipcMain.handle("myPack:create", async (_event, o) => {
     const list = Array.isArray(o?.mods) ? o.mods.slice(0, 300) : [];
     const wanted = list.filter((m) => m.source !== "cf" && typeof m.slug === "string").map((m) => ({ slug: m.slug, version: m.version || null }));
     const mods = wanted.length ? await playPacks.resolveModrinth(wanted, { mc, loader }) : [];
-    // Pack Omniscient (27/10) : Modrinth seulement, jamais de CurseForge ; la version est la base du pack.
+    // Pack Omniscient : Modrinth seulement, jamais de CurseForge ; la version est la base du pack.
     const omni = o?.omni && features.visible("omniPack") ? { base: true, tested: true } : null;
     if (!omni && !features.visible("myPack")) return pageOff;
     const v = await playMode.createCustomVersion({ kind: "mine", name: o?.name, minecraftVersion: mc, loader, loaderVersion, mods, omni });
@@ -4805,7 +4804,7 @@ ipcMain.handle("myPack:add", async (_event, id, list) => {
     return playError(error);
   }
 });
-// « J'ai le fichier (.jar) » dans « Corriger le pack » (27/10) : copie, jamais déplacé ni supprimé.
+// « J'ai le fichier (.jar) » dans « Corriger le pack » : copie, jamais déplacé ni supprimé.
 ipcMain.handle("myPack:addJar", async (event, id, opts) => {
   const busy = packBusy(id);
   if (busy) return busy;
@@ -4879,7 +4878,7 @@ ipcMain.handle("myPack:openFolder", async (_event, id, sub) => {
 });
 
 
-// --- Page d'une version, Pack Omniscient (27/10, preview v22 validée par Rushi) ----------------------
+// --- Page d'une version, Pack Omniscient ----------------------
 // Laboratoire : « vanillaPage » (page des versions vanilla), « dataPacks » (onglet Data packs),
 // « packFiles » (explorateur de fichiers), « omniPack » (Pack Omniscient), « packExport » (export
 // .mrpack pour un ami). Tout passe par myPack:* (voir FEATURE_IPC) puis par ces vérifications.
@@ -4922,7 +4921,7 @@ ipcMain.handle("myPack:searchContent", async (_event, id, kind, q, opts) => {
     return { ...playError(error), items: [] };
   }
 });
-// Fenêtre « Ajouter » commune (28/10, preview validée par Rushi, Laboratoire « contentCf ») : packs
+// Fenêtre « Ajouter » commune (Laboratoire « contentCf ») : packs
 // de ressources, shaders, mondes et data packs CurseForge, cherchés par le site (notre clé). Un
 // fichier que son auteur réserve à l'appli CurseForge (`blocked`) n'est jamais téléchargé : le
 // joueur ouvre sa page, télécharge, puis « Importer un fichier .zip ».
@@ -5012,8 +5011,8 @@ ipcMain.handle("myPack:openCurseForgePage", async (_event, o) => {
   shell.openExternal(`https://www.curseforge.com/minecraft/search?class=${cls}${mc ? `&gameVersion=${encodeURIComponent(mc)}` : ""}`);
   return { ok: true };
 });
-// Fichier CurseForge réservé à l'appli CurseForge (28/10, Rushi : « dès qu'il télécharge, ça le détecte
-// et ça le déplace ») : on ouvre la page du fichier exact, puis on attend (15 min au plus) ce fichier
+// Fichier CurseForge réservé à l'appli CurseForge : on ouvre la page du fichier exact, puis on attend
+// (15 min au plus) ce fichier
 // dans Téléchargements, comme pour les mods. Il n'est pris que s'il a la bonne empreinte (ou, sans
 // empreinte connue, le bon nom). Il est copié, installé, puis retiré de Téléchargements (avec ses
 // doublons identiques « nom (1).zip »). Le launcher ne télécharge rien lui-même.
@@ -5045,8 +5044,8 @@ ipcMain.handle("myPack:watchCfContent", async (_event, id, o) => {
     else if (kind === "dp") out = { ok: true, ...(await liveSave.enqueue(() => playMode.addDatapack(String(id), { from: "file", slug: "", sourceFile: copy, worldKey: null }))) };
     else out = { ok: true, ...(await playMode.addContent(String(id), { kind, from: "file", slug: "", sourceFile: copy })) };
     // Installé : on le retire de Téléchargements, lui et ses doublons identiques, 30 s plus tard
-    // (28/10 : le navigateur fait analyser le fichier par l'antivirus juste après le téléchargement,
-    // et le retirer pendant l'analyse affichait « Échec, erreur de l'analyse antivirus »).
+    // (le navigateur fait analyser le fichier par l'antivirus juste après le téléchargement, et le
+    // retirer pendant l'analyse affichait « Échec, erreur de l'analyse antivirus »).
     const stem = base.replace(/\.zip$/i, "");
     setTimeout(async () => {
       for (const d of manualModsSearchDirs()) {
@@ -5069,7 +5068,7 @@ ipcMain.handle("myPack:openMapsPage", async (_event, mc) => {
   shell.openExternal(`https://www.curseforge.com/minecraft/search?class=worlds${v ? `&gameVersion=${encodeURIComponent(v)}` : ""}`);
   return { ok: true };
 });
-// Basculer une installation vanilla en version modée (28/10, preview validée par Rushi, Laboratoire
+// Basculer une installation vanilla en version modée (Laboratoire
 // « vanillaModded ») : pour lancer des shaders, ou charger un data pack dans tous les mondes. Seuls
 // les mods qui existent sur Modrinth pour CETTE version de Minecraft (et leur chargeur) sont proposés.
 const SWITCH_CHOICES = {
@@ -5192,7 +5191,7 @@ ipcMain.handle("myPack:importMap", async (event, id) => {
     return playError(error);
   }
 });
-// Map CurseForge (28/10, fenêtre « Ajouter un monde », Laboratoire « contentCf ») : même chemin
+// Map CurseForge (fenêtre « Ajouter un monde », Laboratoire « contentCf ») : même chemin
 // qu'un .zip choisi par le joueur, après le téléchargement vérifié.
 ipcMain.handle("myPack:addMap", async (_event, id, o) => {
   if (!pageAllowed(id)) return pageOff;
@@ -5220,7 +5219,7 @@ async function importMapFile(id, zip) {
     return { ok: true, name: w.name, key: w.key };
   }
 }
-// Data packs en attente du premier monde (28/10) : posés dans le plus récent, sauvegarde avant.
+// Data packs en attente du premier monde : posés dans le plus récent, sauvegarde avant.
 async function applyPendingDp(versionId) {
   const done = await liveSave.enqueue(() => playMode.applyPendingDatapacks(versionId)).catch((error) => {
     logStore.pushLog({ level: "warn", source: "launcher", message: `Data packs en attente : ${error.message}` });
@@ -5252,7 +5251,7 @@ ipcMain.handle("myPack:filesTrash", filesCall(async (id, rel) => {
   await shell.trashItem(playMode.filePath(id, rel));
   return { ok: true };
 }));
-// Audit du 01/11 : un .bat ou un .exe livré par un pack ne s'ouvre pas d'un simple clic. Windows ignore
+// Un .bat ou un .exe livré par un pack ne s'ouvre pas d'un simple clic. Windows ignore
 // les points et espaces en fin de nom (« run.bat. ») : retirés avant de regarder l'extension.
 const NEVER_OPEN = /\.(exe|bat|cmd|com|scr|pif|msi|msp|ps1|psm1|vbs|vbe|js|jse|wsf|wsh|hta|lnk|url|reg|cpl|jar|jnlp|dll|scf|inf|sh)$/i;
 ipcMain.handle("myPack:filesOpenExternal", filesCall(async (id, rel) => {
@@ -5357,7 +5356,7 @@ ipcMain.handle("omniPack:exportFriend", async (event, id, o) => {
   const v = playMode.getVersion(String(id));
   if (!v) return { ok: false, error: "Cette version n'existe plus." };
   try {
-    // Menus d'ajout (31/10) : .mrpack ou .zip CurseForge, avec les .jar hors liens dans le fichier.
+    // Menus d'ajout : .mrpack ou .zip CurseForge, avec les .jar hors liens dans le fichier.
     const fresh = features.visible("addMenus");
     const zip = fresh && o?.format === "zip" && !!v.pack;
     const out = await saveDialog(event, zip ? { title: "Exporter pour un ami", name: v.name || v.pack?.name || v.minecraftVersion, ext: "zip", label: "Pack CurseForge" } : { title: "Exporter pour un ami", name: v.name || v.pack?.name || v.minecraftVersion, ext: "mrpack", label: "Pack Modrinth" });
@@ -5405,7 +5404,7 @@ async function cfFingerprintMatch(fps) {
   return out;
 }
 
-// --- Nouveaux menus d'ajout (31/10, preview validée par Rushi, Laboratoire « addMenus ») ----------
+// --- Nouveaux menus d'ajout (Laboratoire « addMenus ») ----------
 // Recherche (Modrinth en direct, CurseForge par le site avec notre clé), fiche d'un élément, et
 // vérification avant « Créer une copie en … ». Le renderer ne reçoit que du texte et des liens https.
 const ADD_KINDS = ["mods", "rp", "sh", "dp", "w", "mp"];
@@ -5548,12 +5547,12 @@ ipcMain.handle("addMenu:openLink", (_event, u) => {
 // site ; ceux qui ont exactement le même fichier sur Modrinth sont pris là ; les autres, le joueur les
 // télécharge (« Ouvrir la page »). Le .zip n'est jamais modifié.
 const cfReads = new Map();
-// Pack Modrinth (.mrpack, 27/10) : tout vient de Modrinth (ou GitHub/GitLab, comme le prévoit le
+// Pack Modrinth (.mrpack) : tout vient de Modrinth (ou GitHub/GitLab, comme le prévoit le
 // format), aucun mod à télécharger à la main, pas besoin du site.
 const PACK_EXT = /\.(zip|mrpack|omnipack)$/i;
 ipcMain.handle("cfPack:pickZip", async (event, kind) => {
   const win = BrowserWindow.fromWebContents(event.sender);
-  // 27/10 (Rushi) : chaque carte ne montre que son type de fichier (.omnipack, .mrpack ou .zip).
+  // Chaque carte ne montre que son type de fichier (.omnipack, .mrpack ou .zip).
   const k = kind === "omni" && features.visible("omniPack") ? "omni" : kind === "mr" && features.visible("mrImport") ? "mr" : "cf";
   const filter = { omni: { name: "Pack Omniscient", extensions: ["omnipack"] }, mr: { name: "Pack Modrinth", extensions: ["mrpack"] }, cf: { name: "Export CurseForge", extensions: ["zip"] } }[k];
   const result = await dialog.showOpenDialog(win, {
@@ -5567,7 +5566,7 @@ ipcMain.handle("cfPack:pickZip", async (event, kind) => {
   const found = await playPacks.packKindOf(result.filePaths[0]).catch(() => null);
   return { ok: true, path: result.filePaths[0], kind: found || k };
 });
-// Logo d'un .mrpack publié sur Modrinth (27/10) : null si introuvable ou hors ligne. PNG et JPEG
+// Logo d'un .mrpack publié sur Modrinth : null si introuvable ou hors ligne. PNG et JPEG
 // sont réduits à 128 px ; WebP et GIF (que nativeImage ne lit pas) sont gardés tels quels s'ils sont petits.
 async function mrpackIcon(zip) {
   try {
@@ -5587,7 +5586,7 @@ async function mrpackIcon(zip) {
 async function readMrpackForImport(zip, src) {
   if (!features.visible("mrImport")) return { ok: false, error: "L'import des packs Modrinth est coupé pour le moment." };
   const pack = await playPacks.readMrpack(zip, { readLevel: readLevelBuffer });
-  // Pack sans mods (vanilla, ex. « Pour un ami » d'une version vanilla, 27/10) : accepté.
+  // Pack sans mods (vanilla, ex. « Pour un ami » d'une version vanilla) : accepté.
   if (!pack.loader && (pack.mods.length || pack.overrideJars.length)) return { ok: false, error: "Ce pack n'a pas de chargeur de mods connu (NeoForge, Forge, Fabric ou Quilt)." };
   const id = crypto.randomUUID();
   const icon = await mrpackIcon(zip);
@@ -5602,7 +5601,7 @@ async function readMrpackForImport(zip, src) {
     loader: pack.loader,
     loaderVersion: pack.loaderVersion,
     modCount: pack.mods.length + pack.overrideJars.length,
-    // Mods déjà dans le fichier du pack (overrides/mods) : copiés, pas téléchargés (27/10).
+    // Mods déjà dans le fichier du pack (overrides/mods) : copiés, pas téléchargés.
     packedJars: pack.overrideJars.length,
     manual: [],
     configFiles: pack.configFiles,
@@ -5613,7 +5612,7 @@ async function readMrpackForImport(zip, src) {
     recommendedRamGB: pack.recommendedRamGB || null,
   };
 }
-// Erreurs d'import notées dans le journal (02/11 : Rushi voyait « fichier non trouvé » sans capture, et
+// Erreurs d'import notées dans le journal (et
 // rien n'était écrit dans les logs). Annulations et sources coupées : pas notées.
 function importHandle(channel, label, fn) {
   ipcMain.handle(channel, async (...args) => {
@@ -5631,7 +5630,7 @@ importHandle("cfPack:read", "lecture du fichier", async (_event, src) => {
     const kind = await playPacks.packKindOf(zip);
     if (kind === "mr") return await readMrpackForImport(zip, src);
     if (kind === "omni") {
-      // Pack Omniscient (.omnipack, 27/10) : toutes ses versions sont installées.
+      // Pack Omniscient (.omnipack) : toutes ses versions sont installées.
       if (!features.visible("omniPack")) return { ok: false, error: "Les Packs Omniscient sont coupés pour le moment." };
       const d = await omniPack.describeForImport(zip);
       const id = crypto.randomUUID();
@@ -5646,7 +5645,7 @@ importHandle("cfPack:read", "lecture du fichier", async (_event, src) => {
     if (!currentSession) return { ok: false, error: "Connecte-toi avec ton compte Microsoft d'abord : la liste des mods passe par le site Omniscient." };
     const infos = new Map();
     const ids = pack.files.map((f) => f.fileID);
-    // Audit du 28/10 (correctif 7) : lots de 500, le maximum accepte par le site (MAX_FILE_IDS de
+    // Lots de 500, le maximum accepte par le site (MAX_FILE_IDS de
     // /api/launcher/curseforge/files) ; avant 100 (ATM10, 414 mods : 5 appels au lieu de 1).
     for (let i = 0; i < ids.length; i += 500) {
       const data = await fetchJson(`${SITE_URL}/api/launcher/curseforge/files`, {
@@ -5673,7 +5672,7 @@ importHandle("cfPack:read", "lecture du fichier", async (_event, src) => {
         by: [],
         on: true,
       };
-      // Fichier .zip dans la liste du pack (04/11, « Mekanism CTM w/ Fusion » de Project Infinity) : pack
+      // Fichier .zip dans la liste du pack (« Mekanism CTM w/ Fusion » de Project Infinity) : pack
       // de ressources, shader ou data pack, pas un mod. Avant, il était retiré du pack (pas un .jar) et
       // « Ouvrir la page » ne faisait rien. Son type vient de la catégorie du projet sur CurseForge
       // (classId, renvoyé par le site) ; sans elle, deviné d'après l'adresse de sa page.
@@ -5706,7 +5705,7 @@ importHandle("cfPack:read", "lecture du fichier", async (_event, src) => {
       loaderVersion: pack.loaderVersion,
       modCount: mods.filter((m) => !m.content).length + pack.overrideJars.length,
       packedJars: pack.overrideJars.length,
-      // Type de chaque fichier à la main (04/11) : mod, pack de ressources (rp) ou shader (sh).
+      // Type de chaque fichier à la main : mod, pack de ressources (rp) ou shader (sh).
       manual: manual.map((m) => ({ packId: id, modId: m.id, name: m.name, fileName: m.file?.filename || "", pageUrl: m.cf.pageUrl, kind: m.content || "mod" })),
       cfContent: mods.filter((m) => m.content).map((m) => ({ kind: m.content, name: m.name, manual: !m.file?.url })),
       configFiles: pack.configFiles,
@@ -5720,7 +5719,7 @@ importHandle("cfPack:read", "lecture du fichier", async (_event, src) => {
     return playError(error);
   }
 });
-// --- « Un pack existant » (28/10, preview B validée par Rushi, Laboratoire « packBrowse ») ---------
+// --- « Un pack existant » (Laboratoire « packBrowse ») ---------
 // Chercher un modpack public (Modrinth, CurseForge, FTB) puis le préparer en fichier de pack local :
 // la suite est exactement l'import d'un fichier (cfPack:read puis cfPack:install), avec les mêmes
 // règles. Modrinth : le .mrpack de cdn.modrinth.com. CurseForge : le .zip du pack, seulement si son
@@ -5736,7 +5735,7 @@ const BROWSE_OFF = { ok: false, code: "feature_off", error: "Cette source de pac
 const FTB_FILE_HOSTS = new Set(["files.feed-the-beast.com", "cdn.feed-the-beast.com"]);
 const BROWSE_LOADERS = ["neoforge", "forge", "fabric", "quilt"];
 // Fichiers préparés il y a plus d'un jour : retirés (un import se fait juste après la préparation).
-// 02/11 (Rushi : « fichier non trouvé » de temps en temps) : le nettoyage tournait EN MÊME TEMPS que
+// « fichier non trouvé » de temps en temps : le nettoyage tournait EN MÊME TEMPS que
 // la préparation. Une version déjà téléchargée il y a plus d'un jour était gardée (même empreinte, donc
 // pas retéléchargée, date inchangée) puis effacée par le nettoyage juste après : « Fichier introuvable. »
 // Maintenant : le nettoyage est attendu avant de télécharger, il saute les fichiers en cours de
@@ -5816,7 +5815,7 @@ ipcMain.handle("packBrowse:search", async (_event, src, query, opts) => {
       mc: browseMc(p.minecraftVersion) || null,
       loader: BROWSE_LOADERS.includes(p.loader) ? p.loader : null,
       page: safeModPageUrl(p.pageUrl),
-      // Menus d'ajout (31/10) : versions où le pack existe et images, pour sa fiche.
+      // Menus d'ajout : versions où le pack existe et images, pour sa fiche.
       av: cleanAv(p.av),
       images: (Array.isArray(p.images) ? p.images : []).map(forgeImg).filter(Boolean).slice(0, 3),
     }));
@@ -5990,8 +5989,8 @@ ipcMain.handle("packBrowse:openPage", (_event, u) => {
   }
   return { ok: true };
 });
-// Progression détaillée des imports (27/10, preview « Progression des imports » C + B validée par
-// Rushi) : chaque étape reçoit fichiers et octets faits, le fichier en cours et la part de tout
+// Progression détaillée des imports : chaque étape reçoit fichiers et octets faits, le fichier en
+// cours et la part de tout
 // l'import déjà faite (`overall`, 0 à 1, en octets). Envoyée au plus toutes les 150 ms.
 function importMeter(send, totalBytes) {
   const parts = new Map();
@@ -6077,7 +6076,7 @@ importHandle("cfPack:install", "installation", async (event, id, opts) => {
       loader: pack.loader,
       loaderVersion: pack.loaderVersion,
       mods: withMods ? job.mods.filter((m) => !m.content) : [],
-      // Packs de ressources / shaders de la liste à télécharger à la main : gardés pour « Reprendre » (04/11).
+      // Packs de ressources / shaders de la liste à télécharger à la main : gardés pour « Reprendre ».
       extra: mr ? { mrName: pack.name, packVersion: pack.packVersion } : { cfName: pack.name, packVersion: pack.packVersion, cfHand: job.mods.filter((m) => m.content && !m.file?.url && m.file?.filename && parts.includes(m.content)).map(cfHandEntry) },
     });
     job.versionId = v.id;
@@ -6121,10 +6120,10 @@ importHandle("cfPack:install", "installation", async (event, id, opts) => {
       meter.set("dl", totalBytes);
       progress({ step: "dl", n: autoMods.length, done: true });
     } else if (withMods) progress({ step: "dl", n: 0, done: true });
-    // Packs de ressources / shaders de la liste du pack que leur auteur laisse télécharger (04/11) :
+    // Packs de ressources / shaders de la liste du pack que leur auteur laisse télécharger :
     // rangés dans leur dossier, avec la même vérification d'empreinte que les mods.
     const autoContent = job.mods.filter((m) => m.content && m.content !== "dp" && parts.includes(m.content) && m.file?.url && m.file.sha1);
-    // Data packs que leur auteur laisse télécharger (04/11) : gardés dans .omniscient/datapacks/, puis
+    // Data packs que leur auteur laisse télécharger : gardés dans .omniscient/datapacks/, puis
     // rangés après les mondes (dossier de Paxi / Open Loader / Global Packs, sinon chaque monde).
     const autoDp = job.mods.filter((m) => m.content === "dp" && parts.includes("dp") && m.file?.url && m.file.sha1);
     if (autoDp.length) {
@@ -6161,12 +6160,12 @@ importHandle("cfPack:install", "installation", async (event, id, opts) => {
       progress({ step: part, idle: true });
     }
     // Version neuve : avec « Réglages du pack », son options.txt (touches, packs de ressources) remplace
-    // la copie des réglages de Jouer (27/10, testé avec un vrai export ATM10). Extraction rangée par
+    // la copie des réglages de Jouer (testé avec un vrai export ATM10). Extraction rangée par
     // étape (mods du pack, réglages, ressources, shaders, mondes) pour que chaque ligne avance à son tour.
     let cur = null;
     const seen = { files: 0, bytes: 0, file: "" };
     // Étapes sans rien à copier (pack sans shader…) : validées dès qu'on les dépasse, pas à la fin
-    // (27/10, Rushi). Le monde est validé après son enregistrement.
+    //. Le monde est validé après son enregistrement.
     const skipEmpty = (from, to) => {
       const a = from ? IMPORT_STEP_ORDER.indexOf(from) + 1 : 0;
       const b = to ? IMPORT_STEP_ORDER.indexOf(to) : IMPORT_STEP_ORDER.length;
@@ -6233,10 +6232,10 @@ importHandle("cfPack:install", "installation", async (event, id, opts) => {
     return playError(error);
   }
 });
-// Pack de ressources / shaders / data pack (.zip) d'un export à télécharger à la main (04/11) : sa page
+// Pack de ressources / shaders / data pack (.zip) d'un export à télécharger à la main : sa page
 // exacte, puis le fichier exact dans Téléchargements (bonne empreinte), copié dans resourcepacks/ ou
 // shaderpacks/ de l'installation (data pack : .omniscient/datapacks/, puis rangé par addCfDatapack),
-// puis retiré de Téléchargements 30 s plus tard (analyse antivirus, voir 28/10).
+// puis retiré de Téléchargements 30 s plus tard (analyse antivirus).
 const CF_CONTENT_DIR = { rp: "resourcepacks", sh: "shaderpacks" };
 // Ce qu'on retient d'un .zip à la main (dans la version, pour « Reprendre ») : de quoi ouvrir sa page exacte
 // et reconnaître le bon fichier.
@@ -6287,8 +6286,8 @@ ipcMain.handle("cfPack:openManual", async (_event, item) => {
   await playMode.acceptManualJar(job.versionId, info.id, got.file, got);
   return { ok: true, found: true };
 });
-// « Reprendre » depuis Mes installations (04/11, Rushi : « après Finir plus tard, on ne peut pas
-// redémarrer ») : un fichier encore à télécharger à la main (mod CurseForge ou .zip). Même chemin
+// « Reprendre » depuis Mes installations : un fichier encore à télécharger à la main (mod
+// CurseForge ou .zip). Même chemin
 // que pendant l'import : page exacte, fichier exact dans Téléchargements, vérifié puis rangé.
 ipcMain.handle("play:handFiles:open", async (_event, versionId, fileId) => {
   const v = playMode.getVersion(String(versionId || ""));
@@ -6316,7 +6315,7 @@ ipcMain.handle("play:handFiles:open", async (_event, versionId, fileId) => {
 // Partie en cours lancée depuis Jouer : version et heure de départ (mondes modifiés ensuite).
 let playRunning = null;
 
-// RAM par pack (01/11) : ce que la fenêtre montre (calcul, RAM du PC, RAM libre) et l'enregistrement.
+// RAM par pack : ce que la fenêtre montre (calcul, RAM du PC, RAM libre) et l'enregistrement.
 ipcMain.handle("play:ram:info", (_event, id) => {
   if (!features.visible("packRam")) return pageOff;
   const v = playMode.getVersion(String(id || ""));
@@ -6385,7 +6384,7 @@ ipcMain.handle("play:launch", async (event, { versionId, worldKey = null, force 
     // Dossier de jeu de cette version ; un monde d'un autre dossier y est rangé (sauvegarde avant).
     const gameDir = await playMode.launchDir(versionId, worldKey, { strict: features.visible("strictDirs") });
     if (worldKey) quickPlayWorld = await liveSave.enqueue(() => playMode.placeWorld(worldKey, gameDir));
-    // Bouclier (27/10, « versionGuard ») : sans monde choisi, le jeu peut ouvrir depuis son menu un
+    // Bouclier (« versionGuard ») : sans monde choisi, le jeu peut ouvrir depuis son menu un
     // monde plus ancien du même dossier et le convertir. On le sauvegarde d'abord.
     if (!worldKey && features.visible("versionGuard")) {
       const fr = settingsStore.loadSettings().locale !== "en";
@@ -6435,7 +6434,7 @@ ipcMain.handle("play:launch", async (event, { versionId, worldKey = null, force 
       javaPreferred: settings.javaPath || undefined,
       gameDir,
     });
-    // Mon pack / pack CurseForge : vérification des mods AVANT de lancer (26/10). S'il reste un
+    // Mon pack / pack CurseForge : vérification des mods AVANT de lancer. S'il reste un
     // problème, le launcher le dit au lieu de laisser Minecraft planter (« Jouer quand même » passe
     // `force`).
     if (version.pack?.kind && !force) {
@@ -6497,7 +6496,7 @@ ipcMain.handle("play:launch", async (event, { versionId, worldKey = null, force 
         // Aide au crash v1 (Laboratoire « crashHelp ») : journal et rapport de crash de CETTE partie,
         // lus à chaque fermeture (l'écran « mods incompatibles » n'est pas un crash).
         if (features.visible("crashHelp")) {
-          // Fichiers du jeu manquants dans libraries/ (04/11 : Forge sans ses fichiers fabriqués à
+          // Fichiers du jeu manquants dans libraries/ (Forge sans ses fichiers fabriqués à
           // l'installation, code 1 au démarrage). L'erreur sort sur la console du jeu, pas dans
           // latest.log : on la cherche aussi dans ce que le jeu a écrit pendant cette partie.
           const gameOut = exitCode ? logStore.getAll().filter((e) => e.source === "game" && e.ts >= startedAt).map((e) => e.message).join("\n") : "";
@@ -6543,7 +6542,7 @@ ipcMain.handle("play:launch", async (event, { versionId, worldKey = null, force 
               else if (c.error) logStore.pushLog({ level: "warn", source: "launcher", message: `Sauvegarde du monde impossible : ${c.error}` });
             }
             for (const win of BrowserWindow.getAllWindows()) if (!win.isDestroyed()) win.webContents.send("play:worldsChanged");
-            // Data packs d'un pack CurseForge (04/11) : aussi dans les mondes créés pendant la partie.
+            // Data packs d'un pack CurseForge : aussi dans les mondes créés pendant la partie.
             if (features.visible("dataPacks")) applyPendingDp(ended?.versionId || versionId).catch(() => {});
             else liveSave.enqueue(() => playMode.spreadAllWorldDatapacks(ended?.versionId || versionId)).catch(() => {});
           })
@@ -6597,9 +6596,9 @@ ipcMain.handle("play:launch", async (event, { versionId, worldKey = null, force 
 // distincts plutot qu'un simple ok/erreur. Un seul test (ou lancement normal) a la fois,
 // meme verrou que game:launch (gameLaunchInProgress) puisque les deux lancent reellement
 // Minecraft.
-// 2026-10-11 : le 4e controle ("Connexion au serveur", un re-ping pendant que le jeu reste
-// ouvert) est retire — intestable de maniere fiable pour le moment (demande de laisser le jeu
-// ouvert le temps du re-ping, pas de manière simple de le valider en conditions reelles). Les
+// Le 4e controle ("Connexion au serveur", un re-ping pendant que le jeu reste
+// ouvert) est retire — intestable de maniere fiable pour le moment (pas de manière simple de
+// le valider en conditions reelles). Les
 // 3 controles restants (joignabilite, fichiers installes, demarrage du jeu) suffisent a
 // debloquer la publication pour l'instant.
 let selfTestInProgress = false;
@@ -6609,8 +6608,8 @@ let selfTestInProgress = false;
 // drapeau global, réinitialisé au début de chaque appel.
 let selfTestAbortRequested = false;
 // Reference vers la tache du panneau de telechargements (voir installTasks) creee par le
-// test en cours (2026-10-11 : le telechargement du check #2 restait invisible du panneau,
-// signale par le proprietaire). "Annuler le test" abat aussi cette tache, pour reellement
+// test en cours (le telechargement du check #2 restait invisible du panneau, signale par
+// le proprietaire). "Annuler le test" abat aussi cette tache, pour reellement
 // interrompre un telechargement en cours plutot que d'attendre qu'il finisse tout seul.
 let selfTestTask = null;
 
@@ -6618,7 +6617,7 @@ ipcMain.handle("selftest:abort", async () => {
   if (!selfTestInProgress) return { ok: false, code: "not_running" };
   selfTestAbortRequested = true;
   selfTestTask?.controller.abort();
-  // Aide guidee ouverte pendant le test (lot 5) : l'annulation la referme comme « Plus tard ».
+  // Aide guidee ouverte pendant le test : l'annulation la referme comme « Plus tard ».
   if (selfTestManualAnswer) {
     const answer = selfTestManualAnswer;
     selfTestManualAnswer = null;
@@ -6627,7 +6626,7 @@ ipcMain.handle("selftest:abort", async () => {
   return { ok: true };
 });
 
-// Lot 5 (audit 17/10, choix de Rushi le 18/10 : « aide puis lancement ») : quand seuls des mods
+// Quand seuls des mods
 // bloques manquent, le test ouvre l'aide guidee pour le proprietaire. S'il ajoute les mods, le
 // test continue et lance le jeu ; sinon « Jeu démarré » reste « non testé » et la publication
 // reste possible avec l'avertissement. false = pas d'aide ni de lancement pendant le test.
@@ -6669,7 +6668,7 @@ ipcMain.handle("selftest:run", async (event, slug) => {
   selfTestInProgress = true;
   selfTestAbortRequested = false;
 
-  // Meme registre de taches que "Installer"/"Rejoindre" (2026-10-11) : le telechargement du
+  // Meme registre de taches que "Installer"/"Rejoindre" : le telechargement du
   // check #2 doit apparaitre dans le meme panneau, pas rester invisible pendant qu'il tourne.
   const task = createInstallTask(slug, null, "selftest");
   selfTestTask = task;
@@ -6683,7 +6682,7 @@ ipcMain.handle("selftest:run", async (event, slug) => {
   const report = (step, status, detail) => event.sender.send("selftest:progress", { step, status, detail });
   const checks = { reachable: false, modpackInstalled: false, gameStarted: false };
   let detectedVersion = null;
-  // Lot 5 : mods a ajouter a la main (tous « bloques ») — le test passe avec un avertissement.
+  // Mods a ajouter a la main (tous « bloques ») — le test passe avec un avertissement.
   let manualModsReport = null;
   let fromModrinthMods = [];
 
@@ -6715,7 +6714,7 @@ ipcMain.handle("selftest:run", async (event, slug) => {
     // explicite ("Annuler le test") interrompt la suite. Un controle rate n'empeche pas les
     // suivants de tourner : le proprietaire doit voir le diagnostic complet (quels controles
     // passent, lesquels non) plutot qu'un test qui s'arrete au premier probleme rencontre —
-    // decision du 2026-10-10, suite a un retour explicite ("le joueur doit savoir ce qui ne va
+    // decision, suite a un retour explicite ("le joueur doit savoir ce qui ne va
     // pas, meme si une section a echoue il faut faire le test suivant").
 
     // 1. Serveur joignable — ping direct (TCP + Server List Ping), independant de Minecraft
@@ -6738,7 +6737,7 @@ ipcMain.handle("selftest:run", async (event, slug) => {
     // les telecharger separement sans dupliquer sa logique interne. Donc ce check reste "en
     // cours" pendant que l'etape 3 s'execute, et n'est confirme "reussi" qu'au moment ou ce
     // lancement a reellement reussi (preuve que les fichiers sont bien la) — jamais devine a
-    // l'avance a partir d'un simple JSON+jar (constate le 2026-10-10 : "reussi" s'affichait a
+    // l'avance a partir d'un simple JSON+jar ("reussi" s'affichait a
     // tort juste apres suppression manuelle des fichiers pour tester).
     if (bailIfAborted("modpack")) return { ok: true, checks, detectedVersion, allPassed: false, aborted: true };
     report("modpack", "running");
@@ -6769,7 +6768,7 @@ ipcMain.handle("selftest:run", async (event, slug) => {
       const fields = modpackErrorFields(error);
       const onlyBlocked = fields.code === "manual_mods" && fields.manualMods.length > 0 && fields.manualMods.every((mod) => mod.reason === "blocked");
       if (onlyBlocked) {
-        // Lot 5 : ce n'est plus un echec. Les joueurs seront guides pas a pas pour ces mods.
+        // Ce n'est plus un echec. Les joueurs seront guides pas a pas pour ces mods.
         manualModsReport = fields.manualMods;
         fromModrinthMods = fields.fromModrinthMods || [];
         checks.modpackInstalled = true;
@@ -6790,7 +6789,7 @@ ipcMain.handle("selftest:run", async (event, slug) => {
       }
     }
     // Moddé : le téléchargement du modpack (mods inclus) est entièrement fini à cet instant — on
-    // peut juger ce check tout de suite, sans attendre le lancement. Bug trouvé le 2026-10-13 (test
+    // peut juger ce check tout de suite, sans attendre le lancement. Bug trouvé (test
     // réel du propriétaire, 5 mods bloqués par CurseForge) : si installModpack échouait, "modded"
     // restait vide, launchMinecraft() se rabattait alors silencieusement sur du Minecraft vanilla
     // (aucun rapport avec le modpack testé), et le succès de CE lancement de secours écrasait
@@ -6809,7 +6808,7 @@ ipcMain.handle("selftest:run", async (event, slug) => {
     // l'erreur rencontree ici est elle-meme une information utile pour le proprietaire. Pour un
     // serveur moddé le check #2 est déjà tranché (voir plus haut) et n'est plus réévalué ici —
     // seul le vanilla décide encore son check #2 à ce stade (voir plus bas).
-    // Serveur moddé dont le pack n'a pas pu s'installer (14/10) : ne plus lancer Minecraft
+    // Serveur moddé dont le pack n'a pas pu s'installer : ne plus lancer Minecraft
     // vanilla à la place, ce lancement ne prouverait rien sur le pack testé.
     if (server.type === "modded" && server.curseforgeModpackId && !modded) {
       if (task.status === "active" || task.status === "paused") {
@@ -6907,7 +6906,7 @@ ipcMain.handle("selftest:run", async (event, slug) => {
 // re-vérifie aussi côté serveur (jamais confiance au client seul pour débloquer la publication).
 ipcMain.handle("selftest:report", async (_event, { slug, checks, detectedVersion, manualMods }) => {
   try {
-    // Lot 5 : mods a ajouter a la main, pour le badge « X mods à ajouter » de la fiche.
+    // Mods a ajouter a la main, pour le badge « X mods à ajouter » de la fiche.
     const list = Array.isArray(manualMods)
       ? manualMods.slice(0, 200).map((mod) => ({
           modName: mod?.modName ? String(mod.modName).slice(0, 120) : null,
@@ -6920,7 +6919,7 @@ ipcMain.handle("selftest:report", async (_event, { slug, checks, detectedVersion
       headers: { ...launcherAuthHeaders(), "Content-Type": "application/json" },
       body: JSON.stringify({ checks, detectedVersion, manualMods: list }),
     });
-    // 2026-10-11 : un test reussi envoie maintenant directement la fiche en file d'attente
+    // Un test reussi envoie maintenant directement la fiche en file d'attente
     // (isPrivate passe a false cote site, voir self-test/route.ts) — sans vider le cache,
     // "Mes instances" pouvait reafficher "Tester pour publication" jusqu'a 60s (SERVER_CACHE_MS)
     // apres une demande reussie, le temps que le cache expire tout seul.
@@ -6958,7 +6957,7 @@ app.whenReady().then(async () => {
 }).catch((error) => {
   // Exception inattendue pendant le demarrage (createWindow/setContentSecurityPolicy/
   // discordPresence.init...) : sans ce .catch(), le launcher restait figue/invisible sans
-  // aucune trace exploitable (voir audit 2026-10-10, §3.5). Meme modele que le cas
+  // aucune trace exploitable (§3.5). Meme modele que le cas
   // "LAUNCHER_API_KEY manquante" juste au-dessus : log + dialogue explicite pour l'utilisateur.
   logStore.pushLog({ level: "error", source: "launcher", message: `Démarrage échoué : ${error instanceof Error ? error.message : error}` });
   dialog.showErrorBox(
@@ -6980,7 +6979,7 @@ app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
 
-// --- Dossier des jeux sur un autre disque (serie 2, idee 9, version validee) --------------------
+// --- Dossier des jeux sur un autre disque --------------------
 // Tout le dossier des jeux (instances, mondes, mods, Java, cache) part en entier : copier, verifier,
 // basculer (pointeur dans userData + redemarrage du launcher), puis effacer l'ancien au demarrage
 // suivant. Voir gamesLocation.js. Pendant le deplacement, rien ne peut s'installer ni se lancer.

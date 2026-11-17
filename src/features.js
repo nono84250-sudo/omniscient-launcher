@@ -1,4 +1,4 @@
-// Laboratoire (25/10, demande de Rushi) : ce que CE launcher a le droit de montrer, d'après le
+// Laboratoire : ce que CE launcher a le droit de montrer, d'après le
 // site (/api/launcher/features, calculé pour le joueur connecté et le canal bêta). Le site
 // refuse de toute façon les routes d'une fonctionnalité cachée ; ici on évite surtout de
 // montrer l'onglet et de démarrer son code.
@@ -73,7 +73,7 @@ function createFeatures({ cacheDir, siteUrl, authHeaders, currentUuid, fetchJson
     return pending;
   }
 
-  // Audit du 28/10 (correctif 6) : comme refresh, sauf si une réponse pour CE compte est arrivée
+  // Comme refresh, sauf si une réponse pour CE compte est arrivée
   // il y a moins de `maxAgeMs` (ou est en route) : au démarrage, le site était lu 3 fois.
   function recent(maxAgeMs) {
     const uuid = currentUuid() || null;

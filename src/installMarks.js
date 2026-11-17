@@ -1,4 +1,4 @@
-// Repère « Installé » (26/10, variante A de la preview validée par Rushi) : une petite pastille
+// Repère « Installé » : une petite pastille
 // « ✓ Installé » à côté des badges, partout où un serveur apparaît (Annuaire, Accueil, Favoris,
 // Récents, Mes serveurs), pour savoir sans ouvrir le menu « … » ce qui est déjà sur ce PC.
 // Pendant une installation : « ⬇ 42 % » avec une fine barre. Non installé : rien.

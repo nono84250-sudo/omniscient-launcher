@@ -1,8 +1,7 @@
-// Sauvegarde PENDANT la partie (mode Jouer, 24/10, versionnage V2/V3 validés par Rushi) :
+// Sauvegarde PENDANT la partie (mode Jouer) :
 //   - F6 : sauvegarder maintenant ; Maj+F6 : sauvegarder avec un nom (« Elytra obtenu »), gardée
 //     à part de la rotation si le joueur le veut (voir planBackups dans playMode.js) ;
-//   - automatique toutes les X min de jeu (30 par défaut, réglable dans la fenêtre Sauvegardes
-//     depuis le 25/10, le même pour tous les mondes), sans rien demander (retour de test de Rushi, 24/10) :
+//   - automatique toutes les X min de jeu (30 par défaut, le même pour tous les mondes), sans rien demander :
 //     copie de ce que le jeu a déjà enregistré sur le disque (il le fait tout seul toutes les
 //     5 min environ), avec le petit menu « Sauvegarde automatique… » et son pourcentage. Si le
 //     joueur met le jeu en pause après l'échéance, on en profite (le monde vient d'être enregistré) ;
@@ -10,7 +9,7 @@
 // La sauvegarde à la fermeture du jeu reste dans playMode.afterGame.
 //
 // Copier un monde ouvert : ce que le jeu a écrit sur le disque doit être cohérent. Le launcher ne
-// prend JAMAIS le focus (retour de Rushi du 25/10 : icône orange, barre des tâches, plein écran
+// prend JAMAIS le focus (icône orange, barre des tâches, plein écran
 // réduit). Il essaie d'abord de copier tout de suite ; si le jeu écrivait, le petit menu demande au
 // joueur d'appuyer sur Échap (Minecraft enregistre alors : « Saving and pausing game... »), et la
 // copie part aussi d'elle-même juste après l'enregistrement automatique du jeu (level.dat réécrit,
@@ -143,7 +142,7 @@ function createLiveSave({ playMode, overlay, globalShortcut, onBackup, onActivit
 
   // Le jeu a-t-il écrit le monde depuis `since` ? Pause (Échap, « Saving and pausing game ») ou
   // son enregistrement automatique (level.dat réécrit). Renvoie "pause", "autosave" ou null.
-  // Séparation stricte (26/10) : le monde peut être dans le dossier de sa version (world.home).
+  // Séparation stricte : le monde peut être dans le dossier de sa version (world.home).
   const levelMtime = (world) => fsp.stat(path.join(world.dir || path.join(playMode.gameDirOf(world.home || null), "saves", world.folder), "level.dat")).then((st) => st.mtimeMs, () => 0);
   async function waitForWrite(world, since, timeoutMs) {
     const first = await levelMtime(world);
@@ -184,9 +183,9 @@ function createLiveSave({ playMode, overlay, globalShortcut, onBackup, onActivit
     return null;
   }
 
-  // Monde ouvert : repéré  // Monde ouvert : repéré par le journal du jeu (entrée/sortie d'un monde) et par session.lock.
-  // Si le journal du jeu n'arrive pas du tout, on se fie seulement à session.lock. Retour de test
-  // du 25/10 (sauvegarde des 30 min jamais faite) : à défaut, le monde lancé depuis sa carte
+  // Monde ouvert : repéré // Monde ouvert : repéré par le journal du jeu (entrée/sortie d'un monde) et par session.lock.
+  // Si le journal du jeu n'arrive pas du tout, on se fie seulement à session.lock. Retour de test (sauvegarde des 30 min
+  // jamais faite) : à défaut, le monde lancé depuis sa carte
   // (Quick Play), tant qu'on n'a pas vu le joueur en sortir.
   async function currentWorld() {
     if (!game) return null;
@@ -199,7 +198,7 @@ function createLiveSave({ playMode, overlay, globalShortcut, onBackup, onActivit
   }
   // Fréquence choisie (5 à 60 min), sinon 30 min.
   function everyMs(world) {
-    void world; // même réglage pour tous les mondes depuis le 25/10
+    void world; // même réglage pour tous les mondes
     const min = Number(playMode.keepConfig?.()?.every);
     return Number.isFinite(min) && min >= 1 ? min * 60_000 : INTERVAL_MS;
   }
@@ -215,7 +214,7 @@ function createLiveSave({ playMode, overlay, globalShortcut, onBackup, onActivit
           overlay.show({ mode: "progress", title: title || t.title, text: `${t.saving}${wName(world) ? ` · ${wName(world)}` : ""}`, percent: pct });
         }
       : undefined;
-    // Pilule en haut à droite du launcher (retour de Rushi du 25/10) : la sauvegarde s'y voit aussi.
+    // Pilule en haut à droite du launcher : la sauvegarde s'y voit aussi.
     const act = (phase) => show && onActivity?.({ key: world.key, name: wName(world), label, phase });
     act("start");
     let r;
@@ -234,7 +233,7 @@ function createLiveSave({ playMode, overlay, globalShortcut, onBackup, onActivit
   }
 
   // F6 (marked = false) ou Maj+F6 (marked = true : sauvegarde ★ gardée à part). Maj+F6 demande le
-  // nom dans le petit menu, qui prend alors le focus (choix de Rushi du 25/10) : le jeu se met en
+  // nom dans le petit menu, qui prend alors le focus : le jeu se met en
   // pause et enregistre. Échap ou Annuler : rien n'est sauvegardé. Pas de réponse en 90 s : nommée
   // par sa date.
   async function manual(marked) {
@@ -295,7 +294,7 @@ function createLiveSave({ playMode, overlay, globalShortcut, onBackup, onActivit
       busy = false;
       return;
     }
-    // Jeu fermé pendant la recherche du monde (audit du 25/10) : sinon `busy` restait bloqué.
+    // Jeu fermé pendant la recherche du monde : sinon `busy` restait bloqué.
     if (!game) {
       busy = false;
       return;
@@ -489,13 +488,13 @@ function createLiveSave({ playMode, overlay, globalShortcut, onBackup, onActivit
     overlay.show({ mode: "done", title: t.title, text: t.ready(Math.round(game.everyMs / 60_000)), hint: t.hint }, { hideAfter: 9000 });
   }
 
-  // Affiche le petit menu 4 s, sans jeu (l'ancien bouton de test a été retiré le 25/10).
+  // Affiche le petit menu 4 s, sans jeu.
   // `at` : la fenêtre du launcher (pendant une partie, le menu reste collé au jeu).
   function testOverlay(at = null) {
     const t = T();
     info("Test du petit menu demandé.");
     if (game) return overlay.show({ mode: "done", title: t.title, text: t.done, hint: t.hint }, { hideAfter: 4000 });
-    // Hors partie (audit du 25/10) : la fenêtre est refermée après le test, sinon cachée elle
+    // Hors partie : la fenêtre est refermée après le test, sinon cachée elle
     // empêchait le launcher de se fermer.
     overlay.warm?.();
     setTimeout(() => !game && overlay.destroy(), 4600);

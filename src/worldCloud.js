@@ -1,4 +1,4 @@
-// Synchro des mondes avec le cloud (mode Jouer, bêta, 24/10), pour les joueurs dont l'offre
+// Synchro des mondes avec le cloud (mode Jouer, bêta), pour les joueurs dont l'offre
 // inclut la sauvegarde en ligne (Supporter ; offre simulée dans l'admin tant que le paiement
 // n'existe pas). Principe :
 // - on n'envoie JAMAIS le monde en cours d'écriture : seulement une sauvegarde .zip déjà faite,
@@ -10,7 +10,7 @@
 //   coupure ou un redémarrage du launcher (file d'attente sur le disque, morceaux déjà reçus
 //   demandés au site) ;
 // - le quota vient de l'offre renvoyée par le site, jamais d'une valeur écrite ici.
-// Plusieurs PC (24/10, preview validée) :
+// Plusieurs PC :
 // - un autre PC du même compte voit les mondes du cloud « Pas sur ce PC » et les télécharge en
 //   arrière-plan (place vérifiée avant, version et pack installés avec le monde) ;
 // - avant chaque « Jouer » d'un monde du cloud, le site dit s'il est ouvert ailleurs ou s'il a été
@@ -36,7 +36,7 @@ function createWorldCloud({ playMode, siteUrl, authHeaders, currentUuid, log, on
   const STATE_FILE = path.join(playMode.PLAY_ROOT, "cloud-queue.json");
   // { uuid, syncedKeys: [clés choisies par le joueur], queue: [{ key, name, backupId, file, size, sha256 }] }
   // locks : mondes dont ce PC tient le verrou sur le site (repris au redémarrage).
-  // uuid (audit du 25/10) : le compte à qui appartient cet état. Avec un autre compte, l'état du
+  // uuid : le compte à qui appartient cet état. Avec un autre compte, l'état du
   // premier est mis de côté (cloud-queue-<uuid>.json) : ses sauvegardes ne partent jamais dans le
   // cloud d'un autre compte, et ses marques « dans le cloud » ne sont pas effacées.
   const emptyState = () => ({ uuid: null, syncedKeys: [], queue: [], locks: [] });
@@ -59,13 +59,13 @@ function createWorldCloud({ playMode, siteUrl, authHeaders, currentUuid, log, on
   // État affiché dans la pilule et le panneau des tâches (window.playCloudActivity côté renderer).
   let job = null; // { items: [{ key, name, size, sent, done, error }], total, sent, bps, paused, done, error }
   let manualPause = false;
-  // Laboratoire (25/10) : « Mondes en ligne » coupé pour ce joueur → plus rien ne part (voir suspend).
-  // Audit du 25/10 : suspendu jusqu'au premier start() (le site n'a pas encore dit oui).
+  // Laboratoire : « Mondes en ligne » coupé pour ce joueur → plus rien ne part (voir suspend).
+  // Suspendu jusqu'au premier start() (le site n'a pas encore dit oui).
   let suspended = true;
   let gameRunning = false;
   let running = false;
   let retryTimer = null;
-  // « Arrêter » (retour de Rushi du 25/10) : coupe le morceau en cours d'envoi.
+  // « Arrêter » : coupe le morceau en cours d'envoi.
   let stopCtl = new AbortController();
   const stoppedError = () => Object.assign(new Error("Synchronisation arrêtée."), { code: "stopped" });
   let lastStatus = null;
@@ -98,7 +98,7 @@ function createWorldCloud({ playMode, siteUrl, authHeaders, currentUuid, log, on
     return data;
   }
 
-  // Économe (retour de Rushi, 24/10 : appels répétés pour un compte sans offre) : la réponse est
+  // Économe (appels répétés pour un compte sans offre) : la réponse est
   // gardée 30 min si l'offre n'inclut pas le cloud, 2 min sinon ; deux demandes en même temps
   // n'en font qu'une. `force` : après une action du joueur (synchro, retrait, fenêtre cloud).
   let statusPending = null;
@@ -160,15 +160,15 @@ function createWorldCloud({ playMode, siteUrl, authHeaders, currentUuid, log, on
   }
 
   // Ajoute (ou remplace) la dernière sauvegarde d'un monde dans la file d'envoi.
-  // Versions miroir (25/10, demande de Rushi) : CHAQUE sauvegarde du PC part dans le cloud, pas
+  // Versions miroir : CHAQUE sauvegarde du PC part dans le cloud, pas
   // seulement la dernière, pour qu'on retrouve la même liste sur le site et sur un autre PC.
-  // Réglage « Envoi automatique dans le cloud » (fenêtre Sauvegardes, 25/10, tous les mondes) : toutes, une
+  // Réglage « Envoi automatique dans le cloud » (fenêtre Sauvegardes, tous les mondes) : toutes, une
   // par partie (la dernière : fin de partie ou sortie du monde, plus celles avec un nom), ou à la
   // main (seulement le bouton Synchroniser, `manual`).
   const GAME_REASONS = new Set(["auto", "world-exit", "named", "manual", "import"]);
-  // Réglage « Envoi au cloud ». Retour de Rushi du 25/10 : « Une par partie » vaut aussi pour le
+  // Réglage « Envoi au cloud ». « Une par partie » vaut aussi pour le
   // bouton Synchroniser (il envoyait toutes les sauvegardes). « À la main » : seulement Synchroniser.
-  // « À la main » (retour de Rushi du 25/10) : rien ne part tout seul, même une sauvegarde ★ ;
+  // « À la main » : rien ne part tout seul, même une sauvegarde ★ ;
   // seulement « ☁ Envoyer » (cloudKeep) et le bouton Synchroniser.
   function sendAllowed(key, backup, manual) {
     if (backup.cloudDropped === "user") return false; // ✕ retirée du cloud par le joueur : reste sur le PC
@@ -180,7 +180,7 @@ function createWorldCloud({ playMode, siteUrl, authHeaders, currentUuid, log, on
     return true;
   }
   // Sauvegarde marquée « envoyée » vers un monde du cloud qui n'existe plus (retiré puis
-  // resynchronisé, retour de Rushi du 25/10 : 11 sauvegardes sur le PC, 10 en ligne) : le monde
+  // resynchronisé, 11 sauvegardes sur le PC, 10 en ligne) : le monde
   // en ligne a un autre identifiant, elle n'y est donc pas.
   function sentToOldWorld(key, backup) {
     const worlds = lastStatus?.data?.worlds;
@@ -342,10 +342,10 @@ function createWorldCloud({ playMode, siteUrl, authHeaders, currentUuid, log, on
     kick();
     return { ok: true };
   }
-  // « Versions en ligne » (25/10) : au plus N versions automatiques par monde en ligne ; les ★ et
+  // « Versions en ligne » : au plus N versions automatiques par monde en ligne ; les ★ et
   // les envois à la main restent en plus. Les autres sortent du cloud et restent sur le PC
   // Pas de marque : avec « Toutes » (pas de limite par monde), elles repartent au prochain
-  // rattrapage (retour de Rushi du 25/10 : elles restaient bloquées hors du cloud).
+  // rattrapage (elles restaient bloquées hors du cloud).
   async function limitOnline(key) {
     if (!playMode.cloudPlan || !currentUuid()) return 0;
     const list = await playMode.listBackups(key);
@@ -493,7 +493,7 @@ function createWorldCloud({ playMode, siteUrl, authHeaders, currentUuid, log, on
         if (error.code === "noUpload") {
           delete item.uploadId;
           await saveState();
-          // Une reprise tout de suite, puis avec un délai (audit du 25/10 : deux PC qui envoient le
+          // Une reprise tout de suite, puis avec un délai (deux PC qui envoient le
           // même monde se relançaient en boucle).
           item.noUploadTries = (item.noUploadTries || 0) + 1;
           if (item.noUploadTries <= 1) continue;
@@ -666,7 +666,7 @@ function createWorldCloud({ playMode, siteUrl, authHeaders, currentUuid, log, on
       );
       if (hash.digest("hex") !== info.sha256) throw new Error("Le fichier téléchargé est abîmé : réessaie.");
     } catch (error) {
-      // Audit du 25/10 : un téléchargement raté ne laisse pas de fichier à moitié écrit.
+      // Un téléchargement raté ne laisse pas de fichier à moitié écrit.
       await fsp.rm(tmp, { force: true }).catch(() => {});
       throw error;
     }
@@ -837,7 +837,7 @@ function createWorldCloud({ playMode, siteUrl, authHeaders, currentUuid, log, on
   // Verrou rendu quand le jeu est fermé ET que la sauvegarde de ce monde est arrivée dans le cloud
   // (l'autre PC récupère alors la bonne version).
   let pendingEnqueue = 0;
-  // `force` (audit du 25/10) : l'envoi s'est arrêté pour de bon (quota plein, plus d'offre) : le
+  // `force` : l'envoi s'est arrêté pour de bon (quota plein, plus d'offre) : le
   // verrou est rendu même si des sauvegardes attendent, sinon les autres PC le voyaient ouvert ici.
   async function releaseLocks({ force = false } = {}) {
     if (gameRunning || pendingEnqueue > 0 || suspended) return;

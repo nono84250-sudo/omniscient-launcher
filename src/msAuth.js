@@ -59,8 +59,7 @@ function createPkcePair() {
 // l'URL de retour, verifiee avant d'accepter le "code" qui l'accompagne —
 // l'architecture BrowserWindow actuelle (qui intercepte deja cette URL de
 // retour dans checkUrl ci-dessous pour en extraire "code") permet de la relire
-// facilement, donc pas besoin de documenter une impossibilite ici (point mineur
-// de l'audit du 2026-10-10).
+// facilement, donc pas besoin de documenter une impossibilite ici.
 function createState() {
   return crypto.randomBytes(16).toString("hex");
 }
@@ -162,7 +161,7 @@ async function requestToken(params) {
   // Un proxy d'entreprise/portail captif peut repondre 200 avec du HTML au lieu
   // du JSON attendu : .catch(() => ({})) ci-dessus evite le crash brut, mais il
   // faut encore detecter l'objet vide resultant plutot que de renvoyer un jeton
-  // d'acces manquant en silence (trouve par l'audit du 2026-10-10).
+  // d'acces manquant en silence.
   if (!data.access_token) {
     throw new Error("Réponse Microsoft illisible (ni jeton d'accès, ni erreur claire) — réessaie plus tard.");
   }
@@ -227,7 +226,7 @@ async function authenticateXsts(xblToken) {
   // DisplayClaims.xui[0].xid (xuid) n'est PAS garanti par Microsoft contrairement a "uhs" sur la
   // reponse XBL (ligne 197) : il sert seulement a une metadonnee facultative du lancement
   // (meta.xuid, voir buildAuthorization). L'exiger ici bloquait a tort la connexion de comptes
-  // dont la reponse XSTS ne le renvoie pas (regression du 2026-10-10, corrigee le soir meme).
+  // dont la reponse XSTS ne le renvoie pas (corrigee le soir meme).
   if (!data.Token) {
     throw new Error("Réponse XSTS illisible ou incomplète — réessaie plus tard.");
   }
@@ -323,7 +322,7 @@ async function refreshSession(refreshToken) {
     const result = await finishSignIn(msToken.access_token);
     return { ...result, refreshToken: latestRefreshToken };
   } catch (error) {
-    // Microsoft a peut-etre deja renouvele (et donc invalide l'ancien) le
+    // Microsoft a peut-etre deja renouvele le
     // refresh_token meme si la suite echoue ensuite (ex: en attente
     // d'approbation Minecraft) — on l'attache a l'erreur pour que
     // l'appelant le sauvegarde quand meme, sinon la session memorisee
@@ -333,7 +332,7 @@ async function refreshSession(refreshToken) {
   }
 }
 
-// Deconnexion / suppression d'un compte (audit 25/10) : efface les cookies Microsoft de la
+// Deconnexion / suppression d'un compte : efface les cookies Microsoft de la
 // fenetre de connexion, pour que le compte ne reste pas ouvert sur ce PC. Ne rejette jamais :
 // la deconnexion elle-meme ne doit pas echouer pour ca. Renvoie false si l'effacement a rate.
 async function clearLoginStorage() {

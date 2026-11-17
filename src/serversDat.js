@@ -205,7 +205,7 @@ function withServer(buf, { name, ip }) {
 // servers.dat (lancement rapide + "Rejoindre" depuis la fiche detail, par
 // exemple) lisaient chacun le meme etat initial puis ecrivaient chacun leur
 // propre resultat — le second a renommer son fichier temporaire ecrase le
-// premier, perdant son entree (course trouvee par l'audit du 2026-10-10, point
+// premier, perdant son entree (point
 // mineur). Meme principe que les verrous keyed ajoutes ce soir dans
 // javaManager.js/modpack.js, ici une simple promesse chainee par fichier.
 const fileLocks = new Map();

@@ -1,8 +1,8 @@
-// Packs du mode Jouer (26/10, previews validées par Rushi) : « Mon pack » (mods choisis sur
+// Packs du mode Jouer : « Mon pack » (mods choisis sur
 // Modrinth, liste CurseForge à la main), import d'un export CurseForge (.zip) et vérification des
 // mods avant de jouer. Node pur (aucune dépendance à Electron), comme modpack.js.
 //
-// Règles (Rushi, 26/10) :
+// Règles :
 // - Modrinth : le launcher télécharge (cdn.modrinth.com seulement), comme pour les packs officiels.
 // - CurseForge, Mon pack : JAMAIS de téléchargement par le launcher, même pour un mod nécessaire.
 //   Le joueur ouvre la page exacte du fichier et le télécharge ; le launcher le retrouve dans
@@ -26,7 +26,7 @@ const RP_NEEDS = {
   entity_model_features: { slug: "entity-model-features", name: "Entity Model Features" },
   entity_texture_features: { slug: "entitytexturefeatures", name: "Entity Texture Features" },
 };
-// Mod proposé à la création d'un Mon pack (Rushi, 26/10) : sa licence permet de l'ajouter à un pack
+// Mod proposé à la création d'un Mon pack : sa licence permet de l'ajouter à un pack
 // quand il est téléchargé depuis sa page Modrinth (pas de JAR redistribué par nous).
 const CRASH_ASSISTANT = "crash-assistant";
 
@@ -207,7 +207,7 @@ async function latestLoaderVersion(loader, mc) {
   }
   if (loader === "neoforge") {
     // NeoForge numérote d'après Minecraft : 1.21.1 → 21.1.x, 1.20.4 → 20.4.x, 1.21 → 21.0.x.
-    // 03/11 : nouveaux numéros de Minecraft (26.x) : 26.3 → 26.3.0.x, 26.1.2 → 26.1.2.x. Avant, ces
+    // Nouveaux numéros de Minecraft (26.x) : 26.3 → 26.3.0.x, 26.1.2 → 26.1.2.x. Avant, ces
     // versions étaient refusées (« Aucune version de neoforge trouvée pour Minecraft 26.3 »).
     const m = /^1\.(\d+)(?:\.(\d+))?$/.exec(mc);
     const n = /^(\d{2})\.(\d+)(?:\.(\d+))?$/.exec(mc);
@@ -230,7 +230,7 @@ function tomlTables(text) {
   for (let i = 0; i < lines.length; i++) {
     let line = lines[i].trim();
     if (!line || line.startsWith("#")) continue;
-    // Commentaire après l'en-tête (« [[mods]] #mandatory », Placebo, JEI… 27/10) : accepté. Avant, la
+    // Commentaire après l'en-tête (« [[mods]] #mandatory », Placebo) : accepté. Avant, la
     // table « mods » était manquée : le mod n'avait pas d'identifiant et ceux qui en dépendent le
     // croyaient absent (79 problèmes faux sur ATM10).
     const t = /^\[\[\s*([^\]]+?)\s*\]\]\s*(?:#.*)?$/.exec(line) || /^\[\s*([^\]]+?)\s*\]\s*(?:#.*)?$/.exec(line);
@@ -266,9 +266,9 @@ let bugSignal = null;
 const setBugSignal = (fn) => {
   bugSignal = fn;
 };
-// `prefer` : chargeur du pack. Un jar multi-chargeurs (27/10, ATM10 : journeymap-neoforge contient aussi
+// `prefer` : chargeur du pack. Un jar multi-chargeurs (ATM10 : journeymap-neoforge contient aussi
 // un fabric.mod.json « wrongloader », Nullscape les quatre) est lu avec la description de ce chargeur.
-// « forge-legacy » (30/10) : pack Forge avant 1.13. Certains jars 1.12.2 contiennent un mods.toml
+// « forge-legacy » : pack Forge avant 1.13. Certains jars 1.12.2 contiennent un mods.toml
 // oublié de leur version 1.16 (EnhancedVisuals v1.4.4 : « CreativeCore 2.0.0 ou plus ») que Forge
 // 1.12.2 ignore ; seul mcmod.info compte, sinon le launcher signale un faux problème impossible à corriger.
 function jarMeta(zip, depth = 0, prefer = null) {
@@ -281,7 +281,7 @@ function jarMeta(zip, depth = 0, prefer = null) {
   const old = zip.getEntry("META-INF/mods.toml");
   const toml = prefer === "forge" ? old || neo : neo || old;
   meta.loaders = [qui && "quilt", fab && "fabric", neo && "neoforge", old && "forge"].filter(Boolean);
-  // Forge avant 1.13 (28/10) : « mcmod.info », lu seulement pour le nom, l'id et le chargeur (ses
+  // Forge avant 1.13 : « mcmod.info », lu seulement pour le nom, l'id et le chargeur (ses
   // dépendances sont trop rarement remplies pour servir de contrôle).
   const legacy = zip.getEntry("mcmod.info");
   if (legacy && !meta.loaders.length) meta.loaders.push("forge");
@@ -290,7 +290,7 @@ function jarMeta(zip, depth = 0, prefer = null) {
   else if (prefer === "fabric" && fab) use = "fabric";
   else if (prefer === "quilt" && (qui || fab)) use = qui ? "quilt" : "fabric";
   if (legacyPack && legacy) use = "mcmod";
-  // Catalogue de bugs (31/10) : le faux problème « CreativeCore 2.0.0 » vient d'être écarté (voir plus haut).
+  // Catalogue de bugs : le faux problème « CreativeCore 2.0.0 » vient d'être écarté (voir plus haut).
   if (legacyPack && legacy && old) {
     try {
       if (/modId\s*=\s*"creativecore"/.test(zip.readAsText(old))) bugSignal?.("creativecore [2.0.0,)", { loader: "forge" });
@@ -336,7 +336,7 @@ function jarMeta(zip, depth = 0, prefer = null) {
       const tables = tomlTables(text);
       meta.loader = toml.entryName.includes("neoforge") ? "neoforge" : "forge";
       const mods = tables.filter((t) => t.name === "mods");
-      // Autre écriture TOML : « mods = [ { modId = '…', version = '…' }, ] » (27/10 : packs de données
+      // Autre écriture TOML : « mods = [ { modId = '…', version = '…' }, ] » (packs de données
       // convertis en mods par Modrinth, structures de Moog).
       if (!mods.length) {
         const arr = /^\s*mods\s*=\s*\[([\s\S]*?)^\s*\]/m.exec(text);
@@ -346,7 +346,7 @@ function jarMeta(zip, depth = 0, prefer = null) {
           mods.push({ name: "mods", values });
         }
       }
-      // Un jar peut déclarer plusieurs mods, chacun avec sa version (27/10 : Accessories CCLayer
+      // Un jar peut déclarer plusieurs mods, chacun avec sa version (Accessories CCLayer
       // déclare « cclayer » 0.beta.28 et « curios » 9.3.1, Embeddium aussi « rubidium »).
       meta.idVersions = {};
       for (const m of mods) {
@@ -371,7 +371,7 @@ function jarMeta(zip, depth = 0, prefer = null) {
   } catch {
     /* fichier de description illisible : le mod est gardé sans contrôle */
   }
-  // Jars inclus NeoForge/Forge. Lus même sans fichier de description à la racine (27/10, ATM10 :
+  // Jars inclus NeoForge/Forge. Lus même sans fichier de description à la racine (ATM10 :
   // « kotlinforforge-…-all.jar » n'est qu'un conteneur, le vrai mod est dans META-INF/jarjar).
   // Sinytra Connector pour Forge 1.20.1 : le mod est déclaré dans le MANIFEST (« Embedded-Dependencies-Mod »).
   const mf = zip.getEntry("META-INF/MANIFEST.MF");
@@ -410,7 +410,7 @@ function jarMeta(zip, depth = 0, prefer = null) {
   return meta;
 }
 
-// Lecture rapide (27/10, Rushi : la page d'ATM10 mettait très longtemps à s'ouvrir) : seulement les
+// Lecture rapide (la page d'ATM10 mettait très longtemps à s'ouvrir) : seulement les
 // fichiers de description et les jars inclus, pas tout le .jar en mémoire (plusieurs Go pour 400 mods).
 const META_FILES = ["fabric.mod.json", "quilt.mod.json", "META-INF/neoforge.mods.toml", "META-INF/mods.toml", "META-INF/MANIFEST.MF", "META-INF/jarjar/metadata.json", "mcmod.info"];
 async function readJarMeta(file, { loader = null } = {}) {
@@ -483,7 +483,7 @@ function mavenSatisfies(ver, range) {
     return true;
   });
 }
-// Version Maven comparée comme NeoForge/Forge (ComparableVersion de Maven, 27/10) : « 1.20.1-1.3.2 »
+// Version Maven comparée comme NeoForge/Forge (ComparableVersion de Maven) : « 1.20.1-1.3.2 »
 // est plus récent que « 1.20-1.2 », « 0.12.15.5-beta.1 » que « 0.12.15-beta.9 », « 1.6.9a » que
 // « 1.6.9 ». Le suffixe « +… » (version de Minecraft) est ignoré.
 const MQ = ["alpha", "beta", "milestone", "rc", "snapshot", "", "sp"];
@@ -597,7 +597,7 @@ function checkJars(jars, { loader }) {
     for (const id of j.meta.ids) {
       const version = j.meta.idVersions?.[id] || j.meta.version;
       const cur = providers.get(id);
-      // Le même mod deux fois : le jeu garde le plus récent (27/10, lionfishapi 2.4 et 3.0).
+      // Le même mod deux fois : le jeu garde le plus récent (lionfishapi 2.4 et 3.0).
       if (!cur || newer(version, cur.version)) providers.set(id, { ref: j.ref, version, own: true });
     }
   }
@@ -613,13 +613,13 @@ function checkJars(jars, { loader }) {
     }
   }
   const out = [];
-  // Sinytra Connector (27/10, Bubule Land RP 2) : fait tourner les mods Fabric sur NeoForge/Forge, avec
+  // Sinytra Connector (Bubule Land RP 2) : fait tourner les mods Fabric sur NeoForge/Forge, avec
   // Forgified Fabric API pour les modules « fabric-… ». Ces mods ne sont alors pas « du mauvais chargeur ».
   const connector = (loader === "neoforge" || loader === "forge") && (providers.has("connector") || providers.has("connectormod"));
   for (const j of jars) {
     if (!j.on || !j.meta) continue;
     const viaConnector = connector && (j.meta.loader === "fabric" || j.meta.loader === "quilt");
-    // Fabric écarte un mod remplacé par un autre qui « fournit » le même id (27/10 : Sodium 0.6
+    // Fabric écarte un mod remplacé par un autre qui « fournit » le même id (Sodium 0.6
     // fournit « indium », le vieux Indium est ignoré au lieu de bloquer le jeu).
     if ((loader === "fabric" || loader === "quilt") && j.meta.ids.some((id) => (providedBy.get(id) || []).some((r) => r !== j.ref))) continue;
     // Un mod pour un autre chargeur (ex. un mod Forge dans un pack Fabric) ne se chargera pas.
@@ -716,12 +716,12 @@ async function readCfExport(zipFile, { readLevel }) {
     shaders: top("shaderpacks/"),
     worlds,
     overridesPrefix: ov,
-    // RAM conseillée par le pack (Mo dans le manifest CurseForge), en Go (RAM par pack, 01/11).
+    // RAM conseillée par le pack (Mo dans le manifest CurseForge), en Go (RAM par pack).
     recommendedRamGB: ramGBFromMb(manifest.minecraft.recommendedRam),
   };
 }
 
-// --- Pack Modrinth (.mrpack, 27/10) ---------------------------------------------------------------
+// --- Pack Modrinth (.mrpack) ---------------------------------------------------------------
 // modrinth.index.json liste chaque fichier avec ses liens et empreintes ; overrides/ (tous les
 // côtés) et client-overrides/ (client, gagne sur overrides/). Rien ne passe par CurseForge.
 // Mêmes hôtes autorisés que modpack.js (spécification Modrinth).
@@ -789,7 +789,7 @@ const partOfPath = (rel) => {
   return "cfg";
 };
 
-// RAM conseillée écrite dans un pack (RAM par pack, 01/11). Jamais plus de 32 Go.
+// RAM conseillée écrite dans un pack (RAM par pack). Jamais plus de 32 Go.
 function ramGBFromMb(mb) {
   const n = Number(mb);
   return Number.isFinite(n) && n >= 512 ? Math.min(32, Math.ceil(n / 1024)) : null;
@@ -872,7 +872,7 @@ async function readMrpack(zipFile, { readLevel }) {
     worlds: await worldsIn(zipFile, inOv, { readLevel, mc: String(deps.minecraft) }),
     overridesPrefix: MR_PREFIXES,
     shadow: [...shadow],
-    // RAM conseillée : petit fichier omniscient.json ajouté par l'export d'Omniscient (01/11).
+    // RAM conseillée : petit fichier omniscient.json ajouté par l'export d'Omniscient.
     recommendedRamGB: await mrpackRamGB(zipFile, entries),
   };
 }
@@ -954,7 +954,7 @@ async function setIrisShader(gameDir, name) {
   await fsp.writeFile(file, t);
 }
 
-// --- Packs de ressources, shaders et data packs sur Modrinth (27/10, Pack Omniscient) ---------------
+// --- Packs de ressources, shaders et data packs sur Modrinth (Pack Omniscient) ---------------
 // Même règle que les mods : seulement des fichiers de cdn.modrinth.com, vérifiés par leur SHA-1.
 const CONTENT_TYPES = { rp: "resourcepack", sh: "shader", dp: "datapack" };
 function cleanZip(file) {
@@ -1001,7 +1001,7 @@ async function downloadChecked(file, target) {
   await fsp.rename(`${target}.part`, target);
   return buf.length;
 }
-// Logo d'un pack Modrinth importé (.mrpack, 27/10) : le fichier est retrouvé sur Modrinth par son
+// Logo d'un pack Modrinth importé (.mrpack) : le fichier est retrouvé sur Modrinth par son
 // SHA-1, puis le logo de son projet (seulement depuis cdn.modrinth.com, 1 Mo au plus). null sinon.
 async function mrPackIcon(sha1) {
   if (!/^[0-9a-f]{40}$/.test(String(sha1 || ""))) return null;
@@ -1046,7 +1046,7 @@ async function lookupHashes(sha1s) {
   }
   return out;
 }
-// --- « Un pack existant » (28/10, Laboratoire « packBrowse ») ------------------------------------
+// --- « Un pack existant » (Laboratoire « packBrowse ») ------------------------------------
 // Parcourir les modpacks publics de Modrinth et de FTB (API publiques, sans clé). CurseForge passe
 // par le site (clé côté site). Le renderer ne reçoit que du texte et des liens d'images ; les liens
 // de fichiers restent ici et sont relus au moment d'installer.
@@ -1170,7 +1170,7 @@ async function ftbVersionFiles(packId, versionId) {
 const DP_LOADERS = {
   paxi: { slug: "paxi", name: "Paxi", ids: ["paxi"], dir: "config/paxi/datapacks" },
   "global-packs": { slug: "globalpacks", name: "Global Packs", ids: ["globalpacks", "global_packs"], dir: "global_packs/required_data" },
-  // Open Loader (04/11, packs CurseForge) : config/openloader/data depuis Minecraft 1.17, openloader/data avant.
+  // Open Loader (packs CurseForge) : config/openloader/data depuis Minecraft 1.17, openloader/data avant.
   "open-loader": { slug: "open-loader", name: "Open Loader", ids: ["openloader"], dir: "config/openloader/data", oldDir: "openloader/data", oldBefore: "1.17" },
 };
 // Noms reconnus dans un pack CurseForge (nom du projet ou du .jar, sans espaces ni tirets).
@@ -1190,7 +1190,7 @@ function dpLoaderDir(key, mc) {
   return l.dir;
 }
 
-// --- Nouveaux menus d'ajout (31/10, preview validée par Rushi, Laboratoire « addMenus ») ----------
+// --- Nouveaux menus d'ajout (Laboratoire « addMenus ») ----------
 // Une seule fenêtre « Ajouter » : par défaut, seulement ce qui marche avec la version ET le chargeur du
 // pack ; le reste est compté à part (« N pas pour cette version »). La fiche d'un élément montre la
 // grille exacte versions × chargeurs (lue dans ses versions Modrinth), la version minimale, les mods

@@ -1,4 +1,4 @@
-// Onglet « Jouer » (bêta, preview C validée par Rushi le 24/10) : à gauche « Mes versions »
+// Onglet « Jouer » (bêta) : à gauche « Mes versions »
 // (n'importe quelle version de Minecraft, vanilla ou avec un pack officiel, comme les
 // installations du launcher officiel), à droite « Mes mondes » (sauvegardés tout seuls, import
 // par copie depuis .minecraft, synchro cloud pour les Supporters). Plus la tuile « Continuer mon
@@ -413,7 +413,7 @@
   .play-modal { position: fixed; inset: 36px 0 0 0; z-index: 250; background: rgba(4, 7, 14, 0.66); display: grid; place-items: center; padding: 16px; }
   .play-modal .modal-box { max-height: calc(100vh - 80px); overflow: auto; }
   .bk-hint { font-size:12px; opacity:.75; margin:6px 0 0; }
-  /* Fenêtre Sauvegardes (design A « Curseur », choisi le 25/10). */
+  /* Fenêtre Sauvegardes. */
   .nb-box { max-width: 600px; text-align: left; }
   .nb-box h3 { margin: 0 0 2px; }
   .nb-sub { font-size: 12.5px; color: var(--muted); margin: 0 0 14px; }
@@ -469,7 +469,7 @@
   .nb-ticks span:first-child { text-align: left; } .nb-ticks span:last-child { text-align: right; }
   @media (max-width: 640px) { .nb-tiles { grid-template-columns: 1fr; } }
   /* Une confirmation (showModal) ouverte depuis une fenêtre de l'onglet Jouer passe toujours au-dessus
-     (retour de test du 25/10 : « Retirer du cloud » restait cachée derrière Synchroniser). */
+     (« Retirer du cloud » restait cachée derrière Synchroniser). */
   body:has(.play-modal) .modal-overlay { z-index: 300; }
   .cloud-box { width: min(520px, 100%); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-l); padding: 22px; display: grid; gap: 12px; box-shadow: 0 20px 60px -20px rgba(0,0,0,.7); max-height: calc(100vh - 80px); overflow: auto; }
   .cloud-box h3 { margin: 0; font-size: 17px; display: flex; align-items: center; gap: 8px; }
@@ -485,7 +485,7 @@
   .cloud-warn { display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px; border-radius: var(--radius-m); background: color-mix(in srgb, var(--warn) 14%, transparent); color: var(--warn); font-size: 13px; }
   .cloud-acts { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
   .play-cloud-line { font-size: 12px; }
-  /* Plusieurs PC (preview validée du 24/10) : bandeau « Nouveau PC », conflit d'appareils. */
+  /* Plusieurs PC : bandeau « Nouveau PC », conflit d'appareils. */
   .play-remote { display:flex; gap:14px; align-items:center; padding:12px 14px; margin:0 0 10px; border-radius:var(--radius-l); border:1px solid color-mix(in srgb, var(--accent) 45%, var(--border)); background:color-mix(in srgb, var(--accent) 10%, var(--surface)); }
   .play-remote > div { flex:1; } .play-remote strong { font-size:13.5px; } .play-remote p { margin:4px 0 0; font-size:12.5px; opacity:.8; }
   .play-remote .join-btn { white-space:nowrap; }
@@ -495,7 +495,7 @@
   .cf-dev b { font-size:13px; }
   .cf-dev span { opacity:.75; }
   .play-split-line { color:var(--warn); font-size:12px; }
-  /* Liste « Mes mondes » (variante B choisie le 25/10) : lignes fines, ▶ toujours visible, le reste
+  /* Liste « Mes mondes » : lignes fines, ▶ toujours visible, le reste
      dans « … », recherche et tri dès 8 mondes, filtres dès 16, sections repliables. */
   .play-cols.mv-wide { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); }
   @media (max-width: 900px) { .play-cols.mv-wide { grid-template-columns: 1fr; } }
@@ -525,7 +525,7 @@
   .mv-row.cloud-only img { opacity:.6; }
   .mv-list.dim .mv-row { opacity:.75; }
   .mv-txt { min-width:0; display:flex; flex-direction:column; gap:1px; }
-  /* Carte d'une version (27/10, Rushi) : le nom seul sur la 1re ligne, pack et problèmes sur la 2e. */
+  /* Carte d'une version : le nom seul sur la 1re ligne, pack et problèmes sur la 2e. */
   .mv-chips { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:3px 0 2px; }
   .mv-name { font-size:13.5px; font-weight:600; color:var(--foreground); white-space:nowrap; overflow:hidden; display:flex; align-items:center; gap:6px; }
   .mv-name > span { overflow:hidden; text-overflow:ellipsis; }
@@ -562,7 +562,7 @@
   .cf-step .n { color:var(--muted); font-variant-numeric:tabular-nums; font-size:12px; }
   .cf-bar { grid-column:2 / -1; height:6px; border-radius:99px; background:color-mix(in srgb, var(--muted) 20%, transparent); overflow:hidden; }
   .cf-bar i { display:block; height:100%; background:var(--accent); transition:width .2s; }
-  /* Progression des imports (27/10) : rond, barre sans fin (taille inconnue), détail, barre générale. */
+  /* Progression des imports : rond, barre sans fin (taille inconnue), détail, barre générale. */
   .cf-bar.ind { position:relative; }
   .cf-bar.ind i { position:absolute; top:0; bottom:0; width:35%; transition:none; animation:ip-ind 1.3s ease-in-out infinite; }
   @keyframes ip-ind { from { left:-35%; } to { left:100%; } }
@@ -680,7 +680,7 @@
   .pk-row > .pk-end { justify-self:end; }
   .pk-ver select { height:30px; padding:0 26px 0 8px; line-height:normal; font-size:12px; width:170px; max-width:170px; }
   .pk-up { font-size:10.5px; font-weight:700; color:var(--accent); white-space:nowrap; }
-  /* 02/11 (Rushi, version A) : la pastille suit le nom de mod le plus long (--pk-nmw, plafonné) et la
+  /* La pastille suit le nom de mod le plus long (--pk-nmw, plafonné) et la
      version prend le reste ; un nom de fichier trop long finit par « … » au lieu de recouvrir la pastille. */
   .pk-mods .pk-row { grid-template-columns:32px var(--pk-nmw,220px) var(--pk-srcw,96px) minmax(0,1fr) 64px; }
   .pk-mods .pk-nm b { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -721,7 +721,7 @@
   .fx-name { border:0; background:none; padding:0; text-align:left; cursor:pointer; color:inherit; font:inherit; min-width:0; display:flex; flex-direction:column; }
   .fx-name b { font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .fx-name small { color:var(--muted); font-size:12px; }
-  /* Survol (27/10, demande de Rushi) : cadre bleu léger sur la ligne, dans tous les onglets de la page. */
+  /* Survol : cadre bleu léger sur la ligne, dans tous les onglets de la page. */
   .pk-list .pk-row { position:relative; border-radius:8px; transition:background .12s, box-shadow .12s; }
   .pk-list .pk-row:hover, .pk-list .pk-row:focus-within { background:color-mix(in srgb, var(--accent) 9%, transparent); box-shadow:inset 0 0 0 1.5px color-mix(in srgb, var(--accent) 70%, transparent); }
   .pk-list .pk-row:hover + .pk-row, .pk-list .pk-row:focus-within + .pk-row { border-top-color:transparent; }
@@ -807,7 +807,7 @@
   .nl-links { display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
   .nl-links .link-btn { margin:0; padding-left:0; padding-right:0; }
   .nl-forever { color:var(--danger, #e5484d) !important; font-weight:600; }
-  /* Changement de version (27/10) */
+  /* Changement de version */
   .nb-ver { font-size:11px; font-weight:600; padding:2px 7px; border-radius:6px; color:var(--muted); background:color-mix(in srgb, var(--muted) 16%, transparent); font-variant-numeric:tabular-nums; white-space:nowrap; }
   .nb-ver.cur { color:var(--accent-2, var(--accent)); background:color-mix(in srgb, var(--accent) 16%, transparent); }
   .nb-sep { padding:5px 10px; font-size:11.5px; font-weight:600; color:var(--warn); background:color-mix(in srgb, var(--warn) 9%, transparent); border-bottom:1px solid var(--border); }
@@ -922,14 +922,14 @@
   `;
   document.head.appendChild(css);
 
-  // --- Bouton du menu de gauche, sous « Serveurs » (Rushi 28/10 : Accueil, Serveurs, Jouer, Ma bibliothèque…) --
+  // --- Bouton du menu de gauche, sous « Serveurs » (Accueil, Serveurs, Jouer, Ma bibliothèque…) --
   const sidebar = document.getElementById("sidebar");
   const nav = document.createElement("button");
   nav.id = "nav-play";
   nav.type = "button";
   nav.className = "sidebar-btn";
   document.getElementById("nav-servers").after(nav);
-  // Laboratoire (25/10) : l'onglet n'existe que si le site dit « visible » pour ce joueur ;
+  // Laboratoire : l'onglet n'existe que si le site dit « visible » pour ce joueur ;
   // le badge « Bêta » suit l'état du mode Jouer (tout sauf « Pour tous »). Voir features.js.
   let playVisible = false;
   let worldsOn = false; // « Mondes en ligne » : sinon aucun appel au cloud, aucune fenêtre
@@ -1001,7 +1001,7 @@
     panel.hidden = false;
     refresh().then(maybeOfferCloud);
   }
-  // Clic sur « Jouer » dans le menu (28/10, Rushi) : toujours la page principale de Jouer, même si
+  // Clic sur « Jouer » dans le menu : toujours la page principale de Jouer, même si
   // on avait laissé la page d'un pack ou « Tous mes mondes » ouverte.
   nav.addEventListener("click", () => {
     packPage = null;
@@ -1066,7 +1066,7 @@
   async function refresh() {
     if (!playVisible) return;
     // Deux lectures en même temps : seule la dernière compte, sinon une réponse lue avant un retrait
-    // arrive après lui et fait réapparaître la tuile un instant (01/11, Rushi : « ça clignote »).
+    // arrive après lui et fait réapparaître la tuile un instant.
     const seq = ++refreshSeq;
     const [v, w] = await Promise.all([api.listVersions(), api.listWorlds()]);
     if (seq !== refreshSeq) return;
@@ -1089,7 +1089,7 @@
   }
   api.onWorldsChanged(() => refresh());
   api.onCrashHelp?.((info) => playVisible && openCrashHelp(info));
-  // Data packs en attente posés dans le premier monde de leur installation (28/10).
+  // Data packs en attente posés dans le premier monde de leur installation.
   api.onDpApplied?.((list) => (list || []).forEach((d) => toast(L() === "fr" ? `Data pack « ${d.name} » ajouté à « ${d.world} » (sauvegarde faite avant). Il marche dès la prochaine ouverture du monde.` : `Data pack “${d.name}” added to “${d.world}” (backup made first). It works the next time you open the world.`)));
   window.mchub.onGameState?.((running) => {
     if (!running) data.running = null;
@@ -1103,7 +1103,7 @@
   // Page d'une version : Mon pack et packs (Laboratoire « myPack »), vanilla (« vanillaPage »),
   // Pack Omniscient (« omniPack »), pack Omniscient publié (toujours, mods en lecture seule).
   const pageOn = (v) => !!v && (v.pack ? on("myPack") || v.pack.kind === "omnipub" : on("vanillaPage") || (!!v.omni && on("omniPack")));
-  // « Test Omnipack » (31/10) : pack proposé installé par « Tester dans le launcher ».
+  // « Test Omnipack » : pack proposé installé par « Tester dans le launcher ».
   const testTag = (v) => (v?.testPack ? `<span class="play-beta-tag tp-tag">${esc(L() === "fr" ? "Test Omnipack" : "Omnipack test")}</span>` : "");
   function versionRow(v) {
     const label = v.name || v.minecraftVersion;
@@ -1138,7 +1138,7 @@
       <button type="button" class="join-btn" data-cloud-download-all>↓ ${fr ? "Télécharger mes mondes" : "Download my worlds"}</button></div>`;
   }
 
-  // --- Liste « Mes mondes » (variante B, choisie par Rushi le 25/10) ---------------------------
+  // --- Liste « Mes mondes » ---------------------------
   // Lignes fines avec ▶ toujours visible ; sauvegardes, interrupteur, épingler, masquer, dossier et
   // cloud dans le menu « … ». Recherche et tri dès 8 mondes, filtres dès 16. Sections Récents (3),
   // Épinglés et Tous mes mondes qu'on ouvre et ferme ; mondes masqués et mondes seulement dans le
@@ -1285,7 +1285,7 @@
     const hid = mvSorted(data.worlds.filter((w) => mv.hidden.has(w.key)));
     let h = "";
     if (on("playTiles") && PJ.allView) {
-      // Demande de Rushi (27/10) : catégories repliables Liés / Non liés / Supprimés dans Minecraft.
+      // Catégories repliables Liés / Non liés / Supprimés dans Minecraft.
       const fr = L() === "fr";
       const linked = (w) => !!(w.lastVersionId && data.versions.some((x) => x.id === w.lastVersionId));
       const pinned = mvSorted(visible.filter((w) => mv.pins.has(w.key)));
@@ -1454,7 +1454,7 @@
     (next.querySelector(".mv-play:not(:disabled), .mv-dots") || next).focus();
   });
 
-  // --- Page Jouer en tuiles « C1 · Tiroir » (27/10, preview validée par Rushi, Laboratoire « playTiles ») ---
+  // --- Page Jouer en tuiles (Laboratoire « playTiles ») ---
   // Avec 20 installations, l'ancienne page (colonne « Mes versions » + tous les mondes à droite) devenait
   // une liste interminable. Ici : une grille de tuiles (jaquette, dernier monde joué, ▶ et « … »
   // toujours visibles). Un clic sur la tuile ouvre la page de l'installation ; le bouton « Mondes (N) »
@@ -1490,7 +1490,7 @@
   const pjCanUp = (v) => !v.keptCopyOf && !!newerFor(v);
   const pjTime = (x) => (typeof x === "number" ? x : Date.parse(x || "") || 0);
   const pjFresh = (at) => !!at && Date.now() - pjTime(at) < 3 * 86400_000;
-  // Pack Omniscient (28/10, Rushi : « faut pas les créer dans le menu Jouer, ça surcharge ») : une seule
+  // Pack Omniscient : une seule
   // tuile par pack, celle du pack de référence. Ses autres versions s'ouvrent depuis la barre « Versions
   // du pack » de sa page ; la tuile compte les mondes de toutes ses versions.
   const pjGroup = (v) => (v.omni?.group ? data.versions.filter((x) => x.omni?.group === v.omni.group) : [v]);
@@ -1498,7 +1498,7 @@
     const ids = new Set(pjGroup(v).map((x) => x.id));
     return data.worlds.filter((w) => ids.has(w.lastVersionId));
   };
-  // 03/11 (Rushi) : l'ordre des tuiles suit aussi la dernière OUVERTURE de la page d'une installation
+  // L'ordre des tuiles suit aussi la dernière OUVERTURE de la page d'une installation
   // (pas seulement le dernier lancement) : la plus récente en premier, de gauche à droite.
   const PJ_OPENED = "omni.pjOpened";
   const pjOpenedMap = () => {
@@ -1546,7 +1546,7 @@
     for (const c of String(v.pack?.slug || v.pack?.name || v.id)) x = (x * 31 + c.charCodeAt(0)) % 997;
     return PJ_COL[x % PJ_COL.length];
   };
-  // « Voir tous mes mondes » (demande de Rushi, 27/10) : à quelle installation chaque monde est lié,
+  // « Voir tous mes mondes » : à quelle installation chaque monde est lié,
   // dans la couleur de sa tuile (vert pour vanilla), ou « Non lié ».
   function pjLinkTag(w) {
     const fr = L() === "fr";
@@ -1558,7 +1558,7 @@
   function pjCover(v, h = 74) {
     if (!v.pack) return `<div class="pj2-cover van" style="height:${h}px;background-image:url(${grassThumb("v" + v.minecraftVersion)});"><span class="pj2-ver">${esc(v.minecraftVersion)}</span></div>`;
     const [a, b] = pjCol(v);
-    // Vrai logo du pack (retrouvé sur Modrinth à l'import, 27/10) sur un fond flou de lui-même.
+    // Vrai logo du pack (retrouvé sur Modrinth à l'import) sur un fond flou de lui-même.
     if (/^data:image\/(png|jpeg|webp|gif);base64,/.test(v.icon || "")) return `<div class="pj2-cover pj2-ico" style="height:${h}px;--ic:url(${v.icon});background:${a};"><img src="${v.icon}" alt="" style="height:${Math.round(h * 0.72)}px;"></div>`;
     const ini = pjName(v).replace(/[^\p{L}\p{N} ]/gu, "").split(/\s+/).filter(Boolean).slice(0, 2).map((s) => s[0]).join("").toUpperCase() || "P";
     return `<div class="pj2-cover" style="height:${h}px;background:radial-gradient(circle at 30% 20%, ${b}, ${a} 75%);"><span class="pj2-logo" style="font-size:${Math.round(h * 0.38)}px;">${esc(ini)}</span></div>`;
@@ -1619,7 +1619,7 @@
     if (PJ.allView) return pjAllView(cloudOnly);
     const list = pjSorted().filter((v) => v.id !== PJ.hide);
     if (PJ.sel && !list.some((v) => v.id === PJ.sel)) PJ.sel = null;
-    // 28/10 (Rushi) : la tuile « + Nouvelle installation » remplace le bouton bleu de l'en-tête ; elle
+    // La tuile « + Nouvelle installation » remplace le bouton bleu de l'en-tête ; elle
     // vient juste après les tuiles montrées, avant « Afficher les N », pour être toujours visible.
     const max = pbOn() ? 10 : 11;
     const shown = PJ.tilesAll || list.length <= max ? list : list.slice(0, max);
@@ -1635,7 +1635,7 @@
       ${v ? `<div class="pj2-drawer" data-pj-drawer><span class="pj2-arrow"></span>${pjDetail(v)}</div>` : ""}</div>
       ${orphans ? `<p class="pj2-orph">${esc(PJT().orphans(orphans))} · <button type="button" class="link-btn" data-pj-all style="font-size:12.5px;">${esc(PJT().orphansGo)}</button></p>` : ""}${PJ.pick ? pjSelBar("i") : ""}`;
   }
-  // Sélection multiple (Rushi, 27/10 : « je devais supprimer 10 mondes… ») : installations
+  // Sélection multiple : installations
   // (« Retirer » en une fois, file d'attente habituelle) et mondes (« Suppression définitive »
   // en une fois : le mot à taper puis les 10 secondes, une seule fois pour tout le lot).
   const SELT = () => (L() === "fr" ? {
@@ -1706,7 +1706,7 @@
     const allOn = kind === "i" ? n && n === pjSorted().filter((v) => v.id !== PJ.hide).length : n && [...panel.querySelectorAll(".mv-body .mv-row[data-world]")].every((r) => PJ.wpick.has(r.dataset.world));
     bar.querySelector("[data-pj-sel-all]").textContent = allOn ? SELT().none : SELT().all;
   }
-  // Cocher en glissant (Rushi, 28/10) : clic maintenu, tout ce que la souris survole prend le même
+  // Cocher en glissant : clic maintenu, tout ce que la souris survole prend le même
   // état que le premier élément (coché, ou décoché si on part d'un élément déjà coché).
   function pjPickTarget(el) {
     if (PJ.pick) {
@@ -1747,12 +1747,12 @@
   });
   document.addEventListener("mouseup", () => (PJ.drag = null));
   async function pjRmMany(ids) {
-    // Dans l'ordre de l'écran, pas celui du glisser : « En attente » se lit 1, 2, 3… (01/11, Rushi).
+    // Dans l'ordre de l'écran, pas celui du glisser : « En attente » se lit 1, 2, 3….
     const screen = [...panel.querySelectorAll("[data-pj-grid] > [data-pj-tile]")].map((t) => t.dataset.pjTile);
     const place = (id) => (screen.includes(id) ? screen.indexOf(id) : screen.length);
     const tiles = [...ids].sort((a, b) => place(a) - place(b)).map((id) => data.versions.find((x) => x.id === id)).filter(Boolean);
     if (!tiles.length) return;
-    // Une tuile de Pack Omniscient = tout le pack : ses autres versions partent avec elle (29/10).
+    // Une tuile de Pack Omniscient = tout le pack : ses autres versions partent avec elle.
     const vs = [...new Set(tiles.flatMap((v) => pjGroup(v)))];
     const extra = vs.filter((v) => !tiles.includes(v));
     if (vs.some((v) => data.running?.versionId === v.id)) return showModal({ title: SELT().rmT(vs.length), body: SELT().running, confirmLabel: "OK", tone: "warn" });
@@ -1875,7 +1875,7 @@
     return out;
   };
   // Retrait terminé : recalcule la place de tous les fantômes d'après l'écran. Sinon, retirer une
-  // tuile placée avant un fantôme le décale et les tuiles changent d'ordre (01/11, Rushi : « au pif »).
+  // tuile placée avant un fantôme le décale et les tuiles changent d'ordre.
   function pjGhostSlots(id, ghost) {
     let tiles = 0, ord = 0;
     panel.querySelectorAll("[data-pj-grid] > .pj2-tile").forEach((t) => {
@@ -1893,8 +1893,8 @@
     });
   }
   // Met à jour un élément sans tout recréer : ce qui n'a pas changé garde ses nœuds, donc ses animations
-  // (rond, barre, fondu) ne repartent pas de zéro et ses images ne clignotent pas (01/11, Rushi :
-  // « à chaque actualisation toutes les animations redémarrent »). Les tuiles sont suivies par leur id.
+  // (rond, barre, fondu) ne repartent pas de zéro et ses images ne clignotent pas. Les tuiles sont
+  // suivies par leur id.
   const pjNodeKey = (n) => {
     if (n.nodeType !== 1) return null;
     if (n.dataset.pjTile) return `t:${n.dataset.pjTile}`;
@@ -2014,7 +2014,7 @@
       const act = b.dataset.pjAct;
       if (act === "up") return openUpdateVersion(id);
       if (act === "folder") return api.myPack.openFolder(id, "");
-      // Pack Omniscient (29/10, Rushi) : même fenêtre que ⚙ › Retirer (tout le pack ou versions choisies).
+      // Pack Omniscient : même fenêtre que ⚙ › Retirer (tout le pack ou versions choisies).
       if (act === "remove") return pjGroup(v).length > 1 ? omRemovePack(id) : removeVersion(id);
       if (act === "rename") return pjRename(id);
     });
@@ -2092,7 +2092,7 @@
     if (b?.hasAttribute("data-pj-tiles")) return take(() => { PJ.tilesAll = !PJ.tilesAll; render(); });
     const tile = e.target.closest("[data-pj-tile]");
     const id = b?.dataset.pjW || (tile && !b && !pageOn(data.versions.find((x) => x.id === tile.dataset.pjTile)) ? tile.dataset.pjTile : null);
-    // 27/10 (Rushi) : un clic sur la tuile ouvre la page de l'installation ; « Mondes (N) » ouvre le tiroir.
+    // Un clic sur la tuile ouvre la page de l'installation ; « Mondes (N) » ouvre le tiroir.
     if (tile && !b && !id) return take(() => openPackPage(tile.dataset.pjTile));
     if (!id) return;
     e.stopImmediatePropagation();
@@ -2108,10 +2108,10 @@
       t.click();
     }
   });
-  // Effet visuel quand on retire une installation (27/10, demande de Rushi : sans effet, la tuile
+  // Effet visuel quand on retire une installation (sans effet, la tuile
   // disparaît d'un coup et le joueur croit à un bug). Pendant le retrait, la tuile montre ce qui se
   // passe ; ensuite elle s'efface, les autres glissent à sa place et une tuile « fantôme » dit pendant
-  // 6 s ce qui s'est passé (variante C de la preview, 27/10).
+  // 6 s ce qui s'est passé.
   const pjSleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const RMT = () => (L() === "fr" ? {
     busy: "Retrait…", busyD: "Mods et fichiers de l'installation", wait: "En attente", waitD: (n) => (n ? `Retrait après ${n} autre${n > 1 ? "s" : ""}` : "Retrait juste après"), cancel: "Annuler",
@@ -2123,7 +2123,7 @@
     trashed: (n) => `${n} world${n > 1 ? "s" : ""} moved to the Recycle Bin with ${n > 1 ? "their" : "its"} backups.`, seeW: "See my worlds", ok: "OK",
   });
   // Calque posé sur la tuile pendant le retrait, ou « En attente » (n°) si d'autres passent avant elle
-  // (file d'attente, demande de Rushi 27/10 : on peut en retirer plusieurs d'affilée).
+  // (file d'attente, on peut en retirer plusieurs d'affilée).
   function pjRmLayer(v) {
     const q = PJ.rmQ.findIndex((j) => j.id === v.id);
     if (q >= 0) return `<div class="pj2-rmov wait"><span class="pj2-qn">${q + 1}</span><b>${esc(RMT().wait)}</b><small>${esc(RMT().waitD(q + (PJ.rm ? 1 : 0)))}</small><button type="button" class="link-btn" data-pj-rm-cancel="${esc(v.id)}" style="font-size:12px;">${esc(RMT().cancel)}</button></div>`;
@@ -2132,7 +2132,7 @@
   }
   // Tuile « fantôme » : reste 6 s à la place de la tuile retirée pour dire ce qui s'est passé.
   function pjGhost(g) {
-    // Jaquette du pack en gris (choix de Rushi, 27/10) : on reconnaît ce qui vient de partir, sans vert « succès ».
+    // Jaquette du pack en gris : on reconnaît ce qui vient de partir, sans vert « succès ».
     const head = `<span class="gcov">${g.cov || ""}</span><em>${esc(RMT().gone)}</em>`;
     return `<div class="pj2-tile pj2-ghost" data-pj-ghost="${g.key}" role="status" aria-label="${esc(RMT().ghost(g.label))}">${head}<b title="${esc(g.label)}">${esc(g.label)}</b>
       <small>${esc(g.withWorlds ? RMT().trashed(g.n) : RMT().kept(g.n))}</small>
@@ -2274,13 +2274,13 @@
   `;
   document.head.appendChild(PJRM_CSS);
 
-  // Interrupteur « Sauvegarde » sur la ligne du monde, à gauche de ▶ (commentaire de Rushi, 27/10).
+  // Interrupteur « Sauvegarde » sur la ligne du monde, à gauche de ▶.
   function pjSw(w) {
     const fr = L() === "fr";
     const tip = w.backup ? (fr ? `Sauvegarde auto activée pour « ${w.name} » : clique pour la couper` : `Auto backup on for “${w.name}”: click to turn it off`) : fr ? `Sauvegarde auto coupée pour « ${w.name} » : clique pour la remettre` : `Auto backup off for “${w.name}”: click to turn it on`;
     return `<button type="button" class="play-switch mv-sw${w.backup ? "" : " off"}" role="switch" aria-checked="${!!w.backup}" data-switch="${esc(w.key)}" title="${esc(tip)}" aria-label="${esc(tip)}"><span class="lbl">${esc(fr ? (w.backup ? "Sauvegarde" : "Coupée") : w.backup ? "Backup" : "Off")}</span><i></i></button>`;
   }
-  // Monde copié pendant une mise à jour avec « garder aussi l'installation ancienne » (27/10).
+  // Monde copié pendant une mise à jour avec « garder aussi l'installation ancienne ».
   const pjCopyTag = (w) => (w.versionCopy ? `<span class="mv-tag copy" title="${esc(L() === "fr" ? `Copie gardée en ${w.minecraftVersion || "?"}, faite avant une mise à jour. L'original est passé dans la nouvelle version.` : `Copy kept on ${w.minecraftVersion || "?"}, made before an update. The original moved to the new version.`)}">${esc(L() === "fr" ? `Copie ${w.minecraftVersion || ""}` : `Copy ${w.minecraftVersion || ""}`)}</span>` : "");
   const PJ_CSS = document.createElement("style");
   PJ_CSS.textContent = `
@@ -2382,8 +2382,7 @@
   document.head.appendChild(PJ_CSS);
 
 
-  // Premier lancement (28/10, Rushi : « quand les gens démarrent, ça crée un pack vanilla de la
-  // dernière version », variante A de la preview, Laboratoire « firstInstall ») : le launcher crée
+  // Premier lancement (Laboratoire « firstInstall ») : le launcher crée
   // tout seul « Minecraft <dernière> » (rien n'est téléchargé avant « Jouer »). Une seule fois par
   // PC : si le joueur retire ensuite toutes ses installations, ou sans Internet, la carte
   // « Commence ici » (la dernière version en un clic, un pack existant, mes mondes).
@@ -2449,7 +2448,7 @@
     const fr = L() === "fr";
     const localKeys = new Set(data.worlds.map((w) => w.key));
     const cloudOnly = (data.cloud?.offer?.cloud ? data.cloud.worlds || [] : []).filter((cw) => !localKeys.has(cw.worldKey));
-    // 28/10 (Rushi) : un joueur qui a déjà eu des installations puis les retire toutes ne doit pas
+    // Un joueur qui a déjà eu des installations puis les retire toutes ne doit pas
     // voir « Minecraft <dernière> » se recréer tout seul : la création automatique est seulement
     // pour un tout premier lancement, sinon la page « Commence ici ».
     if (data.loaded && (data.versions.length || data.worlds.length)) FL.mark();
@@ -2513,7 +2512,7 @@
     const b = e.target.closest("button");
     const card = e.target.closest("[data-pack-card]");
     if (card && !b) return pageOn(data.versions.find((x) => x.id === card.dataset.packCard)) ? openPackPage(card.dataset.packCard) : undefined;
-    // Clic sur la ligne d'un monde, hors de ses boutons : sa liste de sauvegardes (30/10, demande de Rushi).
+    // Clic sur la ligne d'un monde, hors de ses boutons : sa liste de sauvegardes.
     const wrow = !b && !PJ.wpick && e.target.closest(".mv-row[data-world]");
     if (wrow) return openBackupsList(wrow.dataset.world);
     if (!b) return;
@@ -2560,8 +2559,8 @@
   // --- Lancer ------------------------------------------------------------------------------
   // Même affichage que le lancement d'un serveur (renderer.js, launchOfflineInstance) : la pilule
   // passe tout de suite à « Lancement… » avec les étapes (Java, fichiers, mods, démarrage) et le
-  // panneau s'ouvre, pour ne jamais laisser le joueur devant un écran sans rien (retour de test du
-  // 24/10 : 1 min 30 sans signe de vie au premier lancement, le temps des téléchargements).
+  // panneau s'ouvre, pour ne jamais laisser le joueur devant un écran sans rien (1 min 30 sans
+  // signe de vie au premier lancement, le temps des téléchargements).
   let lastLaunch = null; // { versionId, label } : nom lisible dans la pilule pendant la partie
   window.playRunningLabel = (slug) => {
     const id = String(slug || "").replace(/^play:/, "");
@@ -2579,7 +2578,7 @@
       if (!ok) return;
     }
     if (launchInProgress) return;
-    // Avertissement CurseForge (06/11) : une seule fois par PC, avant de lancer un pack CurseForge.
+    // Avertissement CurseForge : une seule fois par PC, avant de lancer un pack CurseForge.
     {
       const pw = opts.worldKey ? data.worlds.find((x) => x.key === opts.worldKey) : null;
       const pv = (opts.versionId && data.versions.find((x) => x.id === opts.versionId)) || (pw?.lastVersionId ? data.versions.find((x) => x.id === pw.lastVersionId) : null);
@@ -2614,7 +2613,7 @@
     const wv = (opts.versionId && data.versions.find((x) => x.id === opts.versionId)) || (w?.lastVersionId ? data.versions.find((x) => x.id === w.lastVersionId) : null);
     const label = w ? `${w.name} · ${wv ? versionLabel(wv) : `Minecraft ${w.minecraftVersion || ""}`.trim()}` : v ? versionLabel(v) : "Minecraft";
     const oldHtml = btn?.innerHTML;
-    // Petit bouton rond (▶ d'une tuile ou d'un monde, 28/10 Rushi : « Préparation… » débordait) :
+    // Petit bouton rond (▶ d'une tuile ou d'un monde, « Préparation… » débordait) :
     // seulement un rond qui tourne, le texte va dans l'infobulle.
     const round = !!btn && btn.offsetWidth > 0 && btn.offsetWidth < 70;
     const busyText = (t) => {
@@ -2787,7 +2786,7 @@
     });
   }
 
-  // Aide au crash v1 (26/10, Laboratoire « crashHelp ») : à la fermeture du jeu, le launcher a lu
+  // Aide au crash v1 (Laboratoire « crashHelp ») : à la fermeture du jeu, le launcher a lu
   // logs/latest.log et le rapport de crash de la partie. On dit le problème en clair ; « Corriger le
   // pack » ouvre la page du pack (qui relit les .jar) ; « Copier les logs » pour demander de l'aide.
   function openCrashHelp(info) {
@@ -2799,10 +2798,10 @@
       body = `<p style="margin:8px 0 4px;">${esc(T("chDeps"))}</p><ul style="margin:0 0 8px 18px;padding:0;font-size:13.5px;line-height:1.5;">${info.deps.map((d) => `<li>${esc(T("chDep", { a: d.mod || d.modId || "?", b: d.needs, min: d.min ? T("chMin", { v: d.min }) : "", have: d.have ? T("chHave", { v: d.have }) : T("chMissing") }))}</li>`).join("")}</ul>`;
     } else if (info.kind === "java") body = `<p style="margin:8px 0;">${esc(T("chJava"))}</p>${info.description ? `<p class="pk-note">${esc(info.description)}</p>` : ""}`;
     else if (info.kind === "memory") body = `<p style="margin:8px 0;">${esc(T("chMem"))}</p>${on("packRam") && v ? `<button type="button" class="btn-secondary" id="ch-ram" style="margin:2px 0 6px;">🧠 ${esc(rmTr("Régler la RAM de ce pack", "Set this pack's RAM"))}</button>` : ""}`;
-    // 04/11 : fichiers manquants dans libraries/ (Forge sans ses fichiers fabriqués) : on propose de corriger.
+    // Fichiers manquants dans libraries/ (Forge sans ses fichiers fabriqués) : on propose de corriger.
     else if (info.missingLibs) body = `<p style="margin:8px 0;">${esc(T("chLibs"))}</p>`;
     else body = `<p style="margin:8px 0;">${esc(T("chCrash"))}</p>${info.description ? `<p class="pk-note">${esc(T("chWhy", { d: info.description }))}</p>` : ""}${(info.lines || []).map((l) => `<p class="pk-note">${esc(T("chSuspect", { m: l }))}</p>`).join("")}`;
-    // Aide Discord (02/11, Laboratoire « bugDiscord ») : le bloc à 3 boutons remplace « Copier les logs ».
+    // Aide Discord (Laboratoire « bugDiscord ») : le bloc à 3 boutons remplace « Copier les logs ».
     const help = on("bugDiscord") ? window.__bugHelp : null;
     const noFiles = help && !info.hasCrash && !info.hasLog ? `<p class="pk-note">${esc(help.empty())}</p>` : "";
     const m = overlay(`<div class="modal-box pop-in tone-warn" role="dialog" aria-modal="true" aria-labelledby="ch-t" data-crash-help style="max-width:520px;text-align:left;">
@@ -2876,7 +2875,7 @@
     }
     // Liste de Mojang (à jour toute seule), gardée seulement là où le chargeur existe et où le
     // launcher sait le lancer : Forge à partir de 1.7.10 (avant 1.13 : ancien format, voir
-    // installLegacyForge dans modpack.js, 28/10), NeoForge à partir de 1.20.2 (sa 1.20.1 est un Forge
+    // installLegacyForge dans modpack.js), NeoForge à partir de 1.20.2 (sa 1.20.1 est un Forge
     // renommé), Fabric et Quilt à partir de 1.14.
     const MIN_MC = { forge: "1.7.10", neoforge: "1.20.2", fabric: "1.14", quilt: "1.14" };
     const mcCmp = (a, b) => a.localeCompare(b, "en", { numeric: true });
@@ -2924,7 +2923,7 @@
                ...[...st.mods.entries()].filter(([, x]) => x.source === "cf").map(([slug, x]) => `<div class="mp-r"><span class="mp-ic" style="background:${icColor(slug)}">${esc(x.name[0])}</span><span>${esc(x.name)}<small>CurseForge</small></span>
                  <span class="acts">${x.status === "ok" ? `<span class="st ok">${esc(T("mpCfOk"))}</span>` : `<span class="st">${esc(T("mpCfWait"))}</span><button type="button" class="act" data-cfopen="${esc(slug)}">${esc(T("mpCfOpen"))}</button>`}</span></div>`),
                ...list.filter((x) => !st.mods.has(x.slug)).map((x) => `<div class="mp-r"><span class="mp-ic" style="background:${icColor(x.slug)}">${esc(x.name[0])}</span><span>${esc(x.name)}<small>CurseForge · ${esc(x.author)}</small></span><button type="button" class="act" data-cfadd="${esc(x.slug)}" data-name="${esc(x.name)}">${esc(T("mpCfAdd"))}</button></div>`),
-               // 29/10 : une erreur (site, clé, quota) ou aucun résultat laissait la liste vide, sans un mot.
+               // Une erreur (site, clé, quota) ou aucun résultat laissait la liste vide, sans un mot.
                ...(list.length ? [] : [`<div class="mp-r" style="grid-template-columns:1fr;color:var(--muted);">${esc(res && res.ok === false ? T("mpCfErr", { e: res.error || res.code || "?" }) : T("mpCfNone"))}</div>`]),
              ].join("")}</div>`}
         <div class="mp-in"><h4>${esc(T("mpIn", { n: st.mods.size }))}</h4>
@@ -3064,7 +3063,7 @@
   }
 
 
-  // --- Nouveaux menus d'ajout (31/10, preview validée par Rushi, Laboratoire « addMenus ») -----------
+  // --- Nouveaux menus d'ajout (Laboratoire « addMenus ») -----------
   // Une seule fenêtre « Ajouter » (mods, packs de ressources, shaders, data packs, mondes) : par défaut,
   // seulement ce qui marche avec la version ET le chargeur du pack ; le reste est compté à part. Chaque
   // élément a sa fiche : grille versions × chargeurs, version minimale, mods nécessaires, images et
@@ -3264,7 +3263,7 @@
   // Fichier CurseForge d'une case (chargeur, version) : Quilt prend aussi les fichiers Fabric.
   const adCfFile = (x, l, mc) => x.files?.[`${l}|${mc}`] || (l === "quilt" ? x.files?.[`fabric|${mc}`] : null) || x.files?.[`mc|${mc}`] || null;
 
-  // 03/11 (Rushi) : « si une installation est impossible, tu la bloques ». Le chargeur existe-t-il
+  // « si une installation est impossible, tu la bloques ». Le chargeur existe-t-il
   // pour cette version de Minecraft ? (réponse gardée ; site ou réseau en panne = on laisse faire).
   const adLok = new Map(); // "chargeur|version" → true / false
   const adLokWait = new Map();
@@ -3314,7 +3313,7 @@
       bl: "",
       bv: "",
       sw: null,
-      flash: null, // confirmation visible à côté du bouton d'import (03/11)
+      flash: null, // confirmation visible à côté du bouton d'import
       flashT: 0,
       name: o.name || "",
       omni: !!o.omni,
@@ -3333,7 +3332,7 @@
     const m = overlay(`<div class="ad-win" role="dialog" aria-modal="true" aria-labelledby="ad-t"></div>`, { className: "play-modal ad-ovl" });
     adW = { m, S };
     const win = m.$(".ad-win");
-    // Retour visible à côté du bouton « Importer » (tous les onglets, 03/11) : vert si réussi,
+    // Retour visible à côté du bouton « Importer » (tous les onglets) : vert si réussi,
     // rouge si échec, puis il s'efface tout seul après quelques secondes.
     const adFlash = (c, text) => {
       clearTimeout(S.flashT);
@@ -3623,9 +3622,9 @@
           for (const v of vs) cells.set(`${l}|${v}`, (cells.get(`${l}|${v}`) || 0) + 1);
         }
       }
-      // 03/11 : une version où le chargeur n'existe pas n'est pas proposée (vérifiée en fond, voir adLoaderOk).
+      // Une version où le chargeur n'existe pas n'est pas proposée (vérifiée en fond, voir adLoaderOk).
       const all = [...cells.entries()].map(([k, n]) => ({ l: k.split("|")[0], v: k.split("|")[1], n })).filter((x) => adLok.get(`${x.l}|${x.v}`) !== false).sort((p1, p2) => p2.n - p1.n || adCmp(p2.v, p1.v) || AD_LOADERS.indexOf(p1.l) - AD_LOADERS.indexOf(p2.l));
-      // 03/11 : une case verte choisie dans la grille (ex. Fabric 1.21.11) reste choisie même si elle n'est pas
+      // Une case verte choisie dans la grille (ex. Fabric 1.21.11) reste choisie même si elle n'est pas
       // dans les 6 propositions du bas (avant, elle était remplacée aussitôt par la 1re proposition).
       const top = all.slice(0, 6);
       const mine = S.pickUser && S.pick && !top.some((x) => `${x.l}|${x.v}` === S.pick) && all.find((x) => `${x.l}|${x.v}` === S.pick);
@@ -3963,7 +3962,7 @@
           if (!S.free.has(S.sel)) S.free.set(S.sel, x);
           return draw();
         }
-        // 03/11 (Rushi) : « version d'abord » : une case verte change la version du futur pack. Les mods
+        // « version d'abord » : une case verte change la version du futur pack. Les mods
         // déjà choisis qui n'existent pas pour la nouvelle version sont retirés (et nommés).
         if (S.mode === "ver") {
           if (!l || (l === S.ctx.l && mc === S.ctx.mc)) return;
@@ -4080,11 +4079,11 @@
     });
   }
 
-  // --- RAM par pack (01/11, preview validée par Rushi, Laboratoire « packRam ») -----------------
+  // --- RAM par pack (Laboratoire « packRam ») -----------------
   // Chaque installation a sa RAM : automatique (calculée), comme dans Paramètres, ou choisie. Même
   // formule que packRam.js (main) : mods ≤40 → 4 Go, ≤120 → 6, ≤220 → 8, sinon 10 ; +1 avec
   // shaders ; au moins la RAM conseillée par le fichier du pack ; jamais plus que le maximum sûr
-  // du PC (4 Go laissés à Windows, 3/4 du PC au plus). Le bloc est replié par défaut (Rushi 01/11).
+  // du PC (4 Go laissés à Windows, 3/4 du PC au plus). Le bloc est replié par défaut.
   const rmTr = (f, e) => (L() === "fr" ? f : e);
   const rmCmp = (a, b) => String(a || "").localeCompare(String(b || ""), "en", { numeric: true });
   let rmSys = { totalGB: 8, settingsGB: 4 };
@@ -4420,7 +4419,7 @@
   const PK_COLORS = ["#2f8f5b", "#3b6fd8", "#b5562b", "#7a52c7", "#c0912a", "#2a8fa3", "#c2456b", "#5d7a2e"];
   const pkColor = (s) => PK_COLORS[[...s].reduce((a, c) => a + c.charCodeAt(0), 0) % PK_COLORS.length];
 
-  // La page s'ouvre tout de suite (27/10) : d'abord l'en-tête, puis ce qui se lit sur le PC (mods,
+  // La page s'ouvre tout de suite : d'abord l'en-tête, puis ce qui se lit sur le PC (mods,
   // problèmes), puis ce qui vient d'Internet (versions Modrinth, solutions) et les tailles.
   async function openPackPage(id) {
     pjMarkOpened(id);
@@ -4528,8 +4527,8 @@
       ${man ? `<p class="pk-note fx-warn">${esc(pkT("fxManaged", { t: pkT(man) }))}</p>` : fx.path ? "" : `<p class="pk-note" style="margin:0 0 10px;">${esc(pkT("fNote"))}</p>`}
       ${fx.err ? `<p class="pk-note fx-warn">${esc(fx.err)}</p>` : ""}${list}`;
   }
-  // « Ouvrir avec Windows » : le launcher peut refuser (.bat, .exe… : audit du 01/11). Le refus
-  // s'affiche maintenant (02/11, test au6 : le bouton ne disait rien).
+  // « Ouvrir avec Windows » : le launcher peut refuser (.bat). Le refus
+  // s'affiche maintenant (le bouton ne disait rien).
   async function fxOpenExt(st, path) {
     const r = await api.myPack.files.openExternal(st.id, path);
     if (r && r.ok === false && r.error) toast(r.error);
@@ -4757,7 +4756,7 @@
       reloadPack();
     });
   }
-  // Basculer une installation vanilla en version modée (28/10, Rushi) : pour lancer des shaders (Iris,
+  // Basculer une installation vanilla en version modée : pour lancer des shaders (Iris,
   // Oculus) ou charger un data pack dans tous les mondes (Paxi, Global Packs). Le launcher regarde sur
   // Modrinth quels mods existent pour CETTE version de Minecraft et ne propose que ceux-là ; s'il n'y en a
   // aucun, il le dit. Rien n'est supprimé : mondes (sauvegardés avant), packs de ressources, shaders,
@@ -4823,7 +4822,7 @@
       if (need === "dp" && dpFile) {
         await api.myPack.setDatapack(st.id, dpFile, { worlds: dpWorlds || [], auto: true });
       }
-      // Le shader qui a demandé la bascule devient le shader actif (29/10 : il restait sur « Aucun »).
+      // Le shader qui a demandé la bascule devient le shader actif (il restait sur « Aucun »).
       if (need === "sh" && dpFile) packErr(await api.myPack.setShader(st.id, dpFile));
       m.close();
       toast(swF(t.done, { n: nm, l: LOADERS[o.loader] || o.loader, m: o.mod }));
@@ -4853,11 +4852,11 @@
       if (r?.ok) openContentAdd("sh");
     });
   }
-  // Ajouter un pack de ressources, un shader, un monde ou un data pack (28/10, Rushi : « la même fenêtre
-  // pour les quatre ») : Modrinth et CurseForge cherchés dans le launcher, ou un fichier .zip déjà
+  // Ajouter un pack de ressources, un shader, un monde ou un data pack : Modrinth et CurseForge cherchés
+  // dans le launcher, ou un fichier .zip déjà
   // téléchargé. Modrinth n'a pas de maps : les mondes viennent de CurseForge ou d'un fichier. Un fichier
   // CurseForge que son auteur réserve à l'appli CurseForge : « Page ↗ », le joueur le télécharge, et le
-  // launcher le trouve tout seul dans Téléchargements puis l'installe (comme les mods, 28/10 Rushi).
+  // launcher le trouve tout seul dans Téléchargements puis l'installe (comme les mods).
   // Les mods gardent leur fenêtre à eux.
   const ACT = () => (L() === "fr" ? {
     t: { rp: "Ajouter un pack de ressources", sh: "Ajouter un shader", w: "Ajouter un monde", dp: "Ajouter un data pack" },
@@ -4880,7 +4879,7 @@
     foundT: "“{n}” found in Downloads and installed.",
     wOk: "World “{n}” added (a backup is made).",
   });
-  // Squelette de chargement (28/10, Rushi) : la fenêtre s'ouvre tout de suite avec 5 lignes grises
+  // Squelette de chargement : la fenêtre s'ouvre tout de suite avec 5 lignes grises
   // animées à la place de la liste, pour qu'on voie que ça charge.
   const SK_W = [62, 48, 70, 54, 40];
   const skRows = (cls, icon = 36) => SK_W.map((w) => `<div class="${cls}" aria-hidden="true" style="cursor:default;align-items:center;gap:10px;"><span class="sk" style="width:${icon}px;height:${icon}px;border-radius:8px;flex:none;"></span><span style="display:grid;gap:6px;flex:1;min-width:0;"><span class="sk" style="width:${w}%;height:12px;"></span><span class="sk" style="width:${w - 20}%;height:10px;"></span></span><span class="sk" style="width:72px;height:26px;border-radius:8px;flex:none;"></span></div>`).join("");
@@ -5021,7 +5020,7 @@
   const packErr = (r) => r && r.ok === false && r.error && toast(pkT("wzFail", { e: r.error }));
   // Problèmes trouvés par le launcher (lecture des .jar : dépendances, versions minimales, chargeur,
   // mods CurseForge pas encore téléchargés, packs de ressources qui demandent un mod).
-  // Data packs : Minecraft 1.13 et plus (29/10 : l'onglet s'affichait en 1.12.2). Les versions
+  // Data packs : Minecraft 1.13 et plus (l'onglet s'affichait en 1.12.2). Les versions
   // datées (26.x), les snapshots et les noms inconnus gardent l'onglet.
   function dpSupported(mc) {
     const m = /^1\.(\d+)/.exec(String(mc || ""));
@@ -5034,7 +5033,7 @@
     const a = x.a?.name || "?";
     const b = x.b?.name || "?";
     if (x.type === "rp") return pkT("rpMissing", { a: x.rp?.name, b });
-    // Mod du pack lui-même pas encore téléchargé (29/10 : « Kanrommon a besoin de Kanrommon »).
+    // Mod du pack lui-même pas encore téléchargé.
     if (x.type === "cf") return pkT(a === b || !x.a ? "cfOwn" : "cfMissing", { a, b });
     if (x.type === "loader") return pkT("loaderBad", { a, l: LOADERS[x.loader] || x.loader, p: LOADERS[x.pack] || x.pack || "?" });
     if (x.type === "missing") return pkT("needMissing", { a, b });
@@ -5055,7 +5054,7 @@
       if (f?.action === "enable") return { x, kind: "mr", title, how: pkT("wzEnable", { b: x.b?.name }), state: "todo" };
       return { x, kind: "none", title, how: pkT(x.type === "version" ? "wzNoneV" : "wzNone"), state: "todo" };
     });
-    // « Pas de solution automatique » (27/10) : le joueur cherche lui-même (Modrinth, CurseForge),
+    // « Pas de solution automatique » : le joueur cherche lui-même (Modrinth, CurseForge),
     // donne un .jar, ou coupe le mod qui demande. Rien n'est supprimé.
     const wzActions = (i, k) => {
       const x = i.x;
@@ -5103,8 +5102,8 @@
       draw();
       root.querySelector(`[data-wz-q="${items.indexOf(i)}"]`)?.focus();
     };
-    // Fichier CurseForge à prendre (30/10, Rushi : « il ouvre la page normale, pas celle de la bonne
-    // version ») : le launcher cherche le fichier exact pour cette version de Minecraft et ce chargeur.
+    // Fichier CurseForge à prendre : le launcher cherche le fichier exact pour cette version de
+    // Minecraft et ce chargeur.
     // S'il n'y en a aucun, la ligne propose les autres solutions au lieu d'envoyer sur CurseForge.
     for (const i of items.filter((x) => x.kind === "cf" && x.x.fix?.modId)) {
       i.look = true;
@@ -5258,7 +5257,7 @@
     draw();
   }
 
-  // --- Pack Omniscient (27/10, preview v22) : menu ⚙, générer, exporter, barre des versions -------------
+  // --- Pack Omniscient : menu ⚙, générer, exporter, barre des versions -------------
   const OMT = () => (L() === "en" ? {
     gear: "Pack settings", exp: "Export", friend: "👥 For a friend", friendD: "A .mrpack file: they import it in Omniscient, Modrinth App or Prism",
     omni: "⬆ For Omniscient", omniD: ".omnipack file, every version, to be published", gen: "⚙ Generate for other versions", genD: "Do it before exporting for Omniscient",
@@ -5343,7 +5342,7 @@
   function omGearHtml(p) {
     const friend = on("packExport");
     const omni = !!p.omni && on("omniPack") && p.kind !== "omnipub";
-    // 29/10 (Rushi) : « Renommer » et « Retirer » aussi ici, pour toute installation.
+    // « Renommer » et « Retirer » aussi ici, pour toute installation.
     return `<span class="om-exp"><button type="button" class="btn-secondary om-gear" data-om="menu" aria-haspopup="true" aria-label="${esc(omT("gear"))}" title="${esc(omT("gear"))}">⚙</button>
       <div class="om-menu" hidden>${friend || omni ? `<div class="om-mh">${esc(omT("exp"))}</div>` : ""}
         ${friend ? `<button type="button" data-om="friend"><b>${esc(omT("friend"))}</b><small>${esc(omT("friendD"))}</small></button>` : ""}
@@ -5383,9 +5382,9 @@
       ${omJobOpen ? `<div class="om-rep om-jlist">${rows.join("")}</div>${fin ? `<p class="om-note">${esc(omT("jNote"))}</p>` : ""}` : ""}
       ${fin && omStale(J).length ? `<p class="om-note om-stale" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--warn);">${esc(omT("staleN", { n: omStale(J).length, l: omStale(J).map((x) => x.minecraftVersion).join(", ") }))}<button type="button" class="btn-secondary" data-om="stale" style="margin:0;padding:3px 10px;font-size:12px;">${esc(omT("staleB"))}</button></p>` : ""}</div>`;
   }
-  // 28/10 (Rushi) : après une régénération avec des mods obligatoires, les versions déjà générées où
+  // Après une régénération avec des mods obligatoires, les versions déjà générées où
   // ces mods n'existent pas restaient dans le pack. On les propose au retrait (jamais retirées seules).
-  // Retirer depuis le menu ⚙ (29/10, Rushi : « ça supprime la version sélectionnée, pas tout le pack »).
+  // Retirer depuis le menu ⚙.
   // Pack Omniscient avec plusieurs versions : tout le pack (conseillé) ou les versions choisies. Leurs
   // mondes restent (case pour les retirer aussi). Installation simple : la fenêtre habituelle.
   async function omRemovePack(id) {
@@ -5534,7 +5533,7 @@
       t.checked ? g.keep.add(t.dataset.k) : g.keep.delete(t.dataset.k);
       syncKeep();
     });
-    // Cocher en glissant (Rushi, 29/10, comme les autres sélections) : clic maintenu, chaque mod
+    // Cocher en glissant (comme les autres sélections) : clic maintenu, chaque mod
     // survolé prend l'état du premier (coché, ou décoché si on part d'un mod déjà coché).
     let kDrag = null;
     const kPaint = (id, on) => {
@@ -5618,7 +5617,7 @@
       toast(omT("saved", { n: out.name, s: sizeFmt(out.size) }));
     });
   }
-  // Mon cloud (03/11, Rushi) : le modpack se crée ici, puis se relie au serveur sur le site.
+  // Mon cloud : le modpack se crée ici, puis se relie au serveur sur le site.
   // Tout part : mods Modrinth et CurseForge (en liens), configs, packs de ressources et shaders,
   // mods perso (contrôlés un par un par le site). Jamais le fichier d'un mod CurseForge.
   async function omOpenCloud(st) {
@@ -5629,7 +5628,7 @@
       custom: [rmTr("Mods perso (contrôlés par le site)", "Own mods (checked by the website)"), rmTr("gardé dans ton cloud", "kept in your cloud"), "var(--accent)"],
       missing: [rmTr("Pas envoyés", "Not sent"), rmTr("fichier introuvable", "file not found"), "var(--muted)"],
     };
-    // Même fenêtre que « Exporter pour un ami » (Rushi 03/11) : squelette, puis la liste à cocher.
+    // Même fenêtre que « Exporter pour un ami » : squelette, puis la liste à cocher.
     const m = overlay(`<div class="modal-box pop-in om-modal" role="dialog" aria-modal="true" style="max-width:580px;width:100%;text-align:left;max-height:calc(100vh - 48px);overflow:auto;"><div data-cl></div></div>`);
     const box = m.$("[data-cl]");
     const skl = (w, h = 12) => `<span class="sk" style="display:block;width:${w};height:${h}px;border-radius:6px;margin:6px 0;"></span>`;
@@ -5784,7 +5783,7 @@
       toast(omT("saved", { n: out.name, s: sizeFmt(out.size) }) + (out.manual?.length ? " " + omT("frManual", { n: out.manual.length }) : ""));
     });
   }
-  // Export « Pour un ami » (31/10, Laboratoire « addMenus ») : choix .mrpack (Modrinth) ou .zip
+  // Export « Pour un ami » (Laboratoire « addMenus ») : choix .mrpack (Modrinth) ou .zip
   // (CurseForge). La liste dit, mod par mod, s'il part en lien ou en .jar dans le fichier.
   // .mrpack : liens Modrinth seulement, le reste en .jar (jamais de lien CurseForge : Modrinth
   // refuserait le fichier). .zip : liens CurseForge pour ce qui existe sur CurseForge, .jar pour
@@ -5794,7 +5793,7 @@
     const name = data.versions.find((x) => x.id === st.id)?.name || p.name;
     let fmt = "mrpack";
     const SRC = { mr: "Modrinth", cf: "CurseForge", local: adTr("Fichier perso", "Own file") };
-    // Rushi 31/10 : la fenêtre s'ouvre tout de suite (squelette) pendant que le launcher lit les mods.
+    // La fenêtre s'ouvre tout de suite (squelette) pendant que le launcher lit les mods.
     const m = overlay(`<div class="modal-box pop-in om-modal" role="dialog" aria-modal="true" style="max-width:580px;width:100%;text-align:left;max-height:calc(100vh - 48px);overflow:auto;"><div data-fr></div></div>`);
     const box = m.$("[data-fr]");
     const skl = (w, h = 12) => `<span class="sk" style="display:block;width:${w};height:${h}px;border-radius:6px;margin:6px 0;"></span>`;
@@ -5887,7 +5886,7 @@
     return `<div class="pk-check bad" role="status" style="border-color:var(--warn);"><span><b>🧠 ${esc(rmTr(`RAM un peu juste : ${v} Go pour ${c.mods} mods`, `RAM a bit low: ${v} GB for ${c.mods} mods`))}</b><br>${esc(rmTr(`Ce pack demande environ ${n} Go. Avec moins, il risque de geler ou de planter.`, `This pack needs about ${n} GB. With less, it may freeze or crash.`))}</span><button type="button" class="join-btn" data-om="ram">${esc(rmTr("Régler", "Set"))}</button></div>`;
   }
   document.addEventListener("click", (e) => { if (!e.target.closest(".om-exp")) document.querySelectorAll(".om-menu").forEach((x) => (x.hidden = true)); });
-  // Largeur d'un texte en pixels (colonnes de la liste des mods, version A du 02/11).
+  // Largeur d'un texte en pixels (colonnes de la liste des mods).
   let pkMeasureCtx = null;
   function pkTextW(txt, font) {
     pkMeasureCtx = pkMeasureCtx || document.createElement("canvas").getContext("2d");
@@ -5930,7 +5929,7 @@
       const showMine = st.filter === "all" || st.filter === "mine";
       const showDeps = st.filter === "all" || st.filter === "deps";
       const list = st.filter === "up" ? ups.filter(match) : null;
-      // Version A (02/11) : largeur commune des colonnes nom et pastille, mesurée sur tous les mods du pack.
+      // Version A : largeur commune des colonnes nom et pastille, mesurée sur tous les mods du pack.
       const nmW = Math.min(300, Math.ceil(Math.max(120, ...p.mods.map((m) => pkTextW(m.name, "600 13.5px Inter, system-ui, sans-serif")))) + 2);
       const srcW = Math.ceil(Math.max(...["mr", "cfApi", "cfHand", "file"].map((k) => pkTextW(pkT(k), "700 10.5px Inter, system-ui, sans-serif")))) + 16;
       const modList = (all, shown, emptyKey) => `<div class="pk-list pk-mods" style="--pk-nmw:${nmW}px;--pk-srcw:${srcW}px;">${shown.length ? shown.map(row).join("") : emptyKey ? `<div class="pk-empty">${esc(pkT(all.length ? "noMatch" : emptyKey))}</div>` : ""}</div>`;
@@ -5951,7 +5950,7 @@
           <span></span>
           <span class="pk-end"><button type="button" class="pk-sw" role="switch" aria-checked="${r.on}" data-pk-rp="${i}" aria-label="${esc(r.name)}"></button><button type="button" class="pk-del" data-pk-del="rp" data-k="${esc(r.file)}" title="${esc(pkT("delL"))}" aria-label="${esc(pkT("delL"))} ${esc(r.name)}">${TRASH}</button></span></div>`).join("")}</div>`;
     } else if (st.tab === "sh" && p.vanilla) {
-      // 28/10 (Rushi) : les shaders aussi en vanilla. Ils attendent un mod (Iris) : « Basculer en version modée ».
+      // Les shaders aussi en vanilla. Ils attendent un mod (Iris) : « Basculer en version modée ».
       body = `<div class="pk-tools"><p class="pk-note" style="flex:1;min-width:220px;">${esc(SWT().shVan)}</p>${p.shaders.length ? `<button type="button" class="btn-secondary" data-sw="sh" style="margin:0;">${esc(SWT().go)}</button>` : ""}<button type="button" class="join-btn" data-pk-add>${esc(pkT("shAdd"))}</button></div>
         ${p.shaders.length ? `<div class="pk-list">${p.shaders.map((x) => `<div class="pk-row" style="grid-template-columns:32px minmax(0,1fr) auto;">
           <span class="pk-av" style="background:${pkColor(x.name)}">☀</span><span class="pk-nm"><b>${esc(x.name)}</b><small>${esc(SWT().shWait)}</small></span>
@@ -6057,7 +6056,7 @@
     } else if (b.hasAttribute("data-sw")) {
       return openSwitchModded(b.dataset.sw);
     } else if (b.hasAttribute("data-pk-add")) {
-      // Menus d'ajout (31/10, Laboratoire « addMenus ») : une seule fenêtre pour tout.
+      // Menus d'ajout (Laboratoire « addMenus ») : une seule fenêtre pour tout.
       if (on("addMenus") && !(st.tab === "sh" && !p.iris && !(p.vanilla && on("vanillaModded")))) return openAddWin({ mode: "add", kind: { rp: "rp", sh: "sh", w: "w", dp: "dp" }[st.tab] || "mods" });
       if (st.tab === "rp" || st.tab === "w" || st.tab === "dp") return openContentAdd(st.tab);
       if (st.tab === "sh") return p.iris || (p.vanilla && on("vanillaModded")) ? openContentAdd("sh") : openShaderLoader();
@@ -6153,7 +6152,7 @@
     });
   }
 
-  // --- Plusieurs PC : conflit d'appareils (preview validée du 24/10) ----------------------------
+  // --- Plusieurs PC : conflit d'appareils ----------------------------
   // Rien n'est jamais écrasé : si les deux copies avancent, le site garde les deux versions et le
   // joueur choisit laquelle continuer ; l'autre reste dans les sauvegardes.
   async function checkDevices(key, force = false) {
@@ -6304,7 +6303,7 @@
     const v = data.versions.find((x) => x.id === id);
     if (!v) return;
     const label = v.name || `${v.minecraftVersion} · ${packName(v.pack)}`;
-    // 27/10 (Rushi) : case pour retirer aussi les mondes de la version, sinon ils s'accumulent.
+    // Case pour retirer aussi les mondes de la version, sinon ils s'accumulent.
     const own = data.worlds.filter((w) => w.home === id || w.lastVersionId === id);
     const names = own.slice(0, 4).map((w) => w.name).join(", ") + (own.length > 4 ? "…" : "");
     const res = await showModal({
@@ -6386,7 +6385,7 @@
       const avail = omni ? [] : packsFor(selV);
       const grp = on("omniPack");
       // Mon pack : seulement là où un chargeur de mods existe (mêmes limites que openMyPack). Sinon, la
-      // fenêtre suivante passait en silence à une autre version (01/11, Rushi : test Fabric trop vieux).
+      // fenêtre suivante passait en silence à une autre version (test Fabric trop vieux).
       const mineOk = t === "release" && adCmp(selV, "1.7.10") >= 0;
       if (selP === "mine" && !mineOk) selP = "vanilla";
       if (selP !== "vanilla" && selP !== "mine" && !(grp && selP === "__omni") && !avail.some((p) => p.id === selP)) selP = "vanilla";
@@ -6523,10 +6522,10 @@
     return { keep, drop };
   }
 
-  // Fenêtre « Sauvegardes » (design A « Curseur » choisi par Rushi le 25/10) : la fréquence de la
+  // Fenêtre « Sauvegardes » : la fréquence de la
   // sauvegarde automatique, combien en garder (un curseur, ou une taille max par monde en option
   // avancée) et l'envoi automatique dans le cloud (Supporter). Réglages LES MÊMES POUR TOUS LES
-  // MONDES (retour de Rushi, 25/10). Ouverte depuis un monde : on y voit aussi ses sauvegardes ;
+  // MONDES. Ouverte depuis un monde : on y voit aussi ses sauvegardes ;
   // depuis « Réglages des sauvegardes » (en-tête de Mes mondes) : seulement les réglages.
   // Aucun chiffre estimé : seulement les tailles réelles et ce que le réglage supprimerait vraiment.
   const BK_STOPS = [1, 2, 3, 5, 10, 15, 20, 30, 50, 0]; // 0 = tout garder
@@ -6636,12 +6635,12 @@
       if (!sup) return `<p class="nb-sub" style="margin:10px 0 0;">${tr("Tes sauvegardes restent seulement sur ce PC.", "Your backups stay only on this PC.")}</p>`;
       const sends = [
         ["all", tr("Toutes", "All"), tr("Chaque sauvegarde part dans le cloud, après la partie (rien n'est envoyé pendant que tu joues). Sur ton autre PC, tu retrouves exactement les mêmes.", "Every backup goes to the cloud, after the game (nothing is sent while you play). On your other PC you get exactly the same ones.")],
-        // « Partiel » : ancien « Une par partie », renommé par Rushi le 25/10 (on choisit combien en ligne).
+        // « Partiel » : ancien « Une par partie », renommé (on choisit combien en ligne).
         ["game", tr("Partiel", "Partial"), tr("Seulement la dernière de chaque partie, plus celles avec un nom, et tu choisis combien en garder en ligne. Les autres restent sur ce PC.", "Only the last one of each game, plus named ones, and you choose how many stay online. The others stay on this PC.")],
         ["manual", tr("À la main", "Manually"), tr("Rien ne part tout seul. Tu envoies quand tu veux avec « ☁ Synchroniser » dans Mes mondes.", "Nothing is sent automatically. You send when you want with “☁ Sync” in My worlds.")],
       ];
       const cur = sends.find((x) => x[0] === cfg.send) || sends[0];
-      // Versions en ligne par monde (25/10) : plafonné par l'offre (table des offres du site).
+      // Versions en ligne par monde : plafonné par l'offre (table des offres du site).
       const cap = Number(c.offer?.cloudVersions) > 0 ? Number(c.offer.cloudVersions) : 10;
       const onl = [1, 2, 3, 5, 10].filter((v) => v <= cap);
       if (!onl.includes(cap)) onl.push(cap);
@@ -6800,7 +6799,7 @@
     }
   }
 
-  // --- Changement de version (27/10, preview validée par Rushi, Laboratoire « versionGuard ») ------
+  // --- Changement de version (Laboratoire « versionGuard ») ------
   const cmpMcVer = (a, b) => String(a).localeCompare(String(b), "en", { numeric: true });
   // Dernière version de Minecraft plus récente que celle de l'installation (sorties officielles).
   function newerFor(v) {
@@ -6808,7 +6807,7 @@
     const top = data.mcVersions.filter((x) => x.type === "release").map((x) => x.id).sort((a, b) => cmpMcVer(b, a))[0];
     return top && cmpMcVer(top, v.minecraftVersion) > 0 ? top : null;
   }
-  // Mettre à jour une installation (retour de Rushi, 27/10 15h57) : c'est l'installation qui change
+  // Mettre à jour une installation : c'est l'installation qui change
   // de version, Minecraft convertit ses mondes à leur prochaine ouverture. Avant : une sauvegarde
   // 🛡 « Avant X » de CHACUN de ses mondes, vérifiée, jamais effacée automatiquement.
   async function openUpdateVersion(id) {
@@ -6926,9 +6925,9 @@
       await refresh();
     });
   }
-  // Liste des sauvegardes d'un monde (clic sur « N sauvegardes sur ce PC », retour de Rushi du
-  // 25/10) : juste la liste, chacune avec Restaurer et Supprimer (confirmation en tapant
-  // « supprimer »). Les réglages sont dans « ⚙ Réglages des sauvegardes ». Depuis le 27/10 : la
+  // Liste des sauvegardes d'un monde (clic sur « N sauvegardes sur ce PC ») : juste la liste,
+  // chacune avec Restaurer et Supprimer (confirmation en tapant
+  // « supprimer »). Les réglages sont dans « ⚙ Réglages des sauvegardes ». La
   // version de Minecraft de chaque sauvegarde et une ligne au changement de version.
   async function openBackupsList(key) {
     const gone = data.gone.find((x) => x.key === key) || null;
@@ -7065,7 +7064,7 @@
       refresh();
       if (out.cloudError) showModal({ title: w.name, body: T("foreverCloudFail", { e: out.cloudError }), confirmLabel: "OK", tone: "warn" });
     });
-    // Dernière chance (Rushi, 26/10) : 10 secondes avec une barre, un seul bouton « Annuler ».
+    // Dernière chance : 10 secondes avec une barre, un seul bouton « Annuler ».
     // Rien n'est effacé avant la fin du compte à rebours.
     function countdown() {
       const SEC = 10;
@@ -7200,7 +7199,7 @@
       copy.disabled = true;
       copy.textContent = T("impCopying");
       m.ov.dataset.locked = "1";
-      // Progression de la copie (27/10) : même fenêtre que les imports de packs.
+      // Progression de la copie : même fenêtre que les imports de packs.
       const steps = [{ id: "world", label: T("impStepW"), state: "run", n: 0, of: picked.size }];
       const run = { t0: Date.now(), end: 0, overall: null };
       const total = found.filter((f) => picked.has(f.folder)).reduce((a, f) => a + (f.sizeBytes || 0), 0);
@@ -7244,7 +7243,7 @@
   // d'une instance) et installe le pack comme ceux des serveurs : les mods autorisés se téléchargent,
   // les autres passent par « Ouvrir la page » (rien n'est téléchargé depuis CurseForge pour eux).
   // « Importer un pack » : on choisit d'abord d'où il vient (Modrinth ou CurseForge).
-  // 27/10 (Rushi) : une carte par type de fichier (Pack Omniscient, Modrinth, CurseForge), et la
+  // Une carte par type de fichier (Pack Omniscient, Modrinth, CurseForge), et la
   // fenêtre de Windows ne montre que le type de la carte cliquée.
   const packKinds = () => [on("omniPack") && "omni", on("mrImport") && "mr", on("cfImport") && "cf"].filter(Boolean);
   function packImportOn() {
@@ -7287,7 +7286,7 @@
     m.ov.querySelector("[data-pkch]").focus();
   }
 
-  // --- « Un pack existant » (28/10, preview B validée par Rushi, Laboratoire « packBrowse ») ---------
+  // --- « Un pack existant » (Laboratoire « packBrowse ») ---------
   // « + Nouvelle installation » propose 3 cartes : Créer (la fenêtre d'avant), Un pack existant (chercher un
   // modpack public Modrinth, CurseForge ou FTB) et Importer (mes mondes ou un fichier de pack). Le pack
   // choisi est téléchargé puis passe par la même fenêtre que l'import d'un fichier (openCfPack).
@@ -7365,7 +7364,7 @@
     @media (max-width:760px){.pb-choice{grid-template-columns:1fr}}`;
     document.head.appendChild(css);
   })();
-  // Bouton « ⋯ » de l'en-tête (Rushi, 28/10) : Sélectionner, Réglages des sauvegardes et Synchroniser
+  // Bouton « ⋯ » de l'en-tête : Sélectionner, Réglages des sauvegardes et Synchroniser
   // y sont rangés pour que l'en-tête ne garde que « Voir tous mes mondes » et « + Nouvelle installation ».
   function pbMoreItems() {
     const list = pjSorted().filter((v) => v.id !== PJ.hide);
@@ -7578,7 +7577,7 @@
     });
   }
 
-  // Fichiers à télécharger à la main, par type (04/11, Rushi) : un .zip de la liste d'un pack CurseForge
+  // Fichiers à télécharger à la main, par type : un .zip de la liste d'un pack CurseForge
   // peut être un pack de ressources ou un shader, pas seulement un mod. « 6 mods et 1 pack de ressources ».
   const cfKindOf = (x) => (x?.kind === "rp" || x?.kind === "sh" || x?.kind === "dp" ? x.kind : "mod");
   const cfKindPart = (x) => (cfKindOf(x) === "mod" ? "mods" : cfKindOf(x));
@@ -7590,7 +7589,7 @@
   };
   const cfKindChip = (x) => `<span class="cf-kd ${cfKindOf(x)}">${esc(T(`cfKC_${cfKindOf(x)}`))}</span>`;
 
-  // « Reprendre » (04/11, Rushi : « après Finir plus tard, on ne peut pas redémarrer ») : la même liste
+  // « Reprendre » : la même liste
   // que pendant l'import, pour les fichiers encore à télécharger à la main d'une installation.
   async function openHandResume(vid) {
     const v = data.versions.find((x) => x.id === vid);
@@ -7611,7 +7610,7 @@
         <div class="modal-actions" style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:12px;">
           <button type="button" class="btn-secondary" id="hd-done">${esc(T("cfDoneB"))}</button>
           <button type="button" class="join-btn" id="hd-play" ${left.length ? "disabled" : ""}>${esc(T("cfPlay"))}</button></div>`;
-      // « Terminé » (04/11, Rushi) : ferme sans lancer le jeu ; remplace « Finir plus tard » (même toast s'il en reste).
+      // « Terminé » : ferme sans lancer le jeu ; remplace « Finir plus tard » (même toast s'il en reste).
       m.$("#hd-done").addEventListener("click", () => {
         m.close();
         if (list.some((_, i) => !found.has(i))) toast(T("hdLaterToast", { p: name }));
@@ -7646,7 +7645,7 @@
   }, true);
 
   async function openCfPack(src) {
-    // Avertissement CurseForge (06/11) : une seule fois par PC, avant d'importer un pack CurseForge.
+    // Avertissement CurseForge : une seule fois par PC, avant d'importer un pack CurseForge.
     if (src?.kind === "cf" && typeof window.confirmCurseforgeWarning === "function" && !(await window.confirmCurseforgeWarning())) return;
     const m = overlay(`<div class="modal-box pop-in" role="dialog" aria-modal="true" aria-labelledby="cf-t" style="max-width:560px;text-align:left;max-height:calc(100vh - 48px);overflow:auto;">
       <h3 id="cf-t">${esc(src.kind === "omni" ? T("omImpT") : src.kind === "mr" ? T("mrT") : T("cfT"))}</h3><p class="join-note">${esc(T("cfReading"))}</p></div>`);
@@ -7661,7 +7660,7 @@
     const picked = new Set(worlds.filter((w) => !src.worldKey || w.key === src.worldKey).map((w) => w.folder));
     const parts = new Set(["mods", "cfg", "rp", "sh", "dp"]);
     const goLabel = () => (picked.size ? T("cfGoW", { n: picked.size }) : T("cfGo"));
-    // Packs de ressources / shaders : ceux du fichier du pack + ceux de sa liste CurseForge (.zip, 04/11).
+    // Packs de ressources / shaders : ceux du fichier du pack + ceux de sa liste CurseForge (.zip).
     const handOf = (k) => (p.manual || []).filter((x) => cfKindOf(x) === k).length;
     const contentRow = (k, key, names = []) => {
       const all = [...(names || []), ...(p.cfContent || []).filter((x) => x.kind === k).map((x) => x.name)];
@@ -7720,7 +7719,7 @@
     go.focus();
   }
 
-  // Progression des imports (27/10, preview « Progression des imports » C + B validée par Rushi) :
+  // Progression des imports :
   // rond qui tourne, barre de l'étape, détail (fichiers, Mo, fichier en cours) et barre de tout
   // l'import avec le temps restant. Les étapes reçoivent ce que main.js envoie (importMeter).
   const ipSpin = '<span class="ip-spin" aria-hidden="true"></span>';
@@ -7771,11 +7770,11 @@
 
   async function installCfPack(m, box, p, folders, parts, ram = null) {
     m.ov.dataset.locked = "1";
-    // À la main : seulement ce qui est coché (mods, packs de ressources, shaders), les mods d'abord (04/11).
+    // À la main : seulement ce qui est coché (mods, packs de ressources, shaders), les mods d'abord.
     const KORD = { mod: 0, rp: 1, sh: 2, dp: 3 };
     p = { ...p, manual: (p.manual || []).filter((x) => parts.has(cfKindPart(x))).sort((a, b) => KORD[cfKindOf(a)] - KORD[cfKindOf(b)]) };
     // Compteur du téléchargement : sans les mods déjà dans le fichier du pack (copiés, pas
-    // téléchargés) ni ceux à télécharger à la main. Avant : ATM10 restait à « 413/416 » (27/10).
+    // téléchargés) ni ceux à télécharger à la main. Avant : ATM10 restait à « 413/416 ».
     const auto = p.modCount - p.manual.filter((x) => cfKindOf(x) === "mod").length - (p.packedJars || 0);
     const omni = p.from === "omnipack";
     const steps = omni ? [
@@ -7784,7 +7783,7 @@
     ] : [
       { id: "list", label: T("cfStepList"), state: "done" },
       ...(parts.has("mods") ? [{ id: "dl", label: T("cfStepDl"), state: "run", n: 0, of: auto }] : []),
-      // Mods rangés dans le fichier du pack : ligne à part, sinon on croit qu'il en manque (27/10).
+      // Mods rangés dans le fichier du pack : ligne à part, sinon on croit qu'il en manque.
       ...(parts.has("mods") && p.packedJars ? [{ id: "packed", label: T("cfStepPacked"), state: "wait", n: 0, of: p.packedJars }] : []),
       ...(parts.has("cfg") ? [{ id: "cfg", label: T("cfStepCfg"), state: "wait" }] : []),
       ...(parts.has("rp") && (p.resourcepacks?.length || (p.cfContent || []).some((x) => x.kind === "rp" && !x.manual)) ? [{ id: "rp", label: T("cfStepRp"), state: "wait" }] : []),
@@ -7796,7 +7795,7 @@
     const found = new Set();
     const run = { t0: Date.now(), end: 0, overall: null };
     // Trois blocs : la progression (redessinée à chaque pas), la liste des mods à la main et les
-    // boutons (redessinés seulement quand ils changent). Avant (29/10) : tout était refait à chaque
+    // boutons (redessinés seulement quand ils changent). Avant : tout était refait à chaque
     // pas, le bouton survolé était recréé et son survol clignotait.
     box.innerHTML = `<div id="cf-live"></div><div id="cf-manbox"></div><div class="modal-actions" id="cf-acts" style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:12px;"></div>`;
     const part = { live: box.querySelector("#cf-live"), man: box.querySelector("#cf-manbox"), acts: box.querySelector("#cf-acts") };
@@ -7809,13 +7808,13 @@
         ${ipOverall(run, steps)}
         <div class="cf-steps">${steps.map((s) => `<div class="cf-step ${s.state}"><span class="ic">${ipIcon(s)}</span><span>${esc(s.label)}</span><span class="n">${s.of ? `${s.n}/${s.of}` : ""}</span>
           ${s.state === "run" && s.id !== "manual" ? ipStepExtra(s) : ""}</div>`).join("")}</div>`);
-      // Avant (04/11) : la liste restait cachée (0/7 sans boutons) si l'étape d'avant ne disait pas « fini ».
+      // Avant : la liste restait cachée (0/7 sans boutons) si l'étape d'avant ne disait pas « fini ».
       const manShow = man && (man.state !== "wait" || steps.every((s) => s.id === "manual" || s.state === "done"));
       const manHtml = manShow ? `<p class="cf-man-note">${esc(T("cfManualD"))}</p>
           <div class="cf-man">${p.manual.map((x, i) => `<div class="cf-man-row ${found.has(i) ? "ok" : ""}"><span style="min-width:0;">${cfKindChip(x)}${esc(x.name)}<span class="fn">${esc(x.fileName)}</span></span>
             <span class="st">${esc(found.has(i) ? T("cfFound") : T("cfWaiting"))}</span>
             ${found.has(i) ? "<span></span>" : `<button type="button" class="link-btn" data-cf-open="${i}">${esc(T("cfOpenPage"))} ↗</button>`}</div>`).join("")}</div>` : "";
-      // « Terminé » (04/11, Rushi) : toujours là à la fin, même s'il reste des fichiers à la main (il
+      // « Terminé » : toujours là à la fin, même s'il reste des fichiers à la main (il
       // remplace alors « Finir plus tard », avec le même toast qui dit où reprendre).
       const ended = allDone || !!run.end;
       const actsHtml = `${man && !ended ? `<button type="button" class="btn-secondary" id="cf-later">${esc(T("cfLater"))}</button>` : ""}
@@ -7840,7 +7839,7 @@
           draw();
         } else {
           b.disabled = false;
-          // Avant (04/11) : une erreur ne montrait rien, le bouton semblait ne rien faire.
+          // Avant : une erreur ne montrait rien, le bouton semblait ne rien faire.
           if (r && r.ok === false && r.error) toast(r.error);
         }
       }));
@@ -7856,8 +7855,8 @@
         m.close();
         toast(folders.length ? T("cfReady", { p: p.name, w: p.worlds.find((w) => w.folder === folders[0])?.name || "" }) : T("cfReadyNoW", { p: p.name }));
         await refresh();
-        // Pack sans monde importé : on lance quand même l'installation qu'on vient de créer (28/10,
-        // le bouton ne faisait rien). Si les étapes finissent avant la réponse, on attend celle-ci.
+        // Pack sans monde importé : on lance quand même l'installation qu'on vient de créer (le
+        // bouton ne faisait rien). Si les étapes finissent avant la réponse, on attend celle-ci.
         const r = job || await jobP;
         if (r?.worldKey) launch({ worldKey: r.worldKey, versionId: r.versionId || undefined }, null);
         else if (r?.versionId) launch({ versionId: r.versionId }, null);
@@ -7885,7 +7884,7 @@
   }
 
   // --- Accueil : carte « Continuer mon monde » --------------------------------------------------
-  // Design A (25/10) : la carte du dernier monde se place a cote de celle du dernier serveur, dans
+  // Design A : la carte du dernier monde se place a cote de celle du dernier serveur, dans
   // #home-halves (voir paintHomeView). Sans cet emplacement, ancienne place : sous la carte serveur.
   const homePanel = document.getElementById("home-panel");
   function injectHome() {
@@ -7948,7 +7947,7 @@
       return;
     }
     const r = await api.cloud.status({ force }).catch(() => null);
-    if (!worldsOn) return; // coupé pendant la demande (audit du 25/10)
+    if (!worldsOn) return; // coupé pendant la demande
     data.cloud = r?.ok ? r : null;
     if (r?.job) setJob(r.job);
     if (r?.djob && !data.djob) setDjob(r.djob);
@@ -7990,7 +7989,7 @@
       <p>${fr ? "On envoie un petit fichier test pour savoir combien de temps prendra l'envoi de tes mondes." : "We send a small test file to know how long sending your worlds will take."}</p>
       <div class="cloud-bar"><i id="cl-test-bar" style="width:0%;transition:width 3s cubic-bezier(.2,.6,.3,1);"></i></div></div>`, { className: "play-modal" });
     m.ov.dataset.locked = "1";
-    // Retour de test du 24/10 : la barre ne bougeait pas. Elle avance maintenant en 3 s jusqu'à 90 %
+    // La barre ne bougeait pas. Elle avance maintenant en 3 s jusqu'à 90 %
     // pendant que le vrai test tourne, puis finit à 100 % quand il est fini (jamais avant 3 s).
     const bar = m.$("#cl-test-bar");
     requestAnimationFrame(() => requestAnimationFrame(() => bar && (bar.style.width = "90%")));
@@ -8016,7 +8015,7 @@
     const all = data.worlds.filter((w) => w.backup);
     const skipped = data.worlds.filter((w) => !w.backup);
     // Taille réelle de ce qui part : toutes les sauvegardes .zip du monde pas encore en ligne
-    // (versions miroir, 25/10). Un monde sans sauvegarde en reçoit une au lancement : sa taille
+    // (versions miroir). Un monde sans sauvegarde en reçoit une au lancement : sa taille
     // n'est connue qu'après, on montre alors la taille du monde.
     const sizeOf = (w) => (w.notInCloud ? w.notInCloudBytes || 0 : w.sizeBytes || 0);
     const pendingTracked = data.worlds.filter((w) => w.backup && inCloud.has(w.key)).reduce((a, w) => a + (w.notInCloudBytes || 0), 0);
@@ -8171,8 +8170,8 @@
     return { parts: list[0].parts, panelHtml: list.map((a) => a.panelHtml).join(""), over: !!list[0].over };
   };
 
-  // Sauvegarde d'un monde dans la pilule (retour de Rushi du 25/10 : « on dirait qu'il ne se passe
-  // rien »). Même très rapide, elle reste au moins 2 s, puis « Sauvegarde terminée ✓ » pendant 3 s.
+  // Sauvegarde d'un monde dans la pilule. Même très rapide, elle reste au moins 2 s, puis «
+  // Sauvegarde terminée ✓ » pendant 3 s.
   const SAVE_MIN_MS = 2000;
   const SAVE_DONE_MS = 3000;
   let saveTimer = null;
@@ -8283,7 +8282,7 @@
     if (data.job?.paused) api.cloud.resume();
     else api.cloud.pause();
   }, true);
-  // « Arrêter » la synchro (retour de Rushi du 25/10) : ce qui est déjà parti reste en ligne.
+  // « Arrêter » la synchro : ce qui est déjà parti reste en ligne.
   document.addEventListener("click", async (e) => {
     const b = e.target.closest("[data-cloud-stop]");
     if (!b) return;
@@ -8339,8 +8338,8 @@
       });
       return;
     }
-    // Synchro : trois choix l'un sous l'autre, chacun avec ce qu'il fait (retour de Rushi du 25/10 :
-    // pouvoir « fermer quand la synchro est finie »), plus Annuler en lien discret.
+    // Synchro : trois choix l'un sous l'autre, chacun avec ce qu'il fait (pouvoir « fermer quand la
+    // synchro est finie »), plus Annuler en lien discret.
     const job = data.job;
     const pct = job.total ? Math.round((job.sent / job.total) * 100) : 0;
     const left = job.bps > 0 && !job.paused ? (job.total - job.sent) / job.bps : NaN;

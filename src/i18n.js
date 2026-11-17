@@ -19,7 +19,7 @@ const LOCALES = {
 
 const DICTIONARIES = {
   fr: {
-    // Aide Discord dans les bugs (02/11), voir bugHelpUi.js.
+    // Aide Discord dans les bugs, voir bugHelpUi.js.
     bugHelp: {
       title: "Besoin d'aide ? Envoie le rapport à l'équipe sur Discord",
       stepCopy: "Copie tout",
@@ -36,7 +36,7 @@ const DICTIONARIES = {
       zipped: "{name} enregistré dans Téléchargements ({kb} Ko)",
       failed: "Impossible de préparer le rapport. Réessaie dans un instant.",
     },
-    // Catalogue de bugs (31/10), voir bugCatalogUi.js.
+    // Catalogue de bugs, voir bugCatalogUi.js.
     bugs: {
       known: "Problème connu",
       why: "Pourquoi ?",
@@ -112,7 +112,7 @@ const DICTIONARIES = {
       taskFailed: "Échec",
       taskCancelled: "Annulé",
     },
-    // Pilule d'etat de la barre du haut + bouton Rejoindre (design 17/10, points 1-2).
+    // Pilule d'etat de la barre du haut + bouton Rejoindre (points 1-2).
     activity: {
       ready: "Prêt",
       pillInstall: "Installation {percent} %",
@@ -163,7 +163,7 @@ const DICTIONARIES = {
       joinStarting: "Démarrage…",
       joinStop: "■ Arrêter · {time}",
       joinRetry: "↻ Réessayer",
-      // Point 4 : etapes, erreurs claires, notification
+      // Etapes, erreurs claires, notification
       stepOf: "Étape {n} sur {total}",
       stepPrepare: "Préparation",
       stepJava: "Java et Minecraft",
@@ -175,7 +175,7 @@ const DICTIONARIES = {
       stepManualLeft: { one: "Mods à ajouter à la main · 1 restant", other: "Mods à ajouter à la main · {count} restants" },
       stepManualNone: "Mods à ajouter à la main · aucun",
       stepStart: "Vérification et démarrage",
-      // Pack FTB (21/10) : d'ou viennent les mods.
+      // Pack FTB : d'ou viennent les mods.
       originCurseforge: { one: "1 mod depuis CurseForge", other: "{count} mods depuis CurseForge" },
       originModrinth: { one: "1 mod depuis Modrinth", other: "{count} mods depuis Modrinth" },
       originFtb: { one: "1 mod depuis les serveurs FTB", other: "{count} mods depuis les serveurs FTB" },
@@ -222,7 +222,7 @@ const DICTIONARIES = {
       warnSent: "✓ Envoyé. Le propriétaire le verra dans son espace.",
       warnFailed: "L'envoi n'a pas marché. Vérifie ta connexion.",
     },
-    // Ecran avant la 1re installation d'un serveur (design 17/10, point 4).
+    // Ecran avant la 1re installation d'un serveur.
     firstInstall: {
       title: "Installer {name}",
       sizeOk: "Prévois environ {need} · tu as la place ({free} libres)",
@@ -240,7 +240,7 @@ const DICTIONARIES = {
       sourceMaintenanceHint: "L'installation peut échouer ou être lente. Tu peux réessayer après la maintenance.",
       cancel: "Annuler",
     },
-    // Mode discret, etats vides et assistant (design 17/10, point 6).
+    // Mode discret, etats vides et assistant.
     discreet: {
       toggle: "Discret",
       onHint: "Mode discret activé : adresses, codes, pseudos et notifications cachés",
@@ -262,7 +262,7 @@ const DICTIONARIES = {
       next: "Continuer",
       skip: "Passer",
     },
-    // Recherche globale Ctrl+K (serie 2, idee 2).
+    // Recherche globale Ctrl+K.
     search: {
       button: "Rechercher…",
       iconTitle: "Rechercher (Ctrl+K)",
@@ -289,14 +289,14 @@ const DICTIONARIES = {
       noneHint: "Vérifie l'orthographe, ou cherche dans tout l'annuaire.",
       noneAction: "Chercher dans l'annuaire",
     },
-    // Fil d'Ariane des fiches (serie 2, idee 3).
+    // Fil d'Ariane des fiches.
     crumb: {
       label: "Fil d'Ariane",
       all: "Tous",
       search: "Recherche",
       backHint: "Retour (Échap ou bouton retour de la souris)",
     },
-    // File d'attente des installations (serie 2, idee 4).
+    // File d'attente des installations.
     queue: {
       inProgress: "En cours",
       waiting: "En attente · {count}",
@@ -307,7 +307,7 @@ const DICTIONARIES = {
       emptyTitle: "Rien en attente.",
       emptyText: "Si tu lances plusieurs installations, elles se rangent ici dans l'ordre.",
     },
-    // Page Aide (serie 2, idee 6).
+    // Page Aide.
     help: {
       title: "Aide",
       search: "Décris ton souci (ex. « le jeu ne se lance pas »)",
@@ -342,7 +342,7 @@ const DICTIONARIES = {
       none: "Aucune réponse pour « {query} ».",
       noneText: "Essaie un autre mot, ou envoie-nous le rapport : on regarde nous-mêmes.",
     },
-    // Suppression en masse (serie 2, idee 7).
+    // Suppression en masse.
     bulk: {
       select: "Sélectionner",
       cancel: "Annuler",
@@ -371,7 +371,7 @@ const DICTIONARIES = {
       undone: "Annulé : les fichiers sont remis en place.",
       noneDone: "Aucun de ces serveurs installés n'a pu être supprimé.",
     },
-    // Dossier des jeux sur un autre disque (serie 2, idee 9).
+    // Dossier des jeux sur un autre disque.
     games: {
       folderTitle: "Dossier des jeux",
       folderDesc: "Serveurs installés, mondes, mods, Java et cache. Tout est rangé ici, au même endroit.",
@@ -452,7 +452,7 @@ const DICTIONARIES = {
       keepHere: "Garder ce disque",
       showMove: "Voir le déplacement",
     },
-    // Bande de couleur des cartes serveur = etat (17/10, variante A).
+    // Bande de couleur des cartes serveur = etat.
     band: {
       legendTitle: "Que veut dire la bande de couleur ?",
       legendText: "Elle montre l'état du serveur, mis à jour régulièrement.",
@@ -511,7 +511,7 @@ const DICTIONARIES = {
       note: "Cette machine a {total} Go de RAM au total — {min}/{max} Go est une valeur prudente pour commencer.",
       continueBtn: "Continuer",
     },
-    // Ma bibliotheque (planche L5-C) : Favoris + Recents + Installes.
+    // Ma bibliotheque : Favoris + Recents + Installes.
     library: {
       installed: "Installés",
       installedHeader: "Les serveurs déjà prêts à jouer sur ce PC.",
@@ -519,7 +519,7 @@ const DICTIONARIES = {
       installedTotal: { one: "1 serveur · {size}", other: "{count} serveurs · {size}" },
       freeSpace: "Libérer de la place",
       sortSize: "Taille",
-      // Case « Serveur retiré » de l'onglet Installés (23/10).
+      // Case « Serveur retiré » de l'onglet Installés.
       removedBadge: "Serveur retiré",
       removedText: "N'est plus sur Omniscient. Ses fichiers restent sur ton PC.",
       removedDelete: "Supprimer les fichiers",
@@ -584,7 +584,7 @@ const DICTIONARIES = {
       sortSmall: "Petits serveurs actifs",
       sortReverse: "Inverser l'ordre",
       sortDir: { recent: "Récent → ancien|Ancien → récent", trend: "Plus → moins|Moins → plus", players: "Plus → moins|Moins → plus", played: "Plus → moins|Moins → plus", az: "A → Z|Z → A", small: "Petit → grand|Grand → petit" },
-      // Filtres et tris (16/10, option C) : mêmes mots que le site (servers.* dans fr.json).
+      // Filtres et tris : mêmes mots que le site (servers.* dans fr.json).
       sortLabel: "Trier",
       sortTrend: "Tendance",
       sortPlayed: "Les plus joués",
@@ -682,14 +682,14 @@ const DICTIONARIES = {
       noServerListNote: "Ce serveur ne s’ajoute pas à ta liste Multijoueur. Après une déconnexion, ferme Minecraft et clique sur Jouer pour revenir.",
       report: "Signaler",
     },
-    // Fiche personnalisable (16/10) : memes libelles que le site (site/src/i18n, serverPage).
+    // Fiche personnalisable : memes libelles que le site (site/src/i18n, serverPage).
     serverPage: {
       infos: "Infos",
       fav: "Favori",
       favOn: "En favori",
       type: "Type",
       modpack: "Modpack",
-      // Mon cloud (03/11) : modpack relié par le propriétaire.
+      // Mon cloud : modpack relié par le propriétaire.
       cloudPackTitle: "Modpack du serveur",
       cloudPackMods: "{n} mods",
       cloudPackCustom: "⚠ {n} mod(s) fourni(s) par le propriétaire du serveur, non vérifié(s) par Omniscient (contrôles automatiques seulement). Installe seulement si tu fais confiance à ce serveur.",
@@ -842,7 +842,7 @@ const DICTIONARIES = {
       at: "à {time}",
       oneLine: "{day} · {time}",
     },
-    // Fichiers de l'instance (fenêtre Réglages) + « Arrêter le jeu » (16/10, option B).
+    // Fichiers de l'instance (fenêtre Réglages) + « Arrêter le jeu ».
     instanceTools: {
       filesTitle: "Fichiers du serveur",
       openFolder: "Ouvrir le dossier",
@@ -1384,7 +1384,7 @@ const DICTIONARIES = {
     },
   },
   en: {
-    // Aide Discord dans les bugs (02/11), voir bugHelpUi.js.
+    // Aide Discord dans les bugs, voir bugHelpUi.js.
     bugHelp: {
       title: "Need help? Send the report to the team on Discord",
       stepCopy: "Copy everything",
@@ -1401,7 +1401,7 @@ const DICTIONARIES = {
       zipped: "{name} saved in Downloads ({kb} KB)",
       failed: "Could not prepare the report. Try again in a moment.",
     },
-    // Catalogue de bugs (31/10), voir bugCatalogUi.js.
+    // Catalogue de bugs, voir bugCatalogUi.js.
     bugs: {
       known: "Known problem",
       why: "Why?",
@@ -2038,7 +2038,7 @@ const DICTIONARIES = {
       favOn: "Favourited",
       type: "Type",
       modpack: "Modpack",
-      // My cloud (03/11): modpack linked by the owner.
+      // My cloud: modpack linked by the owner.
       cloudPackTitle: "Server's modpack",
       cloudPackMods: "{n} mods",
       cloudPackCustom: "⚠ {n} mod(s) provided by the server owner, not verified by Omniscient (automatic checks only). Install only if you trust this server.",

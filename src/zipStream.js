@@ -1,4 +1,4 @@
-// Archives .zip des mondes (mode Jouer, 24/10) : adm-zip garde toute l'archive en memoire, ce
+// Archives .zip des mondes (mode Jouer) : adm-zip garde toute l'archive en memoire, ce
 // qui ne va pas pour un monde de plusieurs Go. Ici, chaque fichier est lu et compresse en flux
 // (deflate), avec ZIP64 au-dela de 4 Go. Le lecteur ne sert qu'a nos propres archives (sauvegardes
 // locales et copies du cloud) : il lit le repertoire central et decompresse fichier par fichier.
@@ -195,7 +195,7 @@ async function listZip(zipFile) {
     let count = tail.readUInt16LE(endAt + 10);
     let centralSize = tail.readUInt32LE(endAt + 12);
     let centralOffset = tail.readUInt32LE(endAt + 16);
-    // ZIP64 : n'importe lequel des trois champs peut être saturé (27/10 : un mod de plus de 65 535
+    // ZIP64 : n'importe lequel des trois champs peut être saturé (un mod de plus de 65 535
     // fichiers, Conquest Reforged, n'était lu qu'à moitié).
     if ((count === 0xffff || centralSize === MAX32 || centralOffset === MAX32) && endAt >= 20 && tail.readUInt32LE(endAt - 20) === 0x07064b50) {
       const end64Offset = Number(tail.readBigUInt64LE(endAt - 20 + 8));
@@ -266,14 +266,14 @@ async function readZipEntry(zipFile, entry, { maxBytes = 64 * 1024 * 1024 } = {}
 }
 
 /** Extrait toute l'archive dans `destDir` (qui doit etre vide ou absent). CRC verifie par fichier.
- *  `pick(name)` (26/10, import d'un export CurseForge) : chemin de destination de l'entrée dans
- *  `destDir`, ou null pour la sauter. `keepExisting(rel)` : vrai = ne jamais écraser ce fichier. */
+ * `pick(name)` (import d'un export CurseForge) : chemin de destination de l'entrée dans
+ * `destDir`, ou null pour la sauter. `keepExisting(rel)` : vrai = ne jamais écraser ce fichier. */
 // `order(a, b)` : ordre d'extraction (entrées de listZip) ; `onEntry(entry, rel)` : appelé (et attendu)
-// avant chaque fichier extrait, pour la progression des imports (27/10).
+// avant chaque fichier extrait, pour la progression des imports.
 async function extractZip(zipFile, destDir, { onBytes, signal, pick = null, keepExisting = null, order = null, onEntry = null } = {}) {
   const entries = await listZip(zipFile);
   if (order) entries.sort(order);
-  // Audit du 01/11 : un zip piégé ne remplit plus le disque. Ce que l'archive annonce doit tenir dans
+  // Un zip piégé ne remplit plus le disque. Ce que l'archive annonce doit tenir dans
   // la place libre, et chaque fichier s'arrête à la taille annoncée (voir `check` ci-dessous).
   const announced = entries.reduce((sum, e) => sum + (!pick || pick(e.name) ? e.size : 0), 0);
   await fsp.mkdir(destDir, { recursive: true });
@@ -293,7 +293,7 @@ async function extractZip(zipFile, destDir, { onBytes, signal, pick = null, keep
       const target = insideJoin(destDir, rel);
       if (keepExisting?.(rel) && fs.existsSync(target)) continue;
       await fsp.mkdir(path.dirname(target), { recursive: true });
-      // Fichier vide (vu dans un vrai export CurseForge, 27/10) : rien à lire, et un flux de 0 octet
+      // Fichier vide (vu dans un vrai export CurseForge) : rien à lire, et un flux de 0 octet
       // ferait planter createReadStream (start > end).
       if (entry.compressed === 0 && entry.size === 0) {
         await fsp.writeFile(target, Buffer.alloc(0));

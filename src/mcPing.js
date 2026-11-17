@@ -28,8 +28,7 @@ function parseServerAddress(address) {
 // dns.resolveSrv (version promises) n'accepte pas de signal d'annulation dans
 // cette version de Node — un Promise.race avec un delai est le seul moyen de ne
 // pas rester bloque si la resolution DNS ne repond jamais (PING_TIMEOUT_MS ne
-// protege que la connexion TCP qui suit, pas cette etape, trouve par l'audit du
-// 2026-10-10).
+// protege que la connexion TCP qui suit, pas cette etape).
 async function resolveSrvTarget(host) {
   let timer;
   try {

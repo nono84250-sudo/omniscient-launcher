@@ -134,7 +134,7 @@
     const settings = await window.mchub.settings.get();
     window.i18n.setLocale(settings.locale);
     window.i18n.applyStaticI18n(document);
-    // Titre de la fenetre (barre des taches) dans la langue choisie (audit 17/10, lot 1).
+    // Titre de la fenetre (barre des taches) dans la langue choisie.
     document.title = window.i18n.t("debugConsole.title");
     window.themeControls.applyTheme(settings);
     window.themeControls.watchSystemTheme(() => window.mchub.settings.get());
@@ -154,7 +154,7 @@
     });
   }
 
-  // TEMPORAIRE (18/10) : affiche tout de suite une notification Windows pour verifier son nom et
+  // TEMPORAIRE : affiche tout de suite une notification Windows pour verifier son nom et
   // son logo. A retirer avec le bouton console-test-notif de debug-console.html.
   document.getElementById("console-test-notif").addEventListener("click", () => {
     try {

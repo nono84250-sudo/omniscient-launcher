@@ -1,9 +1,9 @@
-// Petit menu de sauvegarde par-dessus le jeu (mode Jouer, idée de Rushi du 24/10, comme les outils
+// Petit menu de sauvegarde par-dessus le jeu (mode Jouer, comme les outils
 // de clips) : une fenêtre transparente, toujours au premier plan, en haut à gauche de l'écran du
 // jeu. Elle ne s'affiche pas par-dessus un jeu en plein écran exclusif (seules les touches
 // marchent alors) ; en fenêtré ou en plein écran fenêtré, elle est visible.
 //
-// Elle ne prend JAMAIS le focus (retour de Rushi du 25/10) : prendre le focus faisait clignoter
+// Elle ne prend JAMAIS le focus : prendre le focus faisait clignoter
 // l'icône en orange dans la barre des tâches, la faisait remonter, et réduisait le jeu en plein
 // écran. Elle est créée une fois par partie, puis seulement cachée et montrée sans s'activer
 // (focusable: false, showInactive, type « toolbar » : aucun bouton dans la barre des tâches).
@@ -20,7 +20,7 @@ function createSaveOverlay({ lockNavigation, log } = {}) {
   let hideTimer = null;
   let pendingAnswer = null;
   let shownOnce = false;
-  // Audit du 25/10 : partie finie (destroy) → plus rien ne recrée la fenêtre (une fenêtre cachée
+  // Partie finie (destroy) → plus rien ne recrée la fenêtre (une fenêtre cachée
   // empêchait le launcher de se fermer). warm() la rouvre au début de la partie suivante.
   let closed = false;
   // Où se coller : la fenêtre du jeu (rectangle en pixels Windows, voir gameWindow.js), sinon
@@ -141,8 +141,8 @@ function createSaveOverlay({ lockNavigation, log } = {}) {
     }, 180);
   }
 
-  // Maj+F6 : demande un nom. C'est le SEUL moment où le petit menu prend le focus (choix de Rushi
-  // du 25/10, en connaissant le prix : le jeu se met en pause, et un plein écran peut se réduire).
+  // Maj+F6 : demande un nom. C'est le SEUL moment où le petit menu prend le focus (en connaissant le
+  // prix : le jeu se met en pause, et un plein écran peut se réduire).
   // Renvoie le nom, null si le joueur annule (Échap, Annuler), undefined s'il ne répond pas à temps.
   async function ask(state, { timeoutMs = 90_000 } = {}) {
     answer(null);

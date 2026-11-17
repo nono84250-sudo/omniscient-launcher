@@ -1,4 +1,4 @@
-// Dossier des jeux deplacable (serie 2, idee 9, version validee par Rushi le 17/10) : un seul
+// Dossier des jeux deplacable : un seul
 // dossier pour tout ce qui grossit (instances, mondes, mods, Java telecharge, cache), qu'on peut
 // deplacer en entier sur un autre disque. Le compte, les reglages et les journaux restent dans
 // userData (quelques Ko), avec l'adresse du dossier des jeux.

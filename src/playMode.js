@@ -1,16 +1,16 @@
-// Mode « Jouer » (bêta, preview C validée par Rushi le 24/10) : jouer à n'importe quelle version
+// Mode « Jouer » (bêta) : jouer à n'importe quelle version
 // de Minecraft sans passer par un serveur, en vanilla ou avec un pack officiel (liste de mods
 // Modrinth préparée par l'équipe, rien n'est hébergé chez nous), et garder ses mondes sauvegardés.
 //
 // Organisation sur le disque (dans le dossier des jeux, donc déplaçable avec lui) :
-//   minecraft/play/game/            dossier de jeu COMMUN à toutes les versions (comme le
+//   minecraft/play/game/ dossier de jeu COMMUN à toutes les versions (comme le
 //                                   .minecraft du launcher officiel) : saves/, options.txt,
 //                                   resourcepacks/… Les mondes ne dépendent donc pas d'une version.
-//   minecraft/play/mods/<id>/       mods d'une version avec pack, chargés par Fabric via
+//   minecraft/play/mods/<id>/ mods d'une version avec pack, chargés par Fabric via
 //                                   -Dfabric.addMods (le dossier game/mods reste vide).
-//   minecraft/play/backups/<clé>/   sauvegardes .zip d'un monde + index.json.
-//   minecraft/play/play.json        mes versions et réglages par monde.
-//   minecraft/play/instances/<id>/  (26/10, séparation stricte, Laboratoire « strictDirs ») dossier
+//   minecraft/play/backups/<clé>/ sauvegardes .zip d'un monde + index.json.
+//   minecraft/play/play.json mes versions et réglages par monde.
+//   minecraft/play/instances/<id>/ (séparation stricte, Laboratoire « strictDirs ») dossier
 //                                   de jeu PROPRE à une version : ses mondes (saves/), ses réglages,
 //                                   ses packs de ressources, ses mods (Mon pack, pack CurseForge).
 //                                   game/ ne garde alors que les mondes pas encore rangés (importés,
@@ -19,7 +19,7 @@
 // Chaque monde garde sa clé dans <monde>/omniscient-world.json (Minecraft ignore ce fichier),
 // pour le retrouver même si son dossier est renommé.
 //
-// Règles (Rushi, 24/10) : sauvegarde activée par défaut sur chaque monde, désactivable ; import
+// Règles : sauvegarde activée par défaut sur chaque monde, désactivable ; import
 // depuis .minecraft TOUJOURS par copie. Un monde fermé est zippé directement (afterGame) ; un monde
 // ouvert dans le jeu (F6, toutes les 30 min, voir liveSave.js) est d'abord copié dans un dossier
 // figé, recopié tant que le jeu écrit dedans, puis zippé depuis cette copie.
@@ -34,14 +34,14 @@ const packs = require("./playPacks");
 const packRam = require("./packRam");
 
 const WORLD_FILE = "omniscient-world.json";
-// Combien de sauvegardes garder sur le PC, monde par monde (preview validée par Rushi le 24/10) :
+// Combien de sauvegardes garder sur le PC, monde par monde :
 // un nombre OU une taille max. La plus ancienne part en premier, la plus récente est toujours
 // gardée, la dernière « avant restauration » aussi. Les sauvegardes avec un nom (Maj+F6) ne sont
 // jamais supprimées toutes seules si `named` (coché par défaut) ; elles comptent quand même dans
 // la place utilisée. Le cloud n'est jamais touché par ce réglage.
 // every : une sauvegarde automatique toutes les X min de jeu ; send : envoi automatique dans le
 // cloud (« all » toutes, « game » une par partie + celles avec un nom, « manual » à la main).
-// online : versions gardées en ligne par monde (25/10), sans compter les ★ ni les envois à la main.
+// online : versions gardées en ligne par monde, sans compter les ★ ni les envois à la main.
 const DEFAULT_KEEP = { mode: "count", count: 10, sizeMb: 1000, named: true, every: 30, send: "all", online: 3 };
 const ONLINE_MAX = 10;
 const EVERY_CHOICES = [5, 10, 15, 30, 60];
@@ -50,7 +50,7 @@ const LOCAL_KEEP = DEFAULT_KEEP.count;
 // Ce que le réglage garde et supprime vraiment (même calcul dans play.js pour l'aperçu).
 const validWorldKey = (key) => typeof key === "string" && /^[\w-]{8,64}$/.test(key);
 
-// `protectId` (audit du 25/10) : la sauvegarde qu'on est en train de restaurer n'est jamais retirée
+// `protectId` : la sauvegarde qu'on est en train de restaurer n'est jamais retirée
 // par la sauvegarde « avant restauration » faite juste avant.
 function planBackups(list, cfg, protectId = null) {
   const keep = [];
@@ -62,9 +62,9 @@ function planBackups(list, cfg, protectId = null) {
     const size = Number(b.sizeBytes) || 0;
     // Protégée (nommée, ou la dernière « avant restauration ») : jamais supprimée, mais elle compte
     // dans le nombre et la place (une limite de 10 = 10 sauvegardes au total sur le PC).
-    // La sauvegarde « Import » (Version d'origine, 26/10) non plus : seule la Suppression
-    // définitive l'efface. Les sauvegardes 🛡 « Avant 26.3 » d'un changement de version (27/10,
-    // Laboratoire « versionGuard ») non plus : seulement si le joueur les supprime lui-même.
+    // La sauvegarde « Import » (Version d'origine) non plus : seule la Suppression
+    // définitive l'efface. Les sauvegardes 🛡 « Avant 26.3 » d'un changement de version
+    // (Laboratoire « versionGuard ») non plus : seulement si le joueur les supprime lui-même.
     if ((cfg.named && b.label) || b === lastRestore || b.reason === "import" || b.reason === "upgrade" || b.guardKeep || (protectId && b.id === protectId)) {
       keep.push(b);
       n++;
@@ -85,7 +85,7 @@ function cleanKeep(cfg) {
   const c = cfg && typeof cfg === "object" ? cfg : {};
   return {
     mode: c.mode === "size" ? "size" : "count",
-    // 0 = tout garder (curseur « ∞ » de la fenêtre Sauvegardes, 25/10).
+    // 0 = tout garder (curseur « ∞ » de la fenêtre Sauvegardes).
     count: Number(c.count) === 0 ? 0 : Math.min(500, Math.max(1, Math.round(Number(c.count) || DEFAULT_KEEP.count))),
     sizeMb: Math.min(1_000_000, Math.max(1, Math.round(Number(c.sizeMb) || DEFAULT_KEEP.sizeMb))),
     named: c.named !== false,
@@ -130,7 +130,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     if (!state.worlds || typeof state.worlds !== "object") state.worlds = {};
     return state;
   }
-  // Écriture sûre d'un fichier JSON (02/11, Rushi : « fichier non trouvé » de temps en temps à l'import
+  // Écriture sûre d'un fichier JSON (« fichier non trouvé » de temps en temps à l'import
   // d'un pack). Avant, deux sauvegardes en même temps (l'import et la liste des mondes, par exemple)
   // écrivaient la même copie « play.json.part » : la 1re la renommait, la 2e ne la trouvait plus
   // (« ENOENT: no such file or directory, rename … »). Maintenant les écritures d'un même fichier
@@ -168,7 +168,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
   function saveState() {
     return writeJsonSafe(STATE_FILE, state);
   }
-  // Audit du 25/10 : une clé de monde ne sert dans un chemin que si elle a la forme attendue
+  // Une clé de monde ne sert dans un chemin que si elle a la forme attendue
   // (jamais « .. » ni « __proto__ » venus de la fenêtre).
   function assertKey(key) {
     if (!validWorldKey(key)) throw new Error("Clé de monde invalide.");
@@ -203,7 +203,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
   function listVersions() {
     return loadState().versions.map((v) => ({ ...v, pack: v.pack ? { ...v.pack, cfHand: undefined } : v.pack, files: undefined, mods: undefined, installed: undefined, modCount: modCountOf(v), problems: v.problemCount || 0, hand: handFiles(v) }));
   }
-  // Nombre de mods de la tuile (05/11, Rushi : la tuile disait 10, la page du pack 11). Même compte
+  // Nombre de mods de la tuile (la tuile disait 10, la page du pack 11). Même compte
   // que la page du pack : les mods de la liste, plus les .jar posés à la main dans mods/ (« Fichier »),
   // allumés ou coupés.
   function modCountOf(v) {
@@ -221,7 +221,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
       return list.length;
     }
   }
-  // Fichiers encore à télécharger à la main (04/11, pastille et « Reprendre » de Mes installations) :
+  // Fichiers encore à télécharger à la main (pastille et « Reprendre » de Mes installations) :
   // mods CurseForge sans lien pas encore dans mods/, et .zip (packs de ressources, shaders) gardés à
   // l'import et pas encore dans leur dossier.
   function handFiles(v) {
@@ -237,7 +237,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
       }
       const dir = gameDirOf(v.id);
       for (const c of v.pack.cfHand || []) {
-        // Data pack (04/11) : gardé dans .omniscient/datapacks/ de l'installation une fois trouvé.
+        // Data pack : gardé dans .omniscient/datapacks/ de l'installation une fois trouvé.
         const where = c?.kind === "dp" ? DP_STORE(v.id) : path.join(dir, c?.kind === "sh" ? "shaderpacks" : "resourcepacks");
         if (!c?.fileName || fs.existsSync(path.join(where, c.fileName))) continue;
         out.push({ id: c.id, name: c.name, fileName: c.fileName, kind: c.kind === "sh" || c.kind === "dp" ? c.kind : "rp" });
@@ -290,7 +290,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     await saveState();
     return true;
   }
-  // RAM par pack (01/11, Laboratoire « packRam ») : réglage de l'installation (voir packRam.js).
+  // RAM par pack (Laboratoire « packRam ») : réglage de l'installation (voir packRam.js).
   async function setVersionRam(id, ram) {
     const v = getVersion(id);
     const clean = packRam.cleanRam(ram);
@@ -570,7 +570,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
         folder: d.name,
         home: d.home,
         // Copie d'essai : le nom de son dossier (« … (copie) »), le jeu garde le nom d'origine.
-        // Copie gardée à un changement de version (27/10) : « Nom (1.21.4) », le nom de son dossier.
+        // Copie gardée à un changement de version : « Nom (1.21.4) », le nom de son dossier.
         name: ws.modCopyOf || ws.versionCopy ? d.name : level.name || d.name,
         minecraftVersion: level.version || ws.minecraftVersion || null,
         lastPlayed: level.lastPlayed || levelStat.mtimeMs,
@@ -591,7 +591,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
         modded: ws.modded || (!lastVersion?.pack && level.mods) || null,
         modCopyOf: ws.modCopyOf || null,
         versionCopy: !!ws.versionCopy,
-        // Changement de version (27/10) : installation mise à jour, monde converti à sa prochaine
+        // Changement de version : installation mise à jour, monde converti à sa prochaine
         // ouverture ; ou monde converti récemment (étiquette 3 jours).
         pendingTo: ws.pendingTo || null,
         upgraded: ws.upgraded && Date.now() - Date.parse(ws.upgraded.at || 0) < 3 * 86400_000 ? { from: ws.upgraded.from, to: ws.upgraded.to } : null,
@@ -603,7 +603,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     worlds.sort((a, b) => (b.lastPlayed || 0) - (a.lastPlayed || 0));
     return worlds;
   }
-  // Mondes supprimés dans le jeu (26/10) : le dossier n'est plus dans saves/, mais ses sauvegardes
+  // Mondes supprimés dans le jeu : le dossier n'est plus dans saves/, mais ses sauvegardes
   // sont encore sur le PC. Avant, ils disparaissaient du launcher et les sauvegardes restaient
   // cachées ; maintenant « Supprimés dans Minecraft » (Restaurer ou Suppression définitive).
   async function listGone() {
@@ -633,7 +633,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     return gone;
   }
 
-  // Copie d'essai d'un monde modé (26/10) : « Ouvrir une copie quand même ». Le monde et sa
+  // Copie d'essai d'un monde modé : « Ouvrir une copie quand même ». Le monde et sa
   // Version d'origine ne passent jamais dans le jeu sans leurs mods.
   async function copyWorld(key, { name = "" } = {}) {
     const found = await worldDir(key);
@@ -656,7 +656,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     return { ok: true, key: newKey, folder: path.basename(target), name: path.basename(target) };
   }
 
-  // Suppression définitive (26/10) : le monde sur ce PC s'il y est, TOUTES ses sauvegardes (la
+  // Suppression définitive : le monde sur ce PC s'il y est, TOUTES ses sauvegardes (la
   // Version d'origine comprise) et son état. Le cloud est retiré par main.js.
   async function deleteWorldForever(key) {
     assertKey(key);
@@ -843,12 +843,12 @@ function createPlayMode({ gameRoot, appDataDir }) {
     await pruneBackups(key, list, protectId);
     return { ok: true, backup: entry };
   }
-  // Réglages des sauvegardes : les mêmes pour TOUS les mondes (demande de Rushi, 25/10). L'ancien
+  // Réglages des sauvegardes : les mêmes pour TOUS les mondes. L'ancien
   // réglage par monde (worlds[key].keep) n'est plus lu.
   function keepConfig() {
     return cleanKeep({ ...DEFAULT_KEEP, ...(loadState().keep || {}) });
   }
-  // Versions miroir (25/10) : les sauvegardes retirées par la limite du monde sont signalées au
+  // Versions miroir : les sauvegardes retirées par la limite du monde sont signalées au
   // cloud (worldCloud.dropPruned), qui les retire aussi en ligne, sauf les sauvegardes nommées.
   let pruneListener = null;
   async function pruneBackups(key, list, protectId = null) {
@@ -944,7 +944,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
   function setOnlineCap(n) {
     offerOnlineCap = Number(n) > 0 ? Math.round(Number(n)) : 0;
   }
-  // Seulement avec « Partiel » (retour de Rushi du 25/10) : avec « Toutes » ou « À la main », pas de
+  // Seulement avec « Partiel » : avec « Toutes » ou « À la main », pas de
   // limite par monde (restent la limite du PC, le quota de l'offre et la conservation en jours).
   function onlineLimit() {
     if (keepConfig().send !== "game") return Infinity;
@@ -1090,7 +1090,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     worldState(key).lastVersionId = versionId;
     await saveState();
   }
-  // Supprimer une sauvegarde à la main (liste des sauvegardes d'un monde, 25/10). Renvoie
+  // Supprimer une sauvegarde à la main (liste des sauvegardes d'un monde). Renvoie
   // l'entrée supprimée (pour la retirer aussi du cloud).
   async function deleteBackup(key, backupId) {
     const list = await readBackups(key);
@@ -1105,7 +1105,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     const b = (await readBackups(key)).find((x) => x.id === backupId);
     if (!b) throw new Error("Sauvegarde introuvable.");
     const out = (await worldDir(key)) ? await restoreFromZip(key, backupFile(key, b), { protectId: b.id }) : await restoreGone(key, backupFile(key, b));
-    // Retour à une version plus ancienne (27/10) : le monde s'ouvrira avec la version de la
+    // Retour à une version plus ancienne : le monde s'ouvrira avec la version de la
     // sauvegarde, plus avec l'installation mise à jour.
     const ws = worldState(key);
     if (b.minecraftVersion && ws.minecraftVersion !== b.minecraftVersion) {
@@ -1155,7 +1155,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
       // level.dat) : un monde juste copié ou importé pendant la partie garde la sienne.
       const played = versionId ? getVersion(versionId) : null;
       if (played && (!w.minecraftVersion || w.minecraftVersion === played.minecraftVersion)) ws.lastVersionId = versionId;
-      // Minecraft a converti le monde vers une version plus récente pendant la partie (27/10).
+      // Minecraft a converti le monde vers une version plus récente pendant la partie.
       if (w.minecraftVersion && ws.minecraftVersion && cmpMc(w.minecraftVersion, ws.minecraftVersion) > 0) {
         ws.upgraded = { from: ws.minecraftVersion, to: w.minecraftVersion, at: new Date().toISOString() };
         upgradedNow.push({ key: w.key, from: ws.minecraftVersion, to: w.minecraftVersion });
@@ -1183,7 +1183,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     return created;
   }
 
-  // --- Changement de version (27/10, preview validée par Rushi, Laboratoire « versionGuard ») ------
+  // --- Changement de version (Laboratoire « versionGuard ») ------
   // Un monde ouvert dans une version plus récente est converti par Minecraft et ne s'ouvre plus dans
   // l'ancienne. Avant toute mise à jour d'une installation : une sauvegarde 🛡 « Avant X » de chacun
   // de ses mondes, relue en entier pour la vérifier, jamais effacée automatiquement.
@@ -1267,7 +1267,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     return out;
   }
   /**
-   * Mettre à jour une installation (vanilla ou Mon pack) vers `mc`. Ordre (preview validée) :
+   * Mettre à jour une installation (vanilla ou Mon pack) vers `mc`. Ordre :
    * sauvegardes 🛡 de chaque monde, vérification, copie facultative (installation d'avant + copie de
    * ses mondes), puis passage de l'installation. Les mondes sont convertis par Minecraft à leur
    * prochaine ouverture (pendingTo). `onStep({ step, key?, pct? })`.
@@ -1334,7 +1334,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     copy.createdAt = new Date().toISOString();
     copy.lastPlayedAt = null;
     // Copie gardée exprès dans l'ancienne version : étiquette « Copie gardée en X » sur sa tuile, et
-    // pas de bouton « Mettre à jour » (page Jouer en tuiles, 27/10).
+    // pas de bouton « Mettre à jour » (page Jouer en tuiles).
     copy.keptCopyOf = { id: v.id, at: copy.createdAt };
     delete copy.updatedFrom;
     if (copy.omni) delete copy.omni;
@@ -1371,7 +1371,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     return copy.id;
   }
 
-  // --- Mon pack et pack CurseForge (26/10) ------------------------------------------------------
+  // --- Mon pack et pack CurseForge ------------------------------------------------------
   // Une version « Mon pack » (mods choisis sur Modrinth + liste CurseForge à la main) ou « pack
   // CurseForge » (export .zip d'un joueur) a toujours son propre dossier de jeu, avec ses mods dans
   // mods/. Chaque mod est une entrée de v.mods :
@@ -1383,7 +1383,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
   const ALLOWED_MOD_HOST = (url) => {
     try {
       const u = new URL(url);
-      // github.com, raw.githubusercontent.com, gitlab.com : autorisés par la spécification .mrpack (27/10).
+      // github.com, raw.githubusercontent.com, gitlab.com : autorisés par la spécification .mrpack.
       return u.protocol === "https:" && (["cdn.modrinth.com", "github.com", "raw.githubusercontent.com", "gitlab.com"].includes(u.hostname) || u.hostname.endsWith(".forgecdn.net"));
     } catch {
       return false;
@@ -1452,7 +1452,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     const { customVersion, jvmArgs } = await deps.prepareLaunchVersion({ gameRoot, loaderVersionId, minecraftVersion: v.minecraftVersion });
     await syncPackFiles(v, { deps, onProgress, signal, waitIfPaused });
     await syncAutoDatapacks(v).catch(() => {});
-    // Data packs d'un pack CurseForge sans chargeur (04/11) : dans chaque monde de l'installation.
+    // Data packs d'un pack CurseForge sans chargeur : dans chaque monde de l'installation.
     await spreadAllWorldDatapacks(v.id).catch(() => {});
     return { minecraftVersion: v.minecraftVersion, customVersion, jvmArgs, javaPath, gameDirectory: gameDir };
   }
@@ -1488,7 +1488,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
         const base = on ? name : name.replace(/\.disabled$/i, "");
         const meta = await jarMetaCached(path.join(dir, name), metaLoader(v));
         const m = byFile.get(base);
-        // Pack importé : le nom peut être le nom du fichier (27/10, « simplehats-neoforge-…jar ») ;
+        // Pack importé : le nom peut être le nom du fichier (« simplehats-neoforge-…jar ») ;
         // on montre alors celui que le mod donne lui-même.
         const ref = m && looksFile(m.name) && meta?.name ? { ...m, name: meta.name, version: looksFile(m.version) ? meta.version || "" : m.version } : m || { id: `file:${base}`, name: meta?.name || base.replace(/\.jar$/i, ""), source: "file", version: meta?.version || "", file: { filename: base }, on };
         jars[i] = { ref, on, meta, file: base };
@@ -1545,7 +1545,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
   async function findFixes(v, list) {
     const mc = v.minecraftVersion;
     const loader = v.pack.loader;
-    // Plusieurs recherches à la fois (27/10 : une par une, la page d'un gros pack attendait longtemps).
+    // Plusieurs recherches à la fois (une par une, la page d'un gros pack attendait longtemps).
     const queue = [...list];
     await Promise.all(Array.from({ length: Math.min(8, queue.length) }, async () => {
       while (queue.length) await fixOne(queue.shift());
@@ -1597,7 +1597,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     v.mods = [...next, ...(v.mods || []).filter((m) => m.source !== "mr")];
   }
 
-  // « Corriger » d'une fiche du catalogue de bugs (31/10) : seulement les packs du joueur, et seulement
+  // « Corriger » d'une fiche du catalogue de bugs : seulement les packs du joueur, et seulement
   // vers une version plus récente. Le chargeur s'installe au prochain lancement.
   async function setLoaderVersion(id, version) {
     const v = getVersion(id);
@@ -1690,7 +1690,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     const target = path.join(modsDirOf(id), name);
     await fsp.mkdir(path.dirname(target), { recursive: true });
     await fsp.copyFile(sourceFile, `${target}.part`);
-    // Copie relue (28/10) : seule une copie identique au fichier vérifié est mise en place.
+    // Copie relue : seule une copie identique au fichier vérifié est mise en place.
     if (sha1 && (await fileSha1(`${target}.part`).catch(() => null)) !== String(sha1).toLowerCase()) {
       await fsp.rm(`${target}.part`, { force: true });
       throw new Error("La copie du fichier a échoué, réessaie.");
@@ -1708,7 +1708,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     m.version = meta?.version || name;
     if (meta?.name && (m.name === m.cf?.search || !m.name || m.name === "?")) m.name = meta.name;
     m.cf = { ...(m.cf || {}), got: "hand" };
-    // Autre fichier CurseForge choisi (30/10, « Corriger le pack ») : le pack retient ce fichier-là.
+    // Autre fichier CurseForge choisi (« Corriger le pack ») : le pack retient ce fichier-là.
     if (Number(fileId) > 0) Object.assign(m.cf, { fileID: Number(fileId), pageUrl: pageUrl || m.cf.pageUrl || null });
     await saveState();
     // En arrière-plan : le mod est déjà en place, le joueur n'attend pas.
@@ -1716,12 +1716,12 @@ function createPlayMode({ gameRoot, appDataDir }) {
     return { ok: true, name: m.name };
   }
 
-  // Fichier pris dans Téléchargements : supprimé une fois copié (27/10, Rushi : il y restait). Juste
+  // Fichier pris dans Téléchargements : supprimé une fois copié (il y restait). Juste
   // après le téléchargement, le navigateur ou l'antivirus le tient encore ouvert un moment, et la
   // suppression échouait sans rien dire : on réessaie pendant environ 30 s. Les doublons identiques
   // (« nom (1).jar », même empreinte) partent aussi. Renvoie false si le fichier est resté.
-  // 28/10 (Rushi : « Échec, erreur de l'analyse antivirus » dans le navigateur alors que le mod était
-  // bien installé) : le navigateur fait analyser le fichier juste APRÈS le téléchargement ; le retirer
+  // « Échec, erreur de l'analyse antivirus » dans le navigateur alors que le mod était
+  // bien installé : le navigateur fait analyser le fichier juste APRÈS le téléchargement ; le retirer
   // pendant cette analyse la faisait échouer. On attend donc 30 s avant d'y toucher.
   const fileSha1 = (f) =>
     new Promise((resolve, reject) => {
@@ -1763,7 +1763,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     return left === 0;
   }
 
-  // « J'ai le fichier (.jar) » (27/10) : une COPIE du .jar choisi par le joueur va dans mods/ (son
+  // « J'ai le fichier (.jar) » : une COPIE du .jar choisi par le joueur va dans mods/ (son
   // fichier reste où il est). Le pack le voit comme un mod « Fichier » : on peut le couper, le
   // launcher ne le retire jamais.
   async function addLooseJar(id, sourceFile) {
@@ -1917,7 +1917,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     return m ? { id: m.id, name: m.name, projectId: m.projectId, fileId: m.cf?.fileID || null, fileName: fileNameOf(m), sha1: m.file?.sha1 || null, size: m.file?.size || null, pageUrl: m.cf?.pageUrl || null, search: m.cf?.search || null } : null;
   }
 
-  // --- Séparation stricte (26/10) ----------------------------------------------------------
+  // --- Séparation stricte ----------------------------------------------------------
   // Dossier de jeu pour lancer `versionId` (et `worldKey`) : celui de la version si la séparation
   // est active (ou pour Mon pack / pack CurseForge), sinon le dossier commun, ou celui où le monde
   // est déjà rangé.
@@ -1947,7 +1947,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     await fsp.writeFile(target, stored.size ? withKeys(base || "", stored) : base).catch(() => {});
   }
 
-  // --- Mes touches (28/10, demande de Rushi, Laboratoire « keysSync ») -----------------------------
+  // --- Mes touches (Laboratoire « keysSync ») -----------------------------
   // Deux fichiers de touches communs dans play/ : vanilla et modé (Minecraft vanilla efface les touches
   // des mods qu'il ne connaît pas), chacun en deux formats (avant 1.13 : numéros ; après : noms).
   // À chaque fermeture du jeu, seules les touches que le joueur a CHANGÉES pendant la partie (ou
@@ -2126,8 +2126,8 @@ function createPlayMode({ gameRoot, appDataDir }) {
     return Object.assign(out, { dirs });
   }
 
-  // `onProgress({ i, of, name, files, filesOf, bytes, total, file, overall })` : copie en cours (27/10,
-  // fenêtre d'import avec progression, preview « Progression des imports » validée par Rushi).
+  // `onProgress({ i, of, name, files, filesOf, bytes, total, file, overall })` : copie en cours
+  // (fenêtre d'import avec progression).
   async function importWorlds(fromDir, folders, { onProgress = () => {} } = {}) {
     const base = fromDir || defaultMinecraftSaves();
     await fsp.mkdir(SAVES, { recursive: true });
@@ -2180,8 +2180,8 @@ function createPlayMode({ gameRoot, appDataDir }) {
   // Version à utiliser pour « Jouer » sur un monde : la dernière qui l'a ouvert, sinon une version
   // vanilla de même numéro (créée au besoin) pour ne jamais l'ouvrir dans une version plus ancienne.
   // Version pour ouvrir un monde : TOUJOURS la version de Minecraft du monde (level.dat), jamais une
-  // autre (retour de Rushi du 24/10 : un monde importé s'ouvrait avec la dernière version créée,
-  // ce qui peut l'abîmer ; une version plus ancienne que le monde est refusée ou le casse).
+  // autre (un monde importé s'ouvrait avec la dernière version créée, ce qui peut l'abîmer, une
+  // version plus ancienne que le monde est refusée ou le casse).
   // - une version de « Mes versions » avec le même numéro : celle jouée en dernier, sinon celle du
   //   même pack, sinon la vanilla, sinon la première ;
   // - aucune : erreur code "needVersion" (le launcher propose de la créer, rien n'est lancé) ;
@@ -2194,7 +2194,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     const mc = world.minecraftVersion && VERSION_ID_PATTERN.test(world.minecraftVersion) ? world.minecraftVersion : null;
     const versions = loadState().versions;
     const last = world.lastVersionId ? getVersion(world.lastVersionId) : null;
-    // Installation mise à jour (27/10) : le joueur a accepté la conversion, sauvegarde 🛡 faite.
+    // Installation mise à jour : le joueur a accepté la conversion, sauvegarde 🛡 faite.
     const pendingTo = worldState(key).pendingTo;
     const upd = (world.home ? getVersion(world.home) : null) || last;
     if (pendingTo && upd && upd.minecraftVersion === pendingTo && !pick) return { versionId: upd.id, world };
@@ -2221,7 +2221,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
   }
 
 
-  // --- Page d'une version (27/10, preview « Pack Omniscient » v22 validée par Rushi) -------------------
+  // --- Page d'une version -------------------
   // Une version vanilla a aussi sa page (packs de ressources, mondes, data packs, fichiers). Son
   // dossier : celui de la version avec la séparation stricte (Laboratoire « strictDirs ») ou pour un
   // Pack Omniscient, sinon le dossier commun game/ (les changements valent alors pour toutes les
@@ -2230,7 +2230,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
   function setStrict(on) {
     strictOn = !!on;
   }
-  // Pack Omniscient (27/10) : chaque version du pack est une version de « Mes versions » avec
+  // Pack Omniscient : chaque version du pack est une version de « Mes versions » avec
   // v.omni = { group, tested, missing, base }. Toujours son propre dossier de jeu.
   const ownDir = (v) => isCustom(v) || !!v?.omni || !!v?.own;
   function pageDir(id) {
@@ -2280,7 +2280,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
       sizeBytes: w.bytes,
       mods: [],
       resourcepacks: rps.map((r) => ({ file: r.file, name: r.name, info: r.dir ? "" : r.bytes, on: r.on, needs: [] })),
-      // 28/10 : shaders rangés en vanilla, en attente de « Basculer en version modée ».
+      // Shaders rangés en vanilla, en attente de « Basculer en version modée ».
       shaders: (await listShaders(dir)).map((n) => ({ name: n.replace(/\.zip$/i, ""), file: n, info: "" })),
       shaderOn: -1,
       datapacks: datapackList(v),
@@ -2290,7 +2290,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     };
   }
 
-  // Retirer un élément de la page (« 🗑 Retirer », 27/10). Toujours confirmé dans la fenêtre. Un monde
+  // Retirer un élément de la page (« 🗑 Retirer »). Toujours confirmé dans la fenêtre. Un monde
   // est sauvegardé (sauvegarde nommée, jamais retirée seule) puis part à la Corbeille de Windows : il
   // apparaît dans « Supprimés » avec ses sauvegardes. `trash(abs)` : shell.trashItem (main.js).
   async function removeItem(id, { kind, key }, { trash, deps, withBackups = false } = {}) {
@@ -2350,7 +2350,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
       assertKey(key);
       const found = await worldDir(key);
       if (!found) throw new Error("Monde introuvable.");
-      // « Retirer aussi ses mondes » d'une installation (Rushi, 27/10) : pas de sauvegarde avant, le
+      // « Retirer aussi ses mondes » d'une installation : pas de sauvegarde avant, le
       // monde ET ses sauvegardes vont à la Corbeille, rien ne reste dans le launcher. Seule la
       // Version d'origine d'un monde importé reste (« Suppression définitive » seulement).
       if (withBackups) {
@@ -2405,7 +2405,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     return { name: base.replace(/\.zip$/i, ""), file: base };
   }
 
-  // --- Data packs, monde par monde (27/10) -------------------------------------------------------
+  // --- Data packs, monde par monde -------------------------------------------------------
   // Le launcher garde une copie de chaque data pack de la version (.omniscient/datapacks/) et la pose
   // dans <monde>/datapacks/ des mondes choisis. « Dans tous les mondes » (versions modées) : posé
   // dans le dossier du chargeur (Paxi ou Global Packs) et retiré des mondes (jamais en double).
@@ -2428,7 +2428,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
       entry = { file: base, name: base.replace(/\.zip$/i, ""), src: "file" };
     }
     v.datapacks = (v.datapacks || []).filter((d) => d.file !== entry.file);
-    // 28/10 (Rushi) : sans aucun monde, le data pack attend le premier (voir applyPendingDatapacks).
+    // Sans aucun monde, le data pack attend le premier (voir applyPendingDatapacks).
     const pending = !worldKey && !(await worldsOfVersion(id)).length;
     v.datapacks.push({ ...entry, worlds: [], auto: false, ...(pending ? { pending: true } : {}) });
     await saveState();
@@ -2438,7 +2438,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
   function loaderOf(v) {
     if (!isCustom(v)) return null;
     for (const [k, l] of Object.entries(packs.DP_LOADERS)) if ((v.mods || []).some((m) => m.on !== false && (l.ids.includes(m.id) || m.id === l.slug))) return k;
-    // Pack CurseForge importé (04/11) : mods « cf-<projet> », reconnus à leur nom ou à leur .jar
+    // Pack CurseForge importé : mods « cf-<projet> », reconnus à leur nom ou à leur .jar
     // (aussi ceux rangés dans le fichier du pack, présents seulement dans mods/).
     const names = (v.mods || []).filter((m) => m.on !== false).flatMap((m) => [m.name, fileNameOf(m)]);
     if (v.pack?.kind === "cf" || v.pack?.kind === "mr") {
@@ -2486,12 +2486,12 @@ function createPlayMode({ gameRoot, appDataDir }) {
     d.worlds = [...want].filter((k) => loadState().worlds[k]);
     d.auto = !!auto;
     delete d.pending;
-    // Choix fait à la main dans le launcher : le data pack ne suit plus « tous les mondes » (04/11).
+    // Choix fait à la main dans le launcher : le data pack ne suit plus « tous les mondes ».
     if (!keepAll) delete d.allWorlds;
     await saveState();
     return { ok: true };
   }
-  // Data pack d'un pack CurseForge (04/11) : son .zip est déjà dans .omniscient/datapacks/. Avec Paxi,
+  // Data pack d'un pack CurseForge : son .zip est déjà dans .omniscient/datapacks/. Avec Paxi,
   // Open Loader ou Global Packs dans le pack : dans le dossier de ce mod (tous les mondes). Sinon :
   // dans chaque monde de l'installation, maintenant et à chaque lancement (nouveaux mondes compris).
   function datapackStore(id) {
@@ -2536,7 +2536,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
   async function worldsOfVersion(id) {
     return (await listWorlds()).filter((w) => w.home === id || w.lastVersionId === id);
   }
-  // Data packs ajoutés quand l'installation n'avait encore aucun monde (28/10) : à la fermeture du
+  // Data packs ajoutés quand l'installation n'avait encore aucun monde : à la fermeture du
   // jeu, ils vont dans le monde le plus récent (sauvegardé juste avant par setDatapack). Ils marchent
   // à la prochaine ouverture de ce monde.
   async function applyPendingDatapacks(id) {
@@ -2553,7 +2553,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     }
     return [...done, ...(await spreadAllWorldDatapacks(id))];
   }
-  // Basculer une installation vanilla en version modée (28/10, preview validée par Rushi) : elle
+  // Basculer une installation vanilla en version modée : elle
   // devient un « Mon pack » avec son chargeur ; main.js ajoute ensuite le mod choisi (Iris, Paxi…).
   // Rien n'est supprimé. Sans dossier propre, ses packs de ressources, shaders, réglages et data packs
   // sont COPIÉS du dossier commun vers le sien (les autres versions vanilla gardent les leurs) ; ses
@@ -2601,7 +2601,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
       await fsp.copyFile(src, path.join(dir, d.file));
     }
   }
-  // Sauvegarde d'un monde d'une version avec chargeur (OUI de Rushi, 27/10 07h01) : une copie des
+  // Sauvegarde d'un monde d'une version avec chargeur : une copie des
   // data packs communs va dans omniscient-meta/datapacks/ ; à la restauration, ceux qui manquent
   // dans le dossier du chargeur sont remis.
   function autoDatapackFiles(versionId) {
@@ -2659,7 +2659,7 @@ function createPlayMode({ gameRoot, appDataDir }) {
     }
   }
 
-  // --- Explorateur de fichiers de la version (27/10) -----------------------------------------------
+  // --- Explorateur de fichiers de la version -----------------------------------------------
   // Chemins relatifs au dossier de la version, avec des « / » ; jamais en dehors.
   function filePath(id, rel) {
     const root = path.resolve(pageDir(id));

@@ -1,4 +1,4 @@
-// RAM par pack (01/11, preview validée par Rushi, Laboratoire « packRam »).
+// RAM par pack (Laboratoire « packRam »).
 // Chaque installation garde son réglage : « auto » (calculé : nombre de mods, version, shaders, RAM
 // conseillée par le fichier du pack, RAM du PC), « global » (la valeur de Paramètres › Mémoire) ou
 // « custom » (une valeur choisie). La même formule est recopiée dans play.js (fenêtres).
