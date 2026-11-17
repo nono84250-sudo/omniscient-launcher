@@ -192,10 +192,12 @@ const FTB_ALLOWED_HOSTS = new Set(["files.feed-the-beast.com", "cdn.feed-the-bea
 const FTB_API = "https://api.feed-the-beast.com/v1/modpacks/public/modpack";
 
 class ModpackError extends Error {
-  constructor(message, { code, manualMods, fromModrinth, fromModrinthMods } = {}) {
+  constructor(message, { code, manualMods, fromModrinth, fromModrinthMods, httpStatus } = {}) {
     super(message);
     this.name = "ModpackError";
     this.code = code || "modpack_error";
+    // Code HTTP du dernier essai d'un téléchargement raté (403 = fichier refusé par l'hébergeur).
+    this.httpStatus = httpStatus || null;
     // Mods que CurseForge ne permet pas d'installer automatiquement.
     this.manualMods = manualMods || [];
     // Mods bloques retrouves sur Modrinth (bandeau et liste de la fenetre des mods).
@@ -346,8 +348,10 @@ async function downloadFileLocked(url, destPath, { sha1, sha512, size, signal, o
       clearTimeout(idleTimer);
     }
   }
+  const httpStatus = Number(/^HTTP (\d{3})$/.exec(lastError?.message || "")?.[1]) || null;
   throw new ModpackError(`Téléchargement impossible (${path.basename(destPath)}) : ${lastError.message}`, {
     code: "download_failed",
+    httpStatus,
   });
 }
 
@@ -645,6 +649,10 @@ async function resolveFtbFiles({ config, files, onProgress, instanceDir, manualS
       item.entry.url = info.downloadUrl;
       item.entry.sha1 = info.sha1 || item.entry.sha1;
       item.entry.size = info.fileLength || item.entry.size;
+      // Pour la fenêtre « à la main » si l'hébergeur refuse le fichier au téléchargement.
+      item.entry.cfFileId = item.fileId;
+      item.entry.cfModId = info.modId || item.modId;
+      item.entry.modName = typeof info.modName === "string" ? info.modName : null;
       entries.push(item.entry);
       if (item.isMod) origins.curseforge++;
     } else {
@@ -743,7 +751,7 @@ async function resolveCurseforgeFiles({ config, manifest, onProgress, instanceDi
     // mods/ (« Mekanism CTM w/ Fusion »).
     const zip = /\.zip$/i.test(String(info.fileName || ""));
     const dir = !zip ? "mods" : zipDirOf(info, dpDir);
-    const entry = { path: `${dir}/${path.basename(info.fileName)}`, url: info.downloadUrl, sha1: info.sha1, size: info.fileLength };
+    const entry = { path: `${dir}/${path.basename(info.fileName)}`, url: info.downloadUrl, sha1: info.sha1, size: info.fileLength, cfFileId: info.id, cfModId: info.modId || null, modName: typeof info.modName === "string" ? info.modName : null };
     if (info.downloadUrl && !isAllowedModpackUrl(info.downloadUrl)) {
       throw new ModpackError(`Le mod "${info.fileName}" du modpack se télécharge depuis un site non autorisé.`, {
         code: "disallowed_download_host",
@@ -1047,8 +1055,20 @@ async function extractOverrides(zip, dirName, instanceDir, previousHashes, nextH
 // "tache", juste un AbortSignal standard et une fonction a attendre.
 // onProgress facultatif : sans lui, l'appel plantait dans le flux à chaque morceau reçu et le
 // téléchargement restait bloqué 60 s (« aucune donnée reçue ») : ajout CurseForge d'un pack de ressources.
-async function installFiles({ entries, instanceDir, previousFiles, keepPaths = [], onProgress = () => {}, signal, waitIfPaused }) {
+// Dossiers où chercher un fichier refusé que le joueur a téléchargé à la main (Téléchargements…),
+// fournis par main.js : le mode Jouer appelle installFiles sans les connaître.
+let defaultManualSearchDirs = () => [];
+const setDefaultManualSearchDirs = (fn) => {
+  defaultManualSearchDirs = typeof fn === "function" ? fn : () => [];
+};
+// Fichier refusé par son hébergeur (HTTP 403/404/410) : même chemin qu'un mod bloqué. Même fichier
+// sur Modrinth (empreinte), sinon fichier déposé dans Téléchargements, sinon liste « à télécharger à
+// la main ». Le reste du pack s'installe.
+const REFUSED_HTTP = new Set([401, 403, 404, 410, 451]);
+
+async function installFiles({ entries, instanceDir, previousFiles, keepPaths = [], onProgress = () => {}, signal, waitIfPaused, manualSearchDirs }) {
   const targets = entries.map((entry) => ({ ...entry, target: safeJoin(instanceDir, entry.path) }));
+  const refused = [];
   const totalBytes = targets.reduce((sum, entry) => sum + (entry.size || 0), 0);
 
   let done = 0;
@@ -1084,11 +1104,44 @@ async function installFiles({ entries, instanceDir, previousFiles, keepPaths = [
         done++;
         onProgress({ text: `Téléchargement des mods : ${done}/${targets.length}`, type: "mods", task: done, total: targets.length, bytes: downloadedBytes, totalBytes });
       } catch (error) {
-        failure = failure || error;
+        if (error?.code === "download_failed" && REFUSED_HTTP.has(error.httpStatus) && entry.sha1 && !signal?.aborted) refused.push(entry);
+        else failure = failure || error;
       }
     }
   };
   await Promise.all(Array.from({ length: Math.min(MOD_DOWNLOAD_CONCURRENCY, targets.length) }, worker));
+  if (!failure && refused.length) {
+    const items = refused.map((entry) => ({ entry, info: { id: entry.cfFileId || null, modId: entry.cfModId || null, modName: entry.modName || null, fileName: path.posix.basename(entry.path), pageUrl: null } }));
+    const searchDirs = manualSearchDirs || defaultManualSearchDirs() || [];
+    reportManualFiles(await findManualFiles(items, { instanceDir, searchDirs }), onProgress);
+    await findOnModrinth(items.filter((item) => !item.ready));
+    for (const item of items) {
+      if (!item.viaModrinth) continue;
+      try {
+        await downloadFile(item.entry.url, item.entry.target, { sha1: item.entry.sha1, sha512: item.entry.sha512, size: item.entry.size, signal });
+        freshlyDownloaded.push(item.entry.target);
+      } catch {
+        item.ready = false;
+      }
+    }
+    const manualMods = items
+      .filter((item) => !item.ready)
+      .map(({ entry, info }) => ({
+        fileId: info.id,
+        modId: info.modId,
+        modName: info.modName,
+        fileName: info.fileName,
+        pageUrl: curseforgeProjectUrl(info.modId),
+        reason: "blocked",
+        kind: manualKindOfPath(entry.path),
+      }));
+    if (manualMods.length) {
+      throw new ModpackError(
+        `${manualMods.length} fichier(s) du modpack refusé(s) par leur hébergeur, à ajouter à la main : ${manualMods.map((m) => m.modName || m.fileName).join(", ")}.`,
+        { code: "manual_mods", manualMods, fromModrinth: items.filter((item) => item.viaModrinth && item.ready).length, fromModrinthMods: [] },
+      );
+    }
+  }
   if (failure) {
     if (failure.name === "AbortError") {
       await Promise.all(freshlyDownloaded.map((target) => fsp.rm(target, { force: true })));
@@ -1818,6 +1871,7 @@ async function installModpackLocked({ config, slug, gameRoot, javaPath, resolveJ
 
 module.exports = {
   setBugSignal,
+  setDefaultManualSearchDirs,
   installModpack,
   installLoader,
   // Mode Jouer : mods d'un pack officiel (playMode.js).

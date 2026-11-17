@@ -312,7 +312,7 @@ function bandLegendHtml() {
     .map((key) => `<span><i style="background:${BAND_COLORS[key]}"></i>${escapeHtml(t(`band.legend_${key}`))}</span>`)
     .join("");
   return `<span class="band-legend-anchor">
-      <button type="button" class="band-help" data-band-legend aria-expanded="${bandLegendOpen}" title="${escapeHtml(t("band.legendTitle"))}" aria-label="${escapeHtml(t("band.legendTitle"))}">?</button>
+      <button type="button" class="band-help" data-band-legend aria-expanded="${bandLegendOpen}" title="${escapeHtml(t("band.legendTitle"))}" aria-label="${escapeHtml(t("band.legendTitle"))}">? ${escapeHtml(t("band.legendShort"))}</button>
       ${bandLegendOpen ? `<span class="band-legend-pop" role="dialog" aria-label="${escapeHtml(t("band.legendTitle"))}"><b>${escapeHtml(t("band.legendTitle"))}</b><span class="muted">${escapeHtml(t("band.legendText"))}</span><span class="band-legend-rows">${rows}</span></span>` : ""}
     </span>`;
 }
@@ -3434,6 +3434,9 @@ async function openDetail(slug) {
   statusEl.hidden = true;
   listEl.hidden = true;
   detailEl.hidden = false;
+  // Une fiche serveur garde « Serveurs » allumé dans le menu de gauche, d'où qu'on l'ouvre.
+  [navHomeBtn, navSettingsBtn, navFavoritesBtn, navRecentBtn, navMyInstancesBtn, navFriendsBtn].forEach((btn) => btn?.classList.remove("active"));
+  navServersBtn?.classList.add("active");
   clearPageTheme();
   detailEl.innerHTML = skeletonDetailHtml();
 
@@ -3450,7 +3453,7 @@ async function openDetail(slug) {
     detailEl.hidden = true;
     statusEl.hidden = false;
     statusEl.classList.add("error");
-    statusEl.textContent = t("serverList.errorDetailPrefix", { error: result.error });
+    statusEl.textContent = t("serverList.errorDetailPrefix", { error: friendlyNetError(result.error) });
     return;
   }
   renderDetail(result.server);
@@ -3507,7 +3510,7 @@ async function loadServers() {
           <button type="button" class="join-btn" id="list-error-retry">${escapeHtml(t("serverList.errorRetry"))}</button>
           <button type="button" class="btn-secondary" id="list-error-library">${escapeHtml(t("serverList.errorLibrary"))}</button>
         </div>
-        ${result.error ? `<small class="list-error-detail">${escapeHtml(result.error)}</small>` : ""}
+        ${result.error ? `<small class="list-error-detail">${escapeHtml(friendlyNetError(result.error))}</small>` : ""}
       </div>`;
     const pager = document.getElementById("server-list-pager-slot");
     if (pager) pager.innerHTML = "";
@@ -3925,8 +3928,9 @@ function renderMcStatus(data) {
   // ne revient qu'en cas de panne ou de ralentissement (un point seul ferait croire a une panne).
   const word = document.getElementById("mc-status-word");
   const label = worst === "offline" ? t("titlebar.servicesDown") : worst === "degraded" ? t("titlebar.servicesSlow") : t("titlebar.servicesOk");
-  word.textContent = label;
-  word.hidden = worst === "ok";
+  // Un mot aussi quand tout va bien : un point vert seul ne disait rien.
+  word.textContent = worst === "ok" ? t("titlebar.servicesOkShort") : label;
+  word.hidden = false;
   mcStatusTrigger.classList.toggle("down", worst === "offline");
   mcStatusTrigger.classList.toggle("slow", worst === "degraded");
   mcStatusTrigger.title = label;
@@ -4817,11 +4821,10 @@ function renderFriendsList() {
   if (friendsOwnerId !== (currentProfile?.id ?? null)) resetFriendsState();
   const nothing = friendsList.length === 0 && friendsIncoming.length === 0 && friendsOutgoing.length === 0;
   if (nothing && friendsStatus !== "loaded") {
-    listEl.innerHTML = `
-      <div class="friends-empty">
-        <h3>${t(friendsStatus === "error" ? "friends.loadError" : "friends.loading")}</h3>
-        ${friendsStatus === "error" ? `<p>${t("friends.loadErrorHint")}</p>` : ""}
-      </div>`;
+    // Chargement : petit indicateur discret (un gros titre faisait croire à une page vide).
+    listEl.innerHTML = friendsStatus === "error"
+      ? `<div class="friends-empty"><h3>${t("friends.loadError")}</h3><p>${t("friends.loadErrorHint")}</p></div>`
+      : `<div class="friends-loading" role="status"><span class="friends-spin" aria-hidden="true"></span>${t("friends.loading")}</div>`;
     return;
   }
   if (nothing) {
@@ -5272,6 +5275,9 @@ function paintHomeView({ settings, favoriteSlugs, myServersResult, continueResol
   const shownSlugs = new Set([continueServer?.slug, ...favoriteServers.map((s) => s.slug)].filter(Boolean));
   const whereServers = continueServer ? [] : busiest.slice(0, 3);
   whereServers.forEach((s) => shownSlugs.add(s.slug));
+  // Peu de favoris : des serveurs conseillés (les plus actifs) remplissent l'accueil.
+  const suggested = favoriteServers.length < 3 && continueServer ? busiest.filter((s) => !shownSlugs.has(s.slug)).slice(0, 3) : [];
+  suggested.forEach((s) => shownSlugs.add(s.slug));
   const allKnown = listResult.ok ? listResult.servers : [];
   // « Petit serveur du jour » choisi par le site s'il n'est pas deja affiche ailleurs sur
   // l'accueil ; sinon (null, appel rate, doublon) l'ancien choix : le plus actif non affiche.
@@ -5316,6 +5322,15 @@ function paintHomeView({ settings, favoriteSlugs, myServersResult, continueResol
           : `<div class="home-empty-card"><p>${t("favorites.empty")}</p><button type="button" class="btn-secondary" id="home-browse-btn">${t("home.browseServers")}</button></div>`
       }
     </div>
+    ${
+      suggested.length > 0
+        ? `<div class="home-section">
+            <div class="home-section-header"><h3>${t("home.suggestedTitle")}</h3></div>
+            <p class="join-note" style="margin: 0 0 12px;">${t("home.suggestedSub")}</p>
+            <div class="server-list" id="home-suggested-list">${suggested.map((s) => serverRowHtml(s, favoriteSlugs.includes(s.slug))).join("")}</div>
+          </div>`
+        : ""
+    }
     </div>
     ${
       hasAside
@@ -5355,7 +5370,7 @@ function paintHomeView({ settings, favoriteSlugs, myServersResult, continueResol
 
   const browseBtn = document.getElementById("home-browse-btn");
   if (browseBtn) browseBtn.addEventListener("click", showServersView);
-  for (const el of [document.getElementById("home-where-list"), document.getElementById("home-pick")]) {
+  for (const el of [document.getElementById("home-where-list"), document.getElementById("home-suggested-list"), document.getElementById("home-pick")]) {
     if (!el) continue;
     const rows = el.classList.contains("home-pick") ? [el] : [...el.querySelectorAll(".row")];
     rows.forEach((row) => {
@@ -5443,13 +5458,48 @@ function asListServer(server) {
   };
 }
 
+// Petit résumé de chaque serveur vu, réutilisé hors ligne (nom, version, langues…).
+const SERVER_CACHE_KEY = "omni-server-summaries";
+function readServerCache() {
+  try {
+    return JSON.parse(localStorage.getItem(SERVER_CACHE_KEY) || "{}") || {};
+  } catch {
+    return {};
+  }
+}
+function rememberServers(list) {
+  try {
+    const cache = readServerCache();
+    for (const s of list) {
+      if (!s?.slug || !s.name || s.name === s.slug) continue;
+      cache[s.slug] = {
+        name: s.name, description: s.description || "", type: s.type || "vanilla", minecraftVersion: s.minecraftVersion || null,
+        languages: Array.isArray(s.languages) ? s.languages : [], tags: Array.isArray(s.tags) ? s.tags : [], mainTags: Array.isArray(s.mainTags) ? s.mainTags : [],
+        iconUrl: s.iconUrl || null, playerCapacity: s.playerCapacity ?? null, ip: s.ip || null,
+      };
+    }
+    const keys = Object.keys(cache);
+    if (keys.length > 300) for (const k of keys.slice(0, keys.length - 300)) delete cache[k];
+    localStorage.setItem(SERVER_CACHE_KEY, JSON.stringify(cache));
+  } catch {
+    // cache facultatif
+  }
+}
+
+// Une erreur réseau devient une phrase claire.
+function friendlyNetError(raw) {
+  const s = String(raw || "");
+  return /ECONNRESET|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|ECONNREFUSED|ENETUNREACH|fetch failed|socket hang up|network|timed out|timeout/i.test(s) ? t("serverList.errorNetwork") : s;
+}
+
 async function resolveServersBySlug(slugs) {
   const result = await fetchServerList();
   const allServers = result.ok ? result.servers : [];
   let mine = null;
   const myServers = () =>
     (mine ||= currentProfile ? window.mchub.listMyServers().catch(() => ({ ok: false })) : Promise.resolve({ ok: false }));
-  const placeholder = (slug) => ({ slug, name: slug, description: "", type: "vanilla", playerCount: null, playerCapacity: null, bannerUrl: null });
+  const cached = readServerCache();
+  const placeholder = (slug) => ({ slug, name: slug, description: "", type: "vanilla", playerCount: null, playerCapacity: null, bannerUrl: null, ...(cached[slug] || {}) });
   const resolved = await Promise.all(
     slugs.map(async (slug) => {
       const found = allServers.find((s) => s.slug === slug);
@@ -5467,7 +5517,9 @@ async function resolveServersBySlug(slugs) {
       return placeholder(slug);
     }),
   );
-  return resolved.filter((s) => s !== null);
+  const kept = resolved.filter((s) => s !== null);
+  rememberServers(kept);
+  return kept;
 }
 
 async function pruneDeadSlug(slug) {
@@ -6731,6 +6783,7 @@ function renderOfflineInstancesGrid(instances) {
       <div>
         <h2>${t("nav.myInstances")}</h2>
         <p class="join-note">${t("myInstances.offlineSubtitle")}</p>
+        ${signedIn ? "" : `<button type="button" class="join-btn" id="instances-signin" style="margin-top:10px;">${escapeHtml(t("guest.signInMicrosoft"))}</button>`}
       </div>
     </div>
     ${
@@ -6741,6 +6794,7 @@ function renderOfflineInstancesGrid(instances) {
   `;
 
   document.getElementById("instances-empty-join")?.addEventListener("click", showServersView);
+  document.getElementById("instances-signin")?.addEventListener("click", () => attemptSignIn(true));
   myInstancesPanelEl.querySelectorAll(".my-instance-play-offline").forEach((btn) => {
     // Meme garde synchrone qu'ailleurs (my-instance-play) : desactive avant tout await.
     btn.addEventListener("click", async (event) => {
@@ -6829,9 +6883,10 @@ async function renderMyInstancesList() {
     myInstancesPanelEl.innerHTML = `
       <h2>${t("nav.myInstances")}</h2>
       <p class="join-note" role="alert">${t(authFailed ? "myInstances.loginRequired" : "myInstances.loadError")}</p>
-      ${authFailed ? "" : `<button type="button" class="join-btn" id="my-instances-retry">${t("myInstances.retry")}</button>`}
+      ${authFailed ? `<button type="button" class="join-btn" id="my-instances-signin">${escapeHtml(t("guest.signInMicrosoft"))}</button>` : `<button type="button" class="join-btn" id="my-instances-retry">${t("myInstances.retry")}</button>`}
     `;
     document.getElementById("my-instances-retry")?.addEventListener("click", () => renderMyInstancesList());
+    document.getElementById("my-instances-signin")?.addEventListener("click", () => attemptSignIn(true));
     return;
   }
   myInstancesServers = ownedResult.servers;
@@ -7272,6 +7327,10 @@ function renderMemoryTab(contentEl, settings) {
         </div>
         <div class="ram-bar-track"><div class="ram-bar-fill" style="width: ${usedPercent}%;"></div></div>
         <p class="join-note" style="margin-top: 6px;">${t("settings.ramAvailable", { used: settings.memoryMaxGB, total: settings.totalGB })}</p>
+        <div id="settings-mem-warn-box" style="margin-top: 6px;" hidden>
+          <p class="join-note" id="settings-mem-warn" style="margin: 0 0 6px; color: var(--warn);"></p>
+          <button type="button" class="btn-secondary" id="settings-mem-fix"></button>
+        </div>
       </div>
       <div class="settings-divider"></div>
       <label class="settings-row" style="cursor: pointer;">
@@ -7286,6 +7345,32 @@ function renderMemoryTab(contentEl, settings) {
     <button id="settings-save-memory" class="join-btn" type="button" style="align-self: flex-start;">${t("settings.saveChanges")}</button>
     <p class="join-note" id="settings-status"></p>
   `;
+
+  // Avertissement en direct au-delà de la RAM du PC moins 2 Go (même limite que launchMemory dans main.js).
+  const memMaxEl = document.getElementById("settings-mem-max");
+  const memWarnEl = document.getElementById("settings-mem-warn");
+  const memWarnBox = document.getElementById("settings-mem-warn-box");
+  const memFixBtn = document.getElementById("settings-mem-fix");
+  const memCap = () => Math.max(1, Math.floor((Number(settings.totalGB) || 0) - 2));
+  const updateMemWarn = () => {
+    const total = Number(settings.totalGB) || 0;
+    const cap = memCap();
+    const tooHigh = total > 0 && Number(memMaxEl.value) > cap;
+    memWarnBox.hidden = !tooHigh;
+    if (tooHigh) {
+      memWarnEl.textContent = t("settings.ramTooHigh", { total, cap });
+      memFixBtn.textContent = t("settings.ramFix", { cap });
+    }
+  };
+  memMaxEl.addEventListener("input", updateMemWarn);
+  // Une erreur dit quoi faire : le bouton règle la valeur conseillée.
+  memFixBtn.addEventListener("click", () => {
+    memMaxEl.value = String(memCap());
+    const minEl = document.getElementById("settings-mem-min");
+    if (Number(minEl.value) > memCap()) minEl.value = String(memCap());
+    updateMemWarn();
+  });
+  updateMemWarn();
 
   // Les deux cases sont exclusives : cocher l'une decoche l'autre.
   const alwaysRecommendedEl = document.getElementById("settings-always-recommended");
@@ -8329,6 +8414,8 @@ async function boot() {
   const settings = await window.mchub.settings.get();
   window.i18n.setLocale(settings.locale);
   window.i18n.applyStaticI18n(document);
+  // Le bouton « Discret » est dessiné au chargement, parfois avant la langue : on le redessine.
+  applyDiscreetMode(settings.discreetMode);
   window.themeControls.applyTheme(settings);
   window.themeControls.watchSystemTheme(() => window.mchub.settings.get());
   document.body.classList.toggle("compact-list", !!settings.compactServerList);
@@ -8461,11 +8548,15 @@ async function boot() {
     startServerLinks();
     return;
   }
-  if (lastProfile) {
+  // Démarré sans internet alors que le joueur était connecté la fois d'avant : on retente la
+  // reconnexion au retour du réseau (événement « online ») et toutes les minutes pendant 15 min.
+  const offlineAtBoot = lastProfile && navigator.onLine === false;
+  if (lastProfile && !offlineAtBoot) {
     // Reconnexion ratee : on oublie l'apercu, retour au mode visiteur comme avant.
     currentProfile = null;
     clearBootProfile();
   }
+  if (lastProfile) watchReconnect();
 
   gateEl.hidden = true;
   appEl.hidden = false;
@@ -8474,6 +8565,33 @@ async function boot() {
   // n'a rien a montrer a un visiteur sans historique de connexion.
   showServersView();
   startServerLinks();
+}
+
+function watchReconnect() {
+  let tries = 0;
+  let busy = false;
+  let timer = null;
+  const attempt = async () => {
+    if (signedIn || busy) return stop();
+    busy = true;
+    try {
+      const r = await window.mchub.tryRestoreSession().catch(() => ({ ok: false }));
+      if (r?.ok && !signedIn) {
+        enterApp(r.profile);
+        stop();
+      }
+    } finally {
+      busy = false;
+    }
+    if (++tries >= 15) stop();
+  };
+  const onOnline = () => setTimeout(attempt, 1500);
+  function stop() {
+    window.removeEventListener("online", onOnline);
+    clearInterval(timer);
+  }
+  window.addEventListener("online", onOnline);
+  timer = setInterval(attempt, 60_000);
 }
 
 boot();
@@ -9084,7 +9202,7 @@ function paletteStaticEntries() {
     setting("settings.betaVersion", "misc", "beta version mise a jour update"),
     setting("settings.tabDebug", "debug", "debug journal logs"),
     ...(lastSlug
-      ? [{ group: "actions", title: t("search.actionRelaunch", { name: activityServerName(lastSlug) }), sub: "Ctrl+Entrée", words: "relancer jouer play again", icon: "▶", run: async () => { const server = await resolveServer(lastSlug); if (server) launchServer(server); } }]
+      ? [{ group: "actions", title: t("search.actionRelaunch", { name: activityServerName(lastSlug) }), sub: getLocale() === "en" ? "Ctrl+Enter" : "Ctrl+Entrée", words: "relancer jouer play again", icon: "▶", run: async () => { const server = await resolveServer(lastSlug); if (server) launchServer(server); } }]
       : []),
     { group: "actions", title: t("help.title"), sub: "F1", words: "aide help probleme problem souci bug", icon: "?", run: () => showHelpView() },
     { group: "actions", title: t("search.actionGameFolder"), sub: "", words: "dossier folder", icon: "↳", run: () => window.mchub.settings.openGameFolder() },
@@ -10469,4 +10587,29 @@ document.addEventListener("keydown", (event) => {
       await showModal({ title: tx("Impossible de tester ce pack", "Can't test this pack"), body: ev.message || "", confirmLabel: "OK", tone: "warn" });
     }
   });
+})();
+
+// Quand une fenêtre s'ouvre, les panneaux du haut et le menu du compte se ferment.
+// Fenêtres repérées : role="dialog" aria-modal, .modal-overlay ou #report-overlay visibles.
+(() => {
+  const POPOVERS = ["#notif-panel", "#account-dropdown", ".tasks-panel", ".mc-status-panel"];
+  const dialogOpen = () =>
+    [...document.querySelectorAll('[role="dialog"][aria-modal="true"], .modal-overlay, #report-overlay')].some((el) => !el.hidden && el.getClientRects().length > 0);
+  let wasOpen = false;
+  const check = () => {
+    const open = dialogOpen();
+    if (open && !wasOpen) {
+      for (const sel of POPOVERS) document.querySelectorAll(sel).forEach((el) => (el.hidden = true));
+    }
+    wasOpen = open;
+  };
+  let queued = false;
+  new MutationObserver(() => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      check();
+    });
+  }).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["hidden"] });
 })();

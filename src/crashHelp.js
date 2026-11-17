@@ -92,7 +92,11 @@ function analyze(logText, crashText, exitCode) {
   // « Duplicate mandatory mod ids » (catalogue de bugs) : le jeu peut se fermer avec le code 0.
   if (crashText || /Duplicate mandatory mod ids/i.test(text) || (exitCode != null && exitCode !== 0 && exitCode !== 130 && exitCode !== 143)) {
     const description = clean((/^Description: (.*)$/m.exec(crashText || "") || [])[1]);
-    const cause = clean((/^(?:Caused by: )?([\w.$]+(?:Exception|Error)[^\n]*)$/m.exec(crashText || logText || "") || [])[1]);
+    // Erreurs sans gravité (narrateur sans la bibliothèque « flite » sous Linux) : jamais la vraie cause.
+    const BENIGN = /Narrator\$InitializeException|load library ['"]?flite|libflite/i;
+    const cause = clean(
+      ([...(crashText || logText || "").matchAll(/^(?:Caused by: )?([\w.$]+(?:Exception|Error)[^\n]*)$/gm)].map((m) => m[1]).find((l) => !BENIGN.test(l))) || "",
+    );
     // Mod nommé dans le rapport (« Suspected Mod(s) » / « Mod File: »).
     const suspect = clean((/Suspected Mods?:\s*\n?\s*([^\n]+)/.exec(crashText || "") || [])[1]);
     if (suspect && suspect !== "NONE") lines.push(suspect);
@@ -190,7 +194,7 @@ async function buildReport({ lang, crash, system }) {
     if (text) logs.push(`--- latest.log (${x.lastLines}) ---\n${text.split(/\r?\n/).slice(-REPORT_LOG_LINES).join("\n")}`);
   }
   const report = [
-    `Omniscient Launcher — ${x.title} ${new Date().toISOString().slice(0, 10)}`, "",
+    `Omniscient Launcher — ${x.title} ${new Date().toLocaleDateString("sv-SE")}`, "",
     `== ${x.error} ==`,
     crash
       ? kv([[x.type, x.kinds[info.kind] || info.kind], [x.message, info.description], [x.mods, mods], [x.code, info.exitCode], [x.known, crash.known], [x.when, new Date(crash.at || Date.now()).toLocaleString(lang === "en" ? "en-US" : "fr-BE")]])

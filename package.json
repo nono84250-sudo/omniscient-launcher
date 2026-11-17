@@ -1,26 +1,27 @@
 {
   "name": "launcher",
   "productName": "Omniscient Launcher",
-  "version": "0.4.7",
+  "version": "0.4.8",
   "private": true,
   "description": "Launcher Minecraft Omniscient — lit les serveurs publiés sur le site Omniscient et lance le jeu.",
-  "license": "GPL-3.0-only",
   "author": "Rushifa",
+  "license": "GPL-3.0-only",
   "repository": {
     "type": "git",
     "url": "https://github.com/nono84250-sudo/omniscient-launcher.git"
   },
-  "homepage": "https://omniscientlauncher.com",
   "main": "src/main.js",
+  "homepage": "https://omniscientlauncher.com",
+  "desktopName": "omniscient-launcher.desktop",
   "scripts": {
     "start": "electron .",
     "predist": "node scripts/generate-env.js",
     "dist": "electron-builder",
     "predist:linux": "node scripts/generate-env.js",
-    "dist:linux": "electron-builder --linux AppImage --publish never"
+    "dist:linux": "electron-builder --linux --publish never"
   },
   "devDependencies": {
-    "electron": "^44.9.3",
+    "electron": "^44.11.3",
     "electron-builder": "^26.15.3"
   },
   "dependencies": {
@@ -69,10 +70,24 @@
       "icon": "build/icon.ico"
     },
     "linux": {
-      "target": "AppImage",
+      "target": [
+        "AppImage",
+        "deb"
+      ],
       "icon": "build/icon.png",
       "category": "Game",
-      "artifactName": "OmniscientLauncher-${version}.${ext}"
+      "executableName": "omniscient-launcher",
+      "syncDesktopName": true,
+      "maintainer": "Omniscient",
+      "synopsis": "Launcher Minecraft Omniscient",
+      "artifactName": "OmniscientLauncher.${ext}"
+    },
+    "toolsets": {
+      "appimage": "1.0.3"
+    },
+    "deb": {
+      "packageName": "omniscient-launcher",
+      "artifactName": "omniscient-launcher_amd64.${ext}"
     },
     "nsisWeb": {
       "oneClick": false,

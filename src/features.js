@@ -26,6 +26,7 @@ function createFeatures({ cacheDir, siteUrl, authHeaders, currentUuid, fetchJson
   let confirmed = false; // vrai dès qu'une réponse du site a été reçue pour le compte actuel
   let confirmedAt = 0;
   let timer = null;
+  let downgradeSeen = false;
 
   const visible = (id) => state[id]?.visible === true;
   const all = () => state;
@@ -52,9 +53,16 @@ function createFeatures({ cacheDir, siteUrl, authHeaders, currentUuid, fetchJson
         const data = await fetchJson(`${siteUrl}/api/launcher/features`, { background: true, headers: authHeaders() });
         if (!data || !data.features || typeof data.features !== "object" || Array.isArray(data.features)) return state;
         const next = data.features;
+        // Le site répond parfois « pas testeur » quand il ne peut pas vérifier la session : une perte
+        // des droits de testeur n'est acceptée qu'à la 2e réponse d'affilée.
+        if (data.tester === false && saved?.tester === true && saved.uuid === uuid && !downgradeSeen) {
+          downgradeSeen = true;
+          return state;
+        }
+        downgradeSeen = false;
         const changed = JSON.stringify(next) !== JSON.stringify(state);
         state = next;
-        saved = { at: Date.now(), uuid, features: next };
+        saved = { at: Date.now(), uuid, features: next, tester: data.tester === true };
         confirmed = uuid === (currentUuid() || null);
         confirmedAt = Date.now();
         fs.promises.mkdir(cacheDir, { recursive: true }).then(() => fs.promises.writeFile(file, JSON.stringify(saved))).catch(() => {});

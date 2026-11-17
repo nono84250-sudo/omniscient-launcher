@@ -955,7 +955,10 @@ function wireAutoUpdater(win) {
   });
   autoUpdater.on("error", (error) => {
     logStore.pushLog({ level: "error", source: "launcher", message: `Vérification de mise à jour échouée : ${error?.message || error}` });
-    send({ phase: "error", message: error?.message || String(error) });
+    // Linux : latest-linux.yml répond 404 tant qu'aucune version Linux n'est publiée. Ce n'est pas un
+    // problème de connexion : on affiche « à jour ».
+    if (process.platform === "linux" && /\b404\b|latest-linux\.yml/i.test(String(error?.message || error))) send({ phase: "up-to-date" });
+    else send({ phase: "error", message: error?.message || String(error) });
     updateCheckResolve?.();
     updateCheckResolve = null;
   });
@@ -999,9 +1002,10 @@ function isNewerVersion(candidate, current) {
 
 function checkForUpdates() {
   return new Promise((resolve) => {
-    // Version Linux : build de test personnel, jamais publie (pas de latest-linux.yml
-    // dans les releases) — pas de verification de mise a jour.
-    if (!app.isPackaged || process.platform === "linux") {
+    // Linux : meme verification que Windows. electron-updater lit latest-linux.yml dans la release
+    // (ajoute par la construction Linux) et remplace l'AppImage ou installe le .deb (mot de passe
+    // demande par le systeme). Sans ce fichier dans la release, la verification echoue sans bloquer.
+    if (!app.isPackaged) {
       resolve();
       return;
     }
@@ -2780,8 +2784,18 @@ ipcMain.handle("settings:openGameFolder", () => shell.openPath(GAME_ROOT));
 
 ipcMain.handle("java:detect", async () => {
   const settings = settingsStore.loadSettings();
-  const result = await javaManager.detectJava(settings.javaPath || undefined);
-  return { ...result, managed: !!settings.javaPath, installed: await javaManager.installedJavaMajors() };
+  let result = await javaManager.detectJava(settings.javaPath || undefined);
+  // Pas de Java sur le système (ou trop vieux) : le launcher a peut-être déjà téléchargé les siens
+  // (21 puis 25). Avant, on affichait « Java introuvable » alors que le jeu se lançait très bien.
+  let managedPath = null;
+  if (!settings.javaPath && !(result.found && result.is64Bit && result.meetsMinimum)) {
+    for (const major of [21, 25]) {
+      managedPath = await javaManager.findInstalledJava(major).catch(() => null);
+      if (managedPath) break;
+    }
+    if (managedPath) result = await javaManager.detectJava(managedPath);
+  }
+  return { ...result, managed: !!settings.javaPath || !!managedPath, installed: await javaManager.installedJavaMajors() };
 });
 
 // Installe les Java que Minecraft demande selon sa version (8, 17, 21, 25) : les
@@ -4370,7 +4384,9 @@ ipcMain.handle("bugHelp:zip", async (_event, lang) => {
     const rapport = path.join(tmp, "rapport.txt");
     await fsp.writeFile(rapport, await bugHelpReport(lang), "utf8");
     const logs = await crashHelp.writeZipLogs(tmp, lastCrash?.files);
-    const day = new Date().toISOString().slice(0, 10);
+    // Date locale du PC (la date UTC peut être celle de la veille ou du lendemain).
+    const now = new Date();
+    const day = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
     const downloads = app.getPath("downloads");
     let name = `omniscient-rapport-${day}.zip`;
     for (let i = 2; await fsp.stat(path.join(downloads, name)).then(() => true, () => false); i++) name = `omniscient-rapport-${day}-${i}.zip`;
@@ -4396,6 +4412,9 @@ function bugSignal(code, ctx) {
   sendAll("bugs:found", { entry, canRepair: false, hasLogs: false });
 }
 require("./modpack").setBugSignal(bugSignal);
+// Fichier refusé par son hébergeur pendant une installation (mode Jouer compris) : chercher aussi
+// le fichier déposé à la main dans Téléchargements (voir installFiles).
+require("./modpack").setDefaultManualSearchDirs(manualModsSearchDirs);
 playPacks.setBugSignal(bugSignal);
 // Les seuls signaux que l'interface peut envoyer.
 ipcMain.handle("bugs:signal", (_event, code) => {
@@ -5172,7 +5191,14 @@ ipcMain.handle("myPack:setDatapack", async (_event, id, file, o) => {
   try {
     // « Tous les mondes » sans chargeur : on ajoute d'abord Paxi ou Global Packs (Modrinth).
     const loader = o?.loader && playPacks.DP_LOADERS[o.loader];
-    if (o?.auto && loader && !playMode.loaderOf(playMode.getVersion(String(id)))) await playMode.addPackMods(String(id), [{ slug: loader.slug }], { deps: PLAY_DEPS });
+    if (o?.auto && loader && !playMode.loaderOf(playMode.getVersion(String(id)))) {
+      await playMode.addPackMods(String(id), [{ slug: loader.slug }], { deps: PLAY_DEPS });
+      // Modrinth n'a pas ce chargeur pour cette version : on le dit clairement.
+      const v = playMode.getVersion(String(id));
+      if (!playMode.loaderOf(v)) {
+        return { ok: false, code: "dp_loader_missing", error: `${loader.name} n'existe pas encore pour Minecraft ${v?.minecraftVersion || "?"} (${v?.pack?.loader || "?"}). Choisis l'autre chargeur, ou coche le data pack monde par monde.` };
+      }
+    }
     const worlds = Array.isArray(o?.worlds) ? o.worlds.filter((k) => typeof k === "string").slice(0, 200) : [];
     return await liveSave.enqueue(() => playMode.setDatapack(String(id), String(file || ""), { worlds, auto: !!o?.auto }));
   } catch (error) {
@@ -5253,9 +5279,9 @@ ipcMain.handle("myPack:filesTrash", filesCall(async (id, rel) => {
 }));
 // Un .bat ou un .exe livré par un pack ne s'ouvre pas d'un simple clic. Windows ignore
 // les points et espaces en fin de nom (« run.bat. ») : retirés avant de regarder l'extension.
-const NEVER_OPEN = /\.(exe|bat|cmd|com|scr|pif|msi|msp|ps1|psm1|vbs|vbe|js|jse|wsf|wsh|hta|lnk|url|reg|cpl|jar|jnlp|dll|scf|inf|sh)$/i;
+const NEVER_OPEN = /\.(exe|bat|cmd|com|scr|pif|msi|msp|ps1|psm1|vbs|vbe|js|jse|wsf|wsh|hta|lnk|url|reg|cpl|jar|jnlp|dll|scf|inf|sh|bash|zsh|run|bin|desktop|appimage|command|app|pkg|deb|rpm)$/i;
 ipcMain.handle("myPack:filesOpenExternal", filesCall(async (id, rel) => {
-  if (NEVER_OPEN.test(String(rel).replace(/[. ]+$/, ""))) return { ok: false, error: "Ce type de fichier ne s'ouvre pas depuis le launcher : il pourrait lancer un programme." };
+  if (NEVER_OPEN.test(String(rel).replace(/[. ]+$/, ""))) return { ok: false, code: "blocked_type", error: "Ce type de fichier ne s'ouvre pas depuis le launcher : il pourrait lancer un programme." };
   const err = await shell.openPath(playMode.filePath(id, rel));
   return err ? { ok: false, error: err } : { ok: true };
 }));
@@ -6067,6 +6093,7 @@ importHandle("cfPack:install", "installation", async (event, id, opts) => {
     const { pack } = job;
     const withMods = parts.includes("mods");
     const mr = job.kind === "mr";
+    let refusedManual = [];
     const v = mr && !pack.loader
       ? await playMode.createVersion({ minecraftVersion: pack.minecraftVersion, name: pack.name, own: true })
       : await playMode.createCustomVersion({
@@ -6105,7 +6132,7 @@ importHandle("cfPack:install", "installation", async (event, id, opts) => {
       let n = 0;
       let bytes = 0;
       let totalBytes = 0;
-      await playMode.syncPackFiles(playMode.getVersion(v.id), {
+      const syncMods = () => playMode.syncPackFiles(playMode.getVersion(v.id), {
         deps: PLAY_DEPS,
         onProgress: (p) => {
           if (p?.type === "mods-bytes") {
@@ -6117,6 +6144,22 @@ importHandle("cfPack:install", "installation", async (event, id, opts) => {
           meter.send({ step: "dl", n, bytes, total: totalBytes });
         },
       });
+      try {
+        await syncMods();
+      } catch (error) {
+        // Mod refusé par son hébergeur (HTTP 403) : il rejoint la liste « à télécharger à la main »
+        // et le reste du pack s'installe.
+        if (error?.code !== "manual_mods" || !error.manualMods?.length) throw error;
+        const refused = new Set(error.manualMods.map((m) => m.fileName).filter(Boolean));
+        const live = playMode.getVersion(v.id);
+        for (const list of [live?.mods || [], job.mods]) {
+          for (const m of list) if (m.file?.filename && refused.has(m.file.filename)) m.file = { ...m.file, url: null };
+        }
+        logStore.pushLog({ level: "warn", source: "launcher", message: `Pack : ${refused.size} mod(s) refusé(s) par leur hébergeur, à télécharger à la main : ${[...refused].join(", ")}` });
+        // Montrés tout de suite dans la fenêtre d'import (étape « À la main »), pas seulement sur la tuile après.
+        refusedManual = job.mods.filter((m) => !m.content && m.file?.filename && refused.has(m.file.filename)).map((m) => ({ packId: String(id), modId: m.id, name: m.name, fileName: m.file.filename, pageUrl: m.cf?.pageUrl || null, kind: "mod" }));
+        await syncMods();
+      }
       meter.set("dl", totalBytes);
       progress({ step: "dl", n: autoMods.length, done: true });
     } else if (withMods) progress({ step: "dl", n: 0, done: true });
@@ -6227,8 +6270,15 @@ importHandle("cfPack:install", "installation", async (event, id, opts) => {
     progress({ step: "manual", n: 0, done: manual === 0 });
     installVersionInBackground(v.id).catch((error) => logStore.pushLog({ level: "warn", source: "launcher", message: `Pack ${mr ? "Modrinth" : "CurseForge"} : préparation impossible (${error.message}).` }));
     sendAll("play:worldsChanged");
-    return { ok: true, versionId: v.id, worldKey };
+    return { ok: true, versionId: v.id, worldKey, refusedManual };
   } catch (error) {
+    // Installation ratée : on retire l'installation incomplète pour pouvoir relancer l'import proprement.
+    if (job.versionId && job.kind !== "omni") {
+      const failedId = job.versionId;
+      job.versionId = null;
+      await playMode.removeVersion(failedId).catch(() => false);
+      sendAll("play:worldsChanged");
+    }
     return playError(error);
   }
 });

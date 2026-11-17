@@ -28,31 +28,39 @@ function createSaveOverlay({ lockNavigation, log } = {}) {
   let anchorRect = null;
   let anchorBounds = null;
 
+  const LINUX = process.platform === "linux";
+  // Options communes aux fenêtres du petit menu.
+  const baseOptions = () => ({
+    width: WIDTH,
+    height: HEIGHT,
+    frame: false,
+    transparent: true,
+    resizable: false,
+    movable: false,
+    minimizable: false,
+    maximizable: false,
+    fullscreenable: false,
+    skipTaskbar: true,
+    alwaysOnTop: true,
+    hasShadow: false,
+    show: false,
+    backgroundColor: "#00000000",
+    webPreferences: {
+      preload: path.join(__dirname, "overlayPreload.js"),
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+    },
+  });
+
   function ensure() {
     if (win && !win.isDestroyed()) return;
     win = new BrowserWindow({
-      width: WIDTH,
-      height: HEIGHT,
-      frame: false,
-      transparent: true,
-      resizable: false,
-      movable: false,
-      minimizable: false,
-      maximizable: false,
-      fullscreenable: false,
-      skipTaskbar: true,
-      focusable: false,
-      ...(process.platform === "win32" ? { type: "toolbar" } : {}),
-      alwaysOnTop: true,
-      hasShadow: false,
-      show: false,
-      backgroundColor: "#00000000",
-      webPreferences: {
-        preload: path.join(__dirname, "overlayPreload.js"),
-        contextIsolation: true,
-        nodeIntegration: false,
-        sandbox: true,
-      },
+      ...baseOptions(),
+      // Linux : type « notification », focusable (sinon GNOME ne l'affiche pas), montrée sans focus.
+      // La saisie du nom (Maj+F6) passe par une petite fenêtre à part qui, elle, prend le clavier.
+      focusable: LINUX,
+      ...(process.platform === "win32" ? { type: "toolbar" } : LINUX ? { type: "notification" } : {}),
     });
     win.setAlwaysOnTop(true, "screen-saver");
     lockNavigation?.(win.webContents);
@@ -77,8 +85,51 @@ function createSaveOverlay({ lockNavigation, log } = {}) {
     done?.(value);
   }
 
+  // Linux : fenêtre normale (elle peut recevoir le clavier) créée seulement le temps de Maj+F6.
+  let askWin = null;
+  async function openAskWindow(state) {
+    closeAskWindow();
+    const me = new BrowserWindow({ ...baseOptions(), focusable: true });
+    askWin = me;
+    askWin.setAlwaysOnTop(true, "screen-saver");
+    lockNavigation?.(askWin.webContents);
+    const loaded = new Promise((resolve, reject) => {
+      askWin.webContents.once("did-finish-load", resolve);
+      askWin.webContents.once("did-fail-load", (_e, code, desc) => reject(new Error(`overlay.html non chargé (${code} ${desc})`)));
+    });
+    // Fermée par le joueur (pas par nous) : comme « Annuler ».
+    me.on("closed", () => {
+      if (askWin !== me) return;
+      askWin = null;
+      answer(null);
+    });
+    askWin.loadFile(path.join(__dirname, "overlay.html"));
+    await loaded;
+    if (!askWin || askWin.isDestroyed()) return;
+    if (win && !win.isDestroyed()) askWin.setBounds(win.getBounds());
+    askWin.show();
+    askWin.focus();
+    askWin.webContents.send("overlay:state", { ...state, mode: "ask" });
+    // Curseur dans la case dès l'ouverture, une fois la fenêtre active (deux essais).
+    const focusInput = () => {
+      if (askWin !== me || me.isDestroyed()) return;
+      me.focus();
+      me.webContents.focus();
+      me.webContents.executeJavaScript("document.getElementById('name')?.focus()").catch(() => {});
+    };
+    setTimeout(focusInput, 80);
+    setTimeout(focusInput, 300);
+  }
+  function closeAskWindow() {
+    const w = askWin;
+    askWin = null;
+    if (w && !w.isDestroyed()) w.destroy();
+  }
+
   ipcMain.on("overlay:answer", (event, value) => {
-    if (!win || win.isDestroyed() || event.sender !== win.webContents) return;
+    const fromMain = win && !win.isDestroyed() && event.sender === win.webContents;
+    const fromAsk = askWin && !askWin.isDestroyed() && event.sender === askWin.webContents;
+    if (!fromMain && !fromAsk) return;
     answer(typeof value === "string" && value.trim() ? value.trim().slice(0, 80) : null);
   });
 
@@ -122,7 +173,12 @@ function createSaveOverlay({ lockNavigation, log } = {}) {
     // Clics : seulement pour saisir un nom, sinon ils traversent jusqu'au jeu.
     win.setIgnoreMouseEvents(state.mode !== "ask");
     void focus; // plus jamais de focus (voir en haut du fichier)
-    if (!win.isVisible()) win.showInactive();
+    if (!win.isVisible()) {
+      win.showInactive();
+      // Linux : le gestionnaire de fenêtres peut oublier le « toujours au premier plan » posé avant
+      // l'affichage ; on le remet une fois la fenêtre affichée.
+      if (process.platform === "linux") win.setAlwaysOnTop(true, "screen-saver");
+    }
     if (hideAfter) hideTimer = setTimeout(hide, hideAfter);
     if (!shownOnce) {
       shownOnce = true;
@@ -151,12 +207,25 @@ function createSaveOverlay({ lockNavigation, log } = {}) {
       pendingAnswer = resolve;
     });
     try {
-      await showNow({ ...state, mode: "ask" });
-      if (win && !win.isDestroyed()) {
-        win.setFocusable(true);
-        win.show();
-        win.moveTop();
-        win.focus();
+      if (LINUX) {
+        // Linux : la fenêtre « notification » ne reçoit pas le clavier ; la saisie se fait dans une
+        // petite fenêtre normale posée au même endroit, fermée dès la réponse.
+        ensure();
+        await ready;
+        if (win && !win.isDestroyed()) {
+          clearTimeout(hideTimer);
+          place();
+          win.hide();
+        }
+        await openAskWindow(state);
+      } else {
+        await showNow({ ...state, mode: "ask" });
+        if (win && !win.isDestroyed()) {
+          win.setFocusable(true);
+          win.show();
+          win.moveTop();
+          win.focus();
+        }
       }
     } catch (error) {
       log?.({ level: "warn", source: "launcher", message: `[Sauvegarde en jeu] Case du nom non affichée : ${error instanceof Error ? error.message : error}` });
@@ -165,12 +234,13 @@ function createSaveOverlay({ lockNavigation, log } = {}) {
     const timer = setTimeout(() => answer(undefined), timeoutMs);
     const value = await result;
     clearTimeout(timer);
+    closeAskWindow();
     // Plus de focus après la saisie : le petit menu est caché (Windows rend la main au jeu), puis
     // remontré sans s'activer pour la suite de la sauvegarde.
     if (win && !win.isDestroyed()) {
       win.setIgnoreMouseEvents(true);
       win.hide();
-      win.setFocusable(false);
+      if (process.platform !== "linux") win.setFocusable(false);
     }
     return value;
   }
@@ -179,6 +249,7 @@ function createSaveOverlay({ lockNavigation, log } = {}) {
     closed = true;
     answer(null);
     clearTimeout(hideTimer);
+    closeAskWindow();
     if (win && !win.isDestroyed()) win.destroy();
     win = null;
   }

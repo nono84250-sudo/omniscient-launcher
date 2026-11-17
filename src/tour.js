@@ -203,13 +203,13 @@
     end(false);
     origin = document.querySelector('.sidebar-btn.active[id^="nav-"]')?.id || null;
     const T = L();
-    block(true);
+    // Bulle d'accueil en bas à droite, sans assombrir ni bloquer la page.
+    $("tour-block")?.remove();
     const el = pop();
-    el.classList.add("center");
     el.innerHTML = `<button class="tp-x" data-a="skip" aria-label="${esc(T.close)}">×</button><h4>${esc(T.welcomeT)}</h4><p>${esc(T.welcomeD)}</p>
       <div class="tp-actions"><button class="tp-link" data-a="skip">${esc(T.later)}</button><span class="sp"></span><button class="join-btn" data-a="start">${esc(T.start)}</button></div>`;
-    el.style.left = `calc(50% - ${el.offsetWidth / 2}px)`;
-    el.style.top = `calc(50% - ${el.offsetHeight / 2}px)`;
+    el.style.left = `calc(100% - ${el.offsetWidth + 20}px)`;
+    el.style.top = `calc(100% - ${el.offsetHeight + 20}px)`;
     el.onclick = (e) => {
       const a = e.target.closest("[data-a]")?.dataset.a;
       if (a === "skip") end(true);

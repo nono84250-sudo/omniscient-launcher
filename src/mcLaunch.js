@@ -1,3 +1,4 @@
+const os = require("node:os");
 const path = require("node:path");
 const { spawn } = require("node:child_process");
 const { app } = require("electron");
@@ -51,6 +52,7 @@ function getRunningGame() {
 function stopGame() {
   if (!runningGame?.proc) return false;
   try {
+    runningGame.stopRequested = true;
     runningGame.proc.kill();
     return true;
   } catch {
@@ -194,8 +196,15 @@ async function launchMinecraft({
 
   return new Promise((resolve, reject) => {
     let started = false;
-    launcher.on("close", (code) => {
-      logStore.pushLog({ source: "game", message: `Processus du jeu fermé (code ${code}).` });
+    // Signal de fin du processus (Linux/macOS) : lu sur l'événement « exit » du processus.
+    let exitSignal = null;
+    let stopRequested = false;
+    launcher.on("close", (rawCode) => {
+      // Jeu tué par un signal (code null) : code 128 + n° du signal (137 pour SIGKILL), traité comme un
+      // plantage. « Arrêter » (SIGTERM voulu par le joueur) donne 143, sans fenêtre d'aide.
+      let code = rawCode;
+      if (code == null && (exitSignal || stopRequested)) code = stopRequested ? 143 : 128 + (os.constants.signals[exitSignal] || 9);
+      logStore.pushLog({ source: "game", message: `Processus du jeu fermé (code ${rawCode}${exitSignal ? `, signal ${exitSignal}` : ""}).` });
       // "started" distingue une vraie fin de partie (retour a "parcourt les
       // serveurs" cote Discord) d'un lancement qui n'a jamais reellement
       // demarre — jamais eu de presence "en jeu" a annuler dans ce cas.
@@ -221,6 +230,11 @@ async function launchMinecraft({
         }
         started = true;
         runningGame = { proc, slug, gameDirectory: gameDirectory || GAME_ROOT };
+        const game = runningGame;
+        proc.once("exit", (_c, signal) => {
+          exitSignal = signal || null;
+          stopRequested = !!game.stopRequested;
+        });
         logStore.pushLog({ source: "game", message: `Jeu démarré (PID ${proc.pid}).` });
         onGameState?.(true);
         resolve(proc);

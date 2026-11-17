@@ -680,7 +680,14 @@ function createPlayMode({ gameRoot, appDataDir }) {
       if (!best || stat.mtimeMs > best.mtimeMs) best = { dir, folder: d.name, mtimeMs: stat.mtimeMs };
     }
     if (!best) return null;
-    const key = await readWorldKey(best.dir);
+    let key = await readWorldKey(best.dir);
+    // Monde tout neuf (créé pendant la partie) : il n'a pas encore d'identifiant. On relit la liste
+    // des mondes, qui lui en donne un, au lieu de répondre « Aucun monde ouvert ».
+    if (!key) {
+      listWorldsDirty();
+      await listWorlds().catch(() => null);
+      key = await readWorldKey(best.dir);
+    }
     if (!key) return null;
     const level = (await readLevelDat(path.join(best.dir, "level.dat")).catch(() => null)) || {};
     const ws = worldState(key);

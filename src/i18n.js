@@ -95,6 +95,7 @@ const DICTIONARIES = {
       close: "Fermer",
       mcStatus: "Statut des services",
       servicesOk: "Services OK",
+      servicesOkShort: "En ligne",
       servicesSlow: "Services ralentis",
       servicesDown: "Services en panne",
       notifications: "Notifications",
@@ -114,7 +115,7 @@ const DICTIONARIES = {
     },
     // Pilule d'etat de la barre du haut + bouton Rejoindre (points 1-2).
     activity: {
-      ready: "Prêt",
+      ready: "Aucun téléchargement",
       pillInstall: "Installation {percent} %",
       pillInstallEta: "Installation {percent} % · {eta}",
       pillInstallNoPercent: "Installation…",
@@ -186,7 +187,7 @@ const DICTIONARIES = {
       errNetTitle: "Connexion coupée",
       errNetBody: "Le téléchargement s'est arrêté. Vérifie ta connexion, puis réessaie.",
       errCrashTitle: "Minecraft s'est arrêté (code {code})",
-      errCrashBody: "Le jeu s'est fermé pendant le démarrage. Le plus souvent, il manque de mémoire ou un fichier est abîmé : essaie « Régler la mémoire », puis « Réparer ».",
+      errCrashBody: "Le jeu s'est fermé de façon inattendue. Le plus souvent, il manque de mémoire ou un fichier est abîmé : essaie « Régler la mémoire », puis « Réparer ».",
       errJavaTitle: "Java n'a pas pu être préparé",
       errJavaBody: "Minecraft a besoin de Java pour démarrer, et le launcher n'a pas réussi à le préparer. Réessaie, ou répare Java dans Paramètres.",
       errJavaBodyMajor: "Ce serveur demande Java {major} pour démarrer, et le launcher n'a pas réussi à le préparer. Réessaie, ou répare Java dans Paramètres.",
@@ -242,7 +243,7 @@ const DICTIONARIES = {
     },
     // Mode discret, etats vides et assistant.
     discreet: {
-      toggle: "Discret",
+      toggle: "Mode discret",
       onHint: "Mode discret activé : adresses, codes, pseudos et notifications cachés",
       offHint: "Activer le mode discret (pratique en live)",
       settingTitle: "Mode discret",
@@ -455,6 +456,7 @@ const DICTIONARIES = {
     // Bande de couleur des cartes serveur = etat.
     band: {
       legendTitle: "Que veut dire la bande de couleur ?",
+      legendShort: "Légende",
       legendText: "Elle montre l'état du serveur, mis à jour régulièrement.",
       legend_ok: "En ligne (moins de 80 %)",
       legend_busy: "Presque plein (80 % et plus)",
@@ -563,6 +565,8 @@ const DICTIONARIES = {
       noHistory: "Aucun serveur joué pour l'instant — découvre l'annuaire pour commencer.",
       whereTitle: "Où il y a du monde",
       whereSub: "Les serveurs les plus actifs en ce moment, pour bien démarrer.",
+      suggestedTitle: "Serveurs conseillés",
+      suggestedSub: "Ceux où il y a du monde en ce moment.",
       browseServers: "Parcourir les serveurs",
       featuredTitle: "À la une",
       teamPick: "Le plus actif",
@@ -642,6 +646,7 @@ const DICTIONARIES = {
       errorRetry: "Réessayer",
       errorLibrary: "Ouvrir Ma bibliothèque",
       errorDetailPrefix: "Impossible de charger ce serveur : {error}",
+      errorNetwork: "Pas de connexion à internet, ou le site Omniscient ne répond pas.",
     },
     serverCard: {
       full: "Complet",
@@ -1154,6 +1159,8 @@ const DICTIONARIES = {
       memoryMin: "Minimale (Go)",
       memoryMax: "Maximale (Go)",
       ramAvailable: "{used} Go sur {total} Go disponibles sur cette machine.",
+      ramTooHigh: "Trop haut pour ce PC ({total} Go) : il ne resterait presque rien pour le système. Au lancement, le jeu sera limité à {cap} Go.",
+      ramFix: "Régler pour moi ({cap} Go)",
       alwaysRecommended: "Toujours lancer avec la RAM recommandée du serveur",
       alwaysCustom: "Toujours lancer avec la RAM configurée par moi",
       javaLabel: "Java (64 bits, requis pour jouer)",
@@ -1460,6 +1467,7 @@ const DICTIONARIES = {
       close: "Close",
       mcStatus: "Service status",
       servicesOk: "Services OK",
+      servicesOkShort: "Online",
       servicesSlow: "Services slow",
       servicesDown: "Services down",
       notifications: "Notifications",
@@ -1478,7 +1486,7 @@ const DICTIONARIES = {
       taskCancelled: "Cancelled",
     },
     activity: {
-      ready: "Ready",
+      ready: "No downloads",
       pillInstall: "Installing {percent}%",
       pillInstallEta: "Installing {percent}% · {eta}",
       pillInstallNoPercent: "Installing…",
@@ -1548,7 +1556,7 @@ const DICTIONARIES = {
       errNetTitle: "Connection lost",
       errNetBody: "The download stopped. Check your connection, then try again.",
       errCrashTitle: "Minecraft stopped (code {code})",
-      errCrashBody: "The game closed while starting. Most often it's short on memory or a file is damaged: try “Adjust memory”, then “Repair”.",
+      errCrashBody: "The game closed unexpectedly. Most often it's short on memory or a file is damaged: try “Adjust memory”, then “Repair”.",
       errJavaTitle: "Java couldn't be prepared",
       errJavaBody: "Minecraft needs Java to start, and the launcher couldn't prepare it. Try again, or repair Java in Settings.",
       errJavaBodyMajor: "This server needs Java {major} to start, and the launcher couldn't prepare it. Try again, or repair Java in Settings.",
@@ -1602,7 +1610,7 @@ const DICTIONARIES = {
       cancel: "Cancel",
     },
     discreet: {
-      toggle: "Streamer",
+      toggle: "Streamer mode",
       onHint: "Streamer mode on: addresses, codes, names and notifications hidden",
       offHint: "Turn on streamer mode (handy when live)",
       settingTitle: "Streamer mode",
@@ -1637,7 +1645,7 @@ const DICTIONARIES = {
       group_friends: "Friends",
       group_settings: "Settings",
       group_actions: "Actions",
-      favorite: "Favourite",
+      favorite: "Favorite",
       memory: "Game memory",
       actionRelaunch: "Play {name} again",
       actionGameFolder: "Open game folder",
@@ -1807,7 +1815,8 @@ const DICTIONARIES = {
       showMove: "Show the move",
     },
     band: {
-      legendTitle: "What does the colour band mean?",
+      legendTitle: "What does the color band mean?",
+      legendShort: "Legend",
       legendText: "It shows the server's status, updated regularly.",
       legend_ok: "Online (under 80 %)",
       legend_busy: "Almost full (80 % and up)",
@@ -1903,7 +1912,7 @@ const DICTIONARIES = {
     home: {
       play: "Play",
       playOn: "Play on {name}",
-      yourFavorites: "Your favourites",
+      yourFavorites: "Your favorites",
       firstServerTitle: "Pick your first server",
       firstServerBody: "You haven't played on a server yet. The last one you play will show up here, with a big Play button.",
       shortcutLaunching: "Ctrl+Enter: launching {name}…",
@@ -1914,6 +1923,8 @@ const DICTIONARIES = {
       noHistory: "No server played yet — browse the directory to get started.",
       whereTitle: "Where the players are",
       whereSub: "The most active servers right now, to get you started.",
+      suggestedTitle: "Suggested servers",
+      suggestedSub: "The busy ones right now.",
       browseServers: "Browse servers",
       featuredTitle: "Featured",
       teamPick: "Most active",
@@ -1992,6 +2003,7 @@ const DICTIONARIES = {
       errorRetry: "Try again",
       errorLibrary: "Open My library",
       errorDetailPrefix: "Couldn't load this server: {error}",
+      errorNetwork: "No internet connection, or the Omniscient site isn't responding.",
     },
     serverCard: {
       full: "Full",
@@ -2013,7 +2025,7 @@ const DICTIONARIES = {
       frozenBtn: "Server frozen by the Omniscient team",
       missingText: "This page no longer exists or is no longer public.",
       missingForget: "Remove from my lists",
-      missingForgotten: "Removed from your favourites and recent.",
+      missingForgotten: "Removed from your favorites and recent.",
       missingInstalledNote: "The installed files stay on your computer. You can delete them from My library.",
       partialNote: "Limited preview: this server is not in the directory yet (pending review, private or paused). You can see it because it is yours.",
       frozenText: "This server was frozen by the Omniscient team: it cannot be joined for now.",
@@ -2034,8 +2046,8 @@ const DICTIONARIES = {
     },
     serverPage: {
       infos: "Info",
-      fav: "Favourite",
-      favOn: "Favourited",
+      fav: "Favorite",
+      favOn: "Favorited",
       type: "Type",
       modpack: "Modpack",
       // My cloud: modpack linked by the owner.
@@ -2175,7 +2187,7 @@ const DICTIONARIES = {
     favorites: {
       header: "The servers you starred, ready to launch.",
       empty: "No favorites yet — click a server's star to add it here.",
-      emptyTitle: "No favourites yet",
+      emptyTitle: "No favorites yet",
       emptyText: "Click a server's star to find it here in one click.",
       emptyAction: "See servers",
     },
@@ -2502,6 +2514,8 @@ const DICTIONARIES = {
       memoryMin: "Minimum (GB)",
       memoryMax: "Maximum (GB)",
       ramAvailable: "{used} GB of {total} GB available on this machine.",
+      ramTooHigh: "Too high for this PC ({total} GB): almost nothing would be left for the system. At launch the game will be capped at {cap} GB.",
+      ramFix: "Set it for me ({cap} GB)",
       alwaysRecommended: "Always launch with the server's recommended RAM",
       alwaysCustom: "Always launch with the RAM I configured",
       javaLabel: "Java (64-bit, required to play)",
@@ -2613,7 +2627,7 @@ const DICTIONARIES = {
       reset: "Reset",
       resetConfirm: "Reset all launcher settings?",
       resetTitle: "Reset every setting to default?",
-      resetBody: "Theme, colour, memory, language and other settings go back to default. Your account and games are kept. This can't be undone.",
+      resetBody: "Theme, color, memory, language and other settings go back to default. Your account and games are kept. This can't be undone.",
       resetBtn: "Reset everything",
       resetDone: "Settings reset.",
     },
@@ -2766,8 +2780,57 @@ function t(path, params) {
     value = count === 1 ? value.one : value.other;
   }
   if (typeof value !== "string") return path;
-  return interpolate(value, params);
+  return osText(interpolate(value, params));
 }
+
+// Textes qui parlent de Windows : neutres sous Linux et macOS, inchangés sous Windows.
+// Utilisé aussi par play.js (window.osText).
+const OS_TEXT_RULES = [
+  [/la [Cc]orbeille de Windows/g, "la Corbeille"],
+  [/[Cc]orbeille de Windows/g, "Corbeille"],
+  [/the Windows Recycle Bin/g, "the Trash"],
+  [/Windows Recycle Bin/g, "Trash"],
+  [/Recycle Bin/g, "Trash"],
+  [/Comme Windows/g, "Comme le système"],
+  [/Like Windows/g, "Like the system"],
+  [/le réglage de Windows/g, "le réglage du système"],
+  [/the Windows setting/g, "the system setting"],
+  [/ton compte Windows/g, "ton compte utilisateur"],
+  [/your Windows account name/gi, "your user account name"],
+  [/ton nom Windows/g, "ton nom d'utilisateur"],
+  [/Windows name/g, "user name"],
+  [/l['’]explorateur Windows/gi, "le gestionnaire de fichiers"],
+  [/l['’]Explorateur/g, "le gestionnaire de fichiers"],
+  [/Windows Explorer|File Explorer|Explorer/g, "file manager"],
+  [/Ouvrir avec Windows/g, "Ouvrir avec le système"],
+  [/Open with Windows/g, "Open with the system"],
+  [/choisi par Windows/g, "choisi par le système"],
+  [/the program Windows uses/g, "the program your system uses"],
+  [/Windows sait l['’]ouvrir/g, "Le système sait l'ouvrir"],
+  [/Windows can open/g, "Your system can open"],
+  [/avec Windows/g, "avec le système"],
+  [/[Ww]ith Windows/g, "with the system"],
+  [/in file manager/g, "in the file manager"],
+  [/laissés à Windows/g, "laissés au système"],
+  [/left to Windows/g, "left to the system"],
+  [/pour Windows et/g, "pour le système et"],
+  [/for Windows and/g, "for the system and"],
+  [/ou Windows de/g, "ou le système de"],
+  [/or Windows may/g, "or the system may"],
+  [/et Windows utilisent/g, "et le système utilisent"],
+  [/and Windows use/g, "and the system use"],
+  [/passent à Windows/g, "passent au système"],
+  [/la main à Windows/g, "la main au système"],
+];
+function osText(s) {
+  if (typeof s !== "string" || !s.includes("Windows") && !/Explor|Recycle/.test(s)) return s;
+  const platform = typeof window !== "undefined" && window.mchub ? window.mchub.platform : null;
+  if (!platform || platform === "win32") return s;
+  let out = s;
+  for (const [re, rep] of OS_TEXT_RULES) out = out.replace(re, rep);
+  return out;
+}
+if (typeof window !== "undefined") window.osText = osText;
 
 // Applique le dictionnaire courant a tout le HTML statique (attributs
 // data-i18n/-placeholder/-title) — appele une fois au demarrage, avant tout

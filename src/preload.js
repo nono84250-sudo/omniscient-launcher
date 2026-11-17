@@ -1,6 +1,8 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("mchub", {
+  // Système : les textes qui parlent de Windows deviennent neutres ailleurs (voir osText, i18n.js).
+  platform: process.platform,
   // Aide Discord dans les bugs : rapport nettoyé, zip dans Téléchargements, lien du Discord.
   bugHelp: {
     text: (lang) => ipcRenderer.invoke("bugHelp:text", lang),

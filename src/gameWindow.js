@@ -27,7 +27,73 @@ while ($true) {
 }
 `;
 
+// Linux (X11) : xprop et xwininfo donnent la fenêtre du jeu et sa position. Rien n'est injecté dans
+// le jeu. Sous Wayland ou sans ces outils : pas de suivi.
+const { execFile } = require("node:child_process");
+function run(cmd, args) {
+  return new Promise((resolve) => {
+    execFile(cmd, args, { timeout: 2000, windowsHide: true }, (error, stdout) => resolve(error ? null : String(stdout)));
+  });
+}
+async function linuxWindowRect(pid, cache) {
+  if (!cache.id) {
+    const list = await run("xprop", ["-root", "_NET_CLIENT_LIST"]);
+    const ids = (list || "").match(/0x[0-9a-f]+/gi) || [];
+    for (const id of ids) {
+      const p = await run("xprop", ["-id", id, "_NET_WM_PID"]);
+      if (p && new RegExp(`=\\s*${Number(pid)}\\b`).test(p)) {
+        cache.id = id;
+        break;
+      }
+    }
+    if (!cache.id) return null;
+  }
+  const info = await run("xwininfo", ["-id", cache.id]);
+  if (!info) {
+    cache.id = null; // fenêtre fermée ou recréée : on la recherche au prochain tour
+    return null;
+  }
+  if (/Map State:\s*IsUnMapped/i.test(info)) return null;
+  const num = (re) => Number(re.exec(info)?.[1]);
+  const l = num(/Absolute upper-left X:\s*(-?\d+)/);
+  const t = num(/Absolute upper-left Y:\s*(-?\d+)/);
+  const w = num(/Width:\s*(\d+)/);
+  const h = num(/Height:\s*(\d+)/);
+  if (![l, t, w, h].every(Number.isFinite) || w < 50 || h < 50) return null;
+  return { l, t, r: l + w, b: t + h };
+}
+function trackLinuxWindow(pid, { onRect, log }) {
+  if (!process.env.DISPLAY) return { stop() {}, rect: () => null };
+  let last = null;
+  let stopped = false;
+  let warned = false;
+  const cache = { id: null };
+  const tick = async () => {
+    if (stopped) return;
+    const rect = await linuxWindowRect(pid, cache).catch(() => null);
+    if (rect) {
+      const changed = !last || last.l !== rect.l || last.t !== rect.t || last.r !== rect.r || last.b !== rect.b;
+      if (!last) log?.(`fenêtre du jeu trouvée en ${rect.l},${rect.t} (${rect.r - rect.l}×${rect.b - rect.t}).`);
+      last = rect;
+      if (changed) onRect?.(last);
+    } else if (!last && !warned && !cache.id) {
+      warned = true;
+      log?.("fenêtre du jeu pas encore trouvée (xprop/xwininfo absents ou session Wayland ?)");
+    }
+    if (!stopped) timer = setTimeout(tick, 1500);
+  };
+  let timer = setTimeout(tick, 1500);
+  return {
+    rect: () => last,
+    stop() {
+      stopped = true;
+      clearTimeout(timer);
+    },
+  };
+}
+
 function trackGameWindow(pid, { onRect, log } = {}) {
+  if (process.platform === "linux" && pid) return trackLinuxWindow(pid, { onRect, log });
   if (process.platform !== "win32" || !pid) return { stop() {}, rect: () => null };
   let last = null;
   let buf = "";

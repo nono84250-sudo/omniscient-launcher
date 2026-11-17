@@ -72,14 +72,14 @@
       cfPCfg: "Réglages du pack", cfPCfgD: "config, scripts, quêtes · {n} fichiers", cfPRp: "Packs de ressources ({n})", cfPSh: "Shaders ({n})", cfPDp: "Data packs ({n})",
       cfNoModsW: "Sans les mods, ces mondes modés ne pourront pas s'ouvrir correctement.",
       cfStepRp: "Packs de ressources copiés", cfStepSh: "Shaders copiés",
-      cfT: "Importer un pack CurseForge",
+      cfT: "Importer un pack CurseForge", ftbT: "Installer un pack FTB",
       cfReading: "Lecture de la liste des mods…",
-      cfSrcInst: "Instance CurseForge", cfSrcZip: "Export CurseForge",
+      cfSrcInst: "Instance CurseForge", cfSrcZip: "Export CurseForge", ftbSrc: "Pack FTB",
       cfMeta: "Minecraft {v} · {l} · {n} mods",
       cfAuto: "{n} mods se téléchargent tout seuls, comme pour les packs des serveurs.",
       cfManual: "{n} mods sont à télécharger à la main : leurs auteurs ne permettent pas aux autres launchers de les télécharger. Le launcher t'ouvrira la bonne page.",
       cfConfigs: "Réglages du pack (config, scripts, quêtes) : {n} fichiers repris tels quels.",
-      cfWorldsT: "Mondes trouvés avec ce pack", mrNoWorld: "Aucun monde dans ce pack.", cfNoWorld: "Aucun monde dans cet export. Pour l'avoir, coche « saves » quand tu exportes depuis CurseForge.",
+      cfWorldsT: "Mondes trouvés avec ce pack", mrNoWorld: "Aucun monde dans ce pack.", omNoWorld: "Aucun monde dans ce Pack Omniscient. Pour en mettre un, coche ses mondes quand tu crées le pack.", cfNoWorld: "Aucun monde dans cet export. Pour l'avoir, coche « saves » quand tu exportes depuis CurseForge.",
       cfSafe: "On fait une copie. Le pack et les mondes d'origine ne bougent pas, et la Version d'origine de chaque monde est gardée.",
       cfPrivate: "Le pack reste privé, sur ce PC. Rien n'est publié.",
       cfGo: "Importer le pack", cfGoW: "Importer le pack et {n} monde(s)",
@@ -213,14 +213,14 @@
       cfPCfg: "Pack settings", cfPCfgD: "config, scripts, quests · {n} files", cfPRp: "Resource packs ({n})", cfPSh: "Shaders ({n})", cfPDp: "Data packs ({n})",
       cfNoModsW: "Without the mods, these modded worlds won't open correctly.",
       cfStepRp: "Resource packs copied", cfStepSh: "Shaders copied",
-      cfT: "Import a CurseForge pack",
+      cfT: "Import a CurseForge pack", ftbT: "Install an FTB pack",
       cfReading: "Reading the mod list…",
-      cfSrcInst: "CurseForge instance", cfSrcZip: "CurseForge export",
+      cfSrcInst: "CurseForge instance", cfSrcZip: "CurseForge export", ftbSrc: "FTB pack",
       cfMeta: "Minecraft {v} · {l} · {n} mods",
       cfAuto: "{n} mods download by themselves, like server packs.",
       cfManual: "{n} mods must be downloaded by hand: their authors don't allow other launchers to download them. The launcher will open the right page.",
       cfConfigs: "Pack settings (config, scripts, quests): {n} files copied as they are.",
-      cfWorldsT: "Worlds found with this pack", mrNoWorld: "No world in this pack.", cfNoWorld: "No world in this export. To include it, tick “saves” when you export from CurseForge.",
+      cfWorldsT: "Worlds found with this pack", mrNoWorld: "No world in this pack.", omNoWorld: "No world in this Omniscient Pack. To include one, tick its worlds when you create the pack.", cfNoWorld: "No world in this export. To include it, tick “saves” when you export from CurseForge.",
       cfSafe: "We make a copy. The original pack and worlds don't move, and each world's Original version is kept.",
       cfPrivate: "The pack stays private, on this PC. Nothing is published.",
       cfGo: "Import the pack", cfGoW: "Import the pack and {n} world(s)",
@@ -298,8 +298,12 @@
   const T = (k, o) => {
     let s = S[L()][k] ?? S.fr[k] ?? k;
     if (o) s = s.replace(/\{(\w+)\}/g, (_, x) => (o[x] ?? ""));
-    return s;
+    return osTxt(s);
   };
+  // Textes qui parlent de Windows : neutres sous Linux (voir osText dans i18n.js).
+  function osTxt(s) {
+    return typeof window.osText === "function" ? window.osText(s) : s;
+  }
   const esc = (v) => escapeHtml(v == null ? "" : String(v));
   const packName = (p) => (p ? (typeof p.name === "string" ? p.name || (p.kind === "cf" ? "CurseForge" : p.kind === "mr" ? "Modrinth" : T("mpT")) : p.name?.[L()] || p.name?.fr || p.slug) : "Vanilla");
 
@@ -1760,7 +1764,7 @@
     const taken = new Set();
     const own = new Map(vs.map((v) => [v.id, data.worlds.filter((w) => (w.home === v.id || w.lastVersionId === v.id) && !taken.has(w.key) && taken.add(w.key))]));
     const names = tiles.slice(0, 8).map((v) => `« ${pjName(v)} »${pjGroup(v).length > 1 ? ` (${PJT().nV(pjGroup(v).length)})` : ""}`).join(", ") + (tiles.length > 8 ? ` ${SELT().more(tiles.length - 8)}` : "");
-    const res = await showModal({ title: SELT().rmT(tiles.length), body: SELT().rmD(names) + (tiles.some((v) => pjGroup(v).length > 1) ? ` ${SELT().packNote(tiles.filter((v) => pjGroup(v).length > 1).length)}` : ""), checkboxLabel: taken.size ? SELT().rmW(taken.size) : undefined, confirmLabel: T("yesRemove"), cancelLabel: T("no"), tone: "warn" });
+    const res = await showModal({ title: SELT().rmT(tiles.length), body: osTxt(SELT().rmD(names)) + (tiles.some((v) => pjGroup(v).length > 1) ? ` ${SELT().packNote(tiles.filter((v) => pjGroup(v).length > 1).length)}` : ""), checkboxLabel: taken.size ? SELT().rmW(taken.size) : undefined, confirmLabel: T("yesRemove"), cancelLabel: T("no"), tone: "warn" });
     if (!res?.confirmed) return;
     const withWorlds = !!(taken.size && res.checked);
     PJ.pick = null;
@@ -3199,7 +3203,7 @@
   @media (max-width: 860px) { .ad-body { grid-template-columns: 1fr; } .ad-side { border-left: 0; border-top: 1px solid var(--border); } }
   `;
   document.head.appendChild(AD_CSS);
-  const adTr = (f, e) => (L() === "fr" ? f : e);
+  const adTr = (f, e) => osTxt(L() === "fr" ? f : e);
   const AD_KIND = () => ({ mods: "Mods", rp: adTr("Packs de ressources", "Resource packs"), sh: "Shaders", dp: "Data packs", w: adTr("Mondes", "Worlds"), mp: "Modpacks" });
   const AD_LOADERS = ["neoforge", "forge", "fabric", "quilt"];
   const adCmp = (a, b) => String(a).localeCompare(String(b), "en", { numeric: true });
@@ -4084,7 +4088,7 @@
   // formule que packRam.js (main) : mods ≤40 → 4 Go, ≤120 → 6, ≤220 → 8, sinon 10 ; +1 avec
   // shaders ; au moins la RAM conseillée par le fichier du pack ; jamais plus que le maximum sûr
   // du PC (4 Go laissés à Windows, 3/4 du PC au plus). Le bloc est replié par défaut.
-  const rmTr = (f, e) => (L() === "fr" ? f : e);
+  const rmTr = (f, e) => osTxt(L() === "fr" ? f : e);
   const rmCmp = (a, b) => String(a || "").localeCompare(String(b || ""), "en", { numeric: true });
   let rmSys = { totalGB: 8, settingsGB: 4 };
   const rmLoadSys = () =>
@@ -4311,10 +4315,13 @@
     const list = r.versions.filter((x) => x.modded || x.ram.mode !== "auto");
     const toneOf = (x) => rmVerdict(x.gb, { mods: x.mods, mc: x.minecraftVersion, packGB: x.ram.packGB || null })[0];
     const nBad = list.filter((x) => ["warn", "bad"].includes(toneOf(x))).length;
+    // Packs à vérifier qui ne sont pas en automatique : un bouton les règle d'un coup.
+    const fixable = list.filter((x) => ["warn", "bad"].includes(toneOf(x)) && x.ram.mode !== "auto");
     const sec = document.createElement("section");
     sec.className = "settings-section rm-set";
     const draw = () => {
       sec.innerHTML = `<button type="button" class="rm-tog rm-head" data-rm-settog aria-expanded="${rmSetOpen}"><b class="settings-row-label">🧠 ${esc(rmTr("RAM de chaque pack", "RAM for each pack"))}</b><span class="rm-sum ${nBad ? "warn" : ""}">${esc(`${list.length} pack(s)`)}${nBad ? esc(rmTr(` · ⚠ ${nBad} à vérifier`, ` · ⚠ ${nBad} to check`)) : ""}</span><span class="rm-chev">${rmSetOpen ? "▴" : "▾"}</span></button>
+        ${fixable.length ? `<button type="button" class="join-btn" data-rm-fix style="margin-top:8px;align-self:flex-start;">${esc(rmTr("Régler pour moi", "Set it for me"))}</button>` : ""}
         ${rmSetOpen ? `<p class="settings-row-desc">${esc(rmTr("Par défaut, chaque pack calcule sa RAM tout seul. La valeur du haut sert aux packs réglés sur « Comme dans Paramètres » et aux serveurs.", "By default, each pack works out its own RAM. The value above is used by packs set to “Same as Settings” and by servers."))}</p>
         <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px;">${list.length ? list.map((x) => { const tn = toneOf(x); return `<div class="play-row" style="cursor:default;"><span class="t"><b style="font-weight:600;">${esc(x.name)}</b><small>${esc(`${x.mods} mods · ${rmModeName(x.ram.mode)}`)}</small></span><span class="sz" style="color:${tn === "bad" ? "var(--danger)" : tn === "warn" ? "var(--warn)" : "inherit"}">${esc(rmGo(x.gb))}${tn === "warn" || tn === "bad" ? " ⚠" : ""}</span><button type="button" class="btn-secondary" data-rm-edit="${esc(x.id)}" style="margin:0;padding:3px 10px;font-size:12px;">${esc(rmTr("Modifier", "Change"))}</button></div>`; }).join("") : `<p class="join-note">${esc(rmTr("Aucun pack installé.", "No pack installed."))}</p>`}</div>
         ${list.some((x) => x.ram.mode !== "auto") ? `<button type="button" class="btn-secondary" data-rm-allauto style="margin-top:8px;align-self:flex-start;">${esc(rmTr("Tout remettre en automatique", "Set all back to automatic"))}</button>` : ""}` : ""}`;
@@ -4328,6 +4335,12 @@
       }
       const ed = e.target.closest("[data-rm-edit]");
       if (ed) return rmOpenDialog(ed.dataset.rmEdit, { after: () => window.__omRamSettings(contentEl) });
+      if (e.target.closest("[data-rm-fix]")) {
+        for (const x of fixable) await api.ram.set(x.id, { mode: "auto" }).catch(() => null);
+        toast(rmTr("RAM réglée automatiquement pour ces packs.", "RAM set automatically for these packs."));
+        await refresh();
+        return window.__omRamSettings(contentEl);
+      }
       if (e.target.closest("[data-rm-allauto]")) {
         for (const x of list) if (x.ram.mode !== "auto") await api.ram.set(x.id, { mode: "auto" }).catch(() => null);
         toast(rmTr("Tous les packs sont en RAM automatique.", "Every pack is on automatic RAM."));
@@ -4414,7 +4427,7 @@
     files: "{n} files", fixedToast: "Fixed: {m} is now {v}.",
     verToast: "{m} is now {v}.", opening: "Opening the pack…", fixWait: "Looking for fixes…", checkBefore: "Before playing, the launcher checks all this. If a problem is left, it tells you instead of letting Minecraft crash.",
   });
-  const pkT = (k, vars = {}) => String(PK()[k] ?? k).replace(/\{(\w+)\}/g, (_, x) => vars[x] ?? "");
+  const pkT = (k, vars = {}) => osTxt(String(PK()[k] ?? k).replace(/\{(\w+)\}/g, (_, x) => vars[x] ?? ""));
   const pkCmp = (a, b) => String(a).localeCompare(String(b), "en", { numeric: true });
   const PK_COLORS = ["#2f8f5b", "#3b6fd8", "#b5562b", "#7a52c7", "#c0912a", "#2a8fa3", "#c2456b", "#5d7a2e"];
   const pkColor = (s) => PK_COLORS[[...s].reduce((a, c) => a + c.charCodeAt(0), 0) % PK_COLORS.length];
@@ -4531,7 +4544,17 @@
   // s'affiche maintenant (le bouton ne disait rien).
   async function fxOpenExt(st, path) {
     const r = await api.myPack.files.openExternal(st.id, path);
-    if (r && r.ok === false && r.error) toast(r.error);
+    // Fichier refusé (.sh, .bat…) : expliqué dans une fenêtre.
+    if (r && r.ok === false && r.code === "blocked_type") {
+      showModal({
+        title: L() === "en" ? "This file can't be opened here" : "Ce fichier ne s'ouvre pas ici",
+        body: L() === "en"
+          ? `This file type isn't opened from the launcher: it could start a program. Use “${pkT("fxShow")}” if you really need it.`
+          : `Ce type de fichier ne s'ouvre pas depuis le launcher : il pourrait lancer un programme. Passe par « ${pkT("fxShow")} » si tu en as vraiment besoin.`,
+        confirmLabel: "OK",
+        tone: "warn",
+      });
+    } else if (r && r.ok === false && r.error) toast(r.error);
     return r;
   }
   // Fenêtre « ce fichier ne s'ouvre pas ici » : on explique et on passe la main à Windows.
@@ -4699,7 +4722,8 @@
       if (e.target.closest("[data-dp-ok]")) {
         e.target.closest("[data-dp-ok]").disabled = true;
         const r = await onSave(m);
-        packErr(r);
+        // Erreur de data pack : expliquée dans une fenêtre.
+        if (r && r.ok === false && r.error) showModal({ title: L() === "en" ? "Data pack not saved" : "Data pack non enregistré", body: r.error, confirmLabel: "OK", tone: "warn" });
         m.close();
         if (r?.ok) toast(pkT("dpOk"));
         reloadPack();
@@ -5325,7 +5349,7 @@
     frMods: "Mods Modrinth", frModsD: "toujours inclus : ton ami les télécharge depuis Modrinth", frW: "Mondes", frWD: "coche seulement si tu veux lui donner une copie de ton monde", frCf: "Les mods CurseForge ne sont jamais mis dans le fichier : un petit fichier texte les liste avec leur page.",
     frManual: "{n} mod(s) hors Modrinth sont listés dans « omniscient-a-telecharger.txt ».", light: "léger", vanilla: "Vanilla",
   });
-  const omT = (k, vars = {}) => String(OMT()[k] ?? k).replace(/\{(\w+)\}/g, (_, x) => vars[x] ?? "");
+  const omT = (k, vars = {}) => osTxt(String(OMT()[k] ?? k).replace(/\{(\w+)\}/g, (_, x) => vars[x] ?? ""));
   let omJob = null;
   let omJobOpen = false;
   api.omniPack?.job?.().then((r) => r?.ok && (omJob = r.job)).catch(() => {});
@@ -5910,7 +5934,8 @@
     const row = (m) => {
       const nb = neededBy(m);
       const bad = probs.some((x) => x.b?.id === m.id || (x.type === "loader" && x.a?.id === m.id));
-      const sub = m.auto ? pkT("neededBy", { d: nb.join(", ") || "—" }) : m.deps?.length ? pkT("needs", { d: m.deps.map((d) => p.mods.find((x) => x.id === d.id)?.name || d.id).join(", ") }) : m.author;
+      // Chaque nom une seule fois.
+      const sub = m.auto ? pkT("neededBy", { d: [...new Set(nb)].join(", ") || "—" }) : m.deps?.length ? pkT("needs", { d: [...new Set(m.deps.map((d) => p.mods.find((x) => x.id === d.id)?.name || d.id))].join(", ") }) : m.author;
       const sw = p.readonly ? ""
         : m.auto && nb.length
         ? `<span class="pk-lock" title="${esc(pkT("lock", { d: nb.join(", ") }))}">🔒</span>`
@@ -5938,7 +5963,7 @@
           ${chip("all", pkT("fAll"))}${chip("mine", pkT("fMine"), mine.length)}${chip("deps", pkT("fDeps"), deps.length)}${ups.length ? chip("up", pkT("fUp"), ups.length) : ""}
           <span class="sp"></span>${p.readonly ? "" : `${ups.length ? `<button type="button" class="btn-secondary" data-pk-upall>${esc(pkT("upAll"))}</button>` : ""}<button type="button" class="join-btn" data-pk-add>${esc(pkT("add"))}</button>`}</div>
         ${p.readonly ? `<p class="pk-note">${esc(pkT("readonly"))}</p>` : ""}
-        ${list ? modList(list, list, "") : `
+        ${list ? modList(ups, list, "noMatch") : `
         ${showMine ? `<div class="pk-sec">${esc(pkT("secMine"))} · ${mine.length}</div>${modList(mine, mine.filter(match), "emptyMine")}` : ""}
         ${showDeps ? `<div class="pk-sec">${esc(pkT("secDeps"))} · ${deps.length} <span>${esc(pkT("secDepsD"))}</span></div>${modList(deps, deps.filter(match), "emptyDeps")}` : ""}`}
         <p class="pk-note">${esc(pkT("checkBefore"))}</p>`;
@@ -7292,7 +7317,7 @@
   // choisi est téléchargé puis passe par la même fenêtre que l'import d'un fichier (openCfPack).
   const PBT = () => (L() === "fr" ? {
     newT: "Nouvelle installation", newD: "Que veux-tu ajouter ?",
-    cNew: "Créer", cNewD: "Vanilla, ou Mon pack avec tes propres mods (et Pack Omniscient).",
+    cNew: "Créer", cNewD: "Minecraft sans mods, ou ton propre pack de mods.",
     cBrowse: "Un pack existant", cBrowseD: "Cherche parmi les packs de Modrinth, CurseForge et FTB, puis installe-le.",
     cFile: "Importer", cFileD: "Tes mondes de .minecraft, ou un fichier de pack (.mrpack, .zip, .omnipack).",
     brT: "Un pack existant", brD: "Packs publics de Modrinth, CurseForge et FTB. Clique sur un pack pour voir ses détails et l'installer.",
@@ -7307,7 +7332,7 @@
     more: "Plus d'options", mPick: "☑ Sélectionner", mSet: "⚙ Réglages des sauvegardes", mSync: "☁ Synchroniser",
   } : {
     newT: "New installation", newD: "What do you want to add?",
-    cNew: "Create", cNewD: "Vanilla, or My pack with your own mods (and Omniscient pack).",
+    cNew: "Create", cNewD: "Minecraft without mods, or your own mod pack.",
     cBrowse: "An existing pack", cBrowseD: "Search Modrinth, CurseForge and FTB packs, then install one.",
     cFile: "Import", cFileD: "Your worlds from .minecraft, or a pack file (.mrpack, .zip, .omnipack).",
     brT: "An existing pack", brD: "Public packs from Modrinth, CurseForge and FTB. Click a pack to see its details and install it.",
@@ -7334,7 +7359,7 @@
     .pb-choice{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:12px}
     .pb-big{display:flex;flex-direction:column;gap:6px;align-items:flex-start;padding:16px;border-radius:14px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font:inherit;color:inherit;text-align:left;transition:border-color .12s,transform .12s}
     .pb-big:hover,.pb-big:focus-visible{border-color:var(--accent);transform:translateY(-1px);outline:none}
-    .pb-big .e{font-size:26px}.pb-big b{font-size:14.5px}.pb-big small{font-size:12px;color:var(--muted);line-height:1.4}
+    .pb-big .e{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent)}.pb-big .e svg{width:20px;height:20px}.pb-big b{font-size:14.5px}.pb-big small{font-size:12px;color:var(--muted);line-height:1.4}
     .pb-modal{max-width:880px;width:calc(100vw - 80px);max-height:calc(100vh - 64px);overflow:auto;text-align:left}
     .pb-top{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
     .pb-top input[type=search]{flex:1 1 220px;min-width:0;margin:0}
@@ -7420,9 +7445,9 @@
     const P = PBT();
     const m = overlay(`<div class="modal-box pop-in pb-chooser" role="dialog" aria-modal="true" aria-labelledby="pb-ch-t" style="max-width:680px;width:calc(100vw - 80px);text-align:left;">
       <h3 id="pb-ch-t" style="margin:0;">${esc(P.newT)}</h3><p style="margin:6px 0 0;font-size:13px;color:var(--muted);">${esc(P.newD)}</p>
-      <div class="pb-choice"><button type="button" class="pb-big" data-c="new"><span class="e">🧱</span><b>${esc(P.cNew)}</b><small>${esc(P.cNewD)}</small></button>
-      <button type="button" class="pb-big" data-c="browse"><span class="e">🔍</span><b>${esc(P.cBrowse)}</b><small>${esc(P.cBrowseD)}</small></button>
-      <button type="button" class="pb-big" data-c="file"><span class="e">📄</span><b>${esc(P.cFile)}</b><small>${esc(P.cFileD)}</small></button></div>
+      <div class="pb-choice"><button type="button" class="pb-big" data-c="new"><span class="e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg></span><b>${esc(P.cNew)}</b><small>${esc(P.cNewD)}</small></button>
+      <button type="button" class="pb-big" data-c="browse"><span class="e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></span><b>${esc(P.cBrowse)}</b><small>${esc(P.cBrowseD)}</small></button>
+      <button type="button" class="pb-big" data-c="file"><span class="e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M12 11v6m0 0l-3-3m3 3l3-3"/></svg></span><b>${esc(P.cFile)}</b><small>${esc(P.cFileD)}</small></button></div>
       <div class="modal-actions" style="display:flex;justify-content:flex-end;margin-top:14px;"><button type="button" class="btn-secondary" data-x>${esc(T("cancel"))}</button></div></div>`);
     m.ov.addEventListener("click", (e) => {
       if (e.target.closest("[data-x]")) return m.close();
@@ -7555,7 +7580,7 @@
     m.close();
     if (r?.ok) {
       browser?.close();
-      return openCfPack({ zip: r.path, kind: r.kind });
+      return openCfPack({ zip: r.path, kind: r.kind, via: p.src });
     }
     if (p.src === "cf" && r?.code === "no_download") return pbNoDownload(p, browser);
     showModal({ title: P.prepT(p.name), body: r?.error || "", confirmLabel: "OK", tone: "warn" });
@@ -7645,16 +7670,19 @@
   }, true);
 
   async function openCfPack(src) {
+    // Fichier glissé-déposé (sans type) : l'extension dit ce que c'est.
+    if (src && !src.kind) src = { ...src, kind: /\.omnipack$/i.test(src.zip || "") ? "omni" : /\.mrpack$/i.test(src.zip || "") ? "mr" : "cf" };
     // Avertissement CurseForge : une seule fois par PC, avant d'importer un pack CurseForge.
     if (src?.kind === "cf" && typeof window.confirmCurseforgeWarning === "function" && !(await window.confirmCurseforgeWarning())) return;
     const m = overlay(`<div class="modal-box pop-in" role="dialog" aria-modal="true" aria-labelledby="cf-t" style="max-width:560px;text-align:left;max-height:calc(100vh - 48px);overflow:auto;">
-      <h3 id="cf-t">${esc(src.kind === "omni" ? T("omImpT") : src.kind === "mr" ? T("mrT") : T("cfT"))}</h3><p class="join-note">${esc(T("cfReading"))}</p></div>`);
+      <h3 id="cf-t">${esc(src.kind === "omni" ? T("omImpT") : src.kind === "mr" ? T("mrT") : src.via === "ftb" ? T("ftbT") : T("cfT"))}</h3><p class="join-note">${esc(T("cfReading"))}</p></div>`);
     const p = await api.cfPack.read(src);
+    if (p) p.via = src.via || null; // origine (FTB…) pour le titre des fenêtres suivantes
     if (!document.body.contains(m.ov)) return;
     const box = m.ov.querySelector(".modal-box");
     if (!p?.ok) {
       m.close();
-      return showModal({ title: T("cfT"), body: p?.error || "", confirmLabel: "OK", tone: "warn" });
+      return showModal({ title: src.kind === "omni" ? T("omImpT") : src.kind === "mr" ? T("mrT") : T("cfT"), body: p?.error || "", confirmLabel: "OK", tone: "warn" });
     }
     const worlds = p.worlds || [];
     const picked = new Set(worlds.filter((w) => !src.worldKey || w.key === src.worldKey).map((w) => w.folder));
@@ -7668,9 +7696,9 @@
       const hand = handOf(k);
       return `<label class="play-row"><input type="checkbox" data-cfp="${k}" checked><span class="t">${esc(T(key, { n: all.length }))}<small>${esc(all.join(", "))}${hand ? ` · ${esc(T("cfPHand", { m: hand }))}` : ""}</small></span></label>`;
     };
-    box.innerHTML = `<h3 id="cf-t">${esc(p.from === "omnipack" ? T("omImpT") : p.from === "mrpack" ? T("mrT") : T("cfT"))}</h3>
+    box.innerHTML = `<h3 id="cf-t">${esc(p.from === "omnipack" ? T("omImpT") : p.from === "mrpack" ? T("mrT") : src.via === "ftb" ? T("ftbT") : T("cfT"))}</h3>
       <div class="cf-head"><img src="${p.icon || grassThumb(p.name)}" alt=""><div><b>${esc(p.name)}</b>
-        <small><span class="cf-src">${esc(p.from === "omnipack" ? T("omImpSrc", { n: (p.versions || []).length }) : p.from === "mrpack" ? T("mrSrc") : p.from === "zip" ? T("cfSrcZip") : T("cfSrcInst"))}</span>${esc(T("cfMeta", { v: p.from === "omnipack" ? (p.versions || []).join(", ") : p.minecraftVersion, l: p.loader ? modLabel({ loader: p.loader }) + (p.loaderVersion ? " " + p.loaderVersion : "") : "Vanilla", n: p.modCount }))}</small></div></div>
+        <small><span class="cf-src">${esc(p.from === "omnipack" ? T("omImpSrc", { n: (p.versions || []).length }) : p.from === "mrpack" ? T("mrSrc") : p.via === "ftb" ? T("ftbSrc") : p.from === "zip" ? T("cfSrcZip") : T("cfSrcInst"))}</span>${esc(T("cfMeta", { v: p.from === "omnipack" ? (p.versions || []).join(", ") : p.minecraftVersion, l: p.loader ? modLabel({ loader: p.loader }) + (p.loaderVersion ? " " + p.loaderVersion : "") : "Vanilla", n: p.modCount }))}</small></div></div>
       <span class="play-path">${esc(p.path)}</span>
       <div class="cf-sub">${esc(T("cfWhatT"))}</div>
       <div class="play-list">
@@ -7684,7 +7712,7 @@
       <div class="cf-sub">${esc(T("cfWorldsT"))}</div>
       ${worlds.length ? `<div class="play-list">${worlds.map((w) => `<label class="play-row"><input type="checkbox" data-cfw="${esc(w.folder)}" ${picked.has(w.folder) ? "checked" : ""}>
         <img src="${w.icon || grassThumb(w.folder)}" alt=""><span class="t">${esc(w.name)}<small>Minecraft ${esc(p.minecraftVersion)}${w.lastPlayed ? ` · ${esc(ago(w.lastPlayed))}` : ""}</small></span>
-        <span class="sz">${esc(sizeFmt(w.sizeBytes))}</span></label>`).join("")}</div>` : `<p class="cf-man-note">${esc(T(p.from === "mrpack" ? "mrNoWorld" : "cfNoWorld"))}</p>`}
+        <span class="sz">${esc(sizeFmt(w.sizeBytes))}</span></label>`).join("")}</div>` : `<p class="cf-man-note">${esc(T(p.from === "mrpack" ? "mrNoWorld" : p.from === "omnipack" ? "omNoWorld" : "cfNoWorld"))}</p>`}
       ${on("packRam") ? `<div id="cf-ram"></div>` : ""}
       <p class="play-safe">✓ ${esc(T("cfSafe"))}</p>
       <p class="play-safe">✓ ${esc(T("cfPrivate"))}</p>
@@ -7803,7 +7831,7 @@
     const draw = () => {
       const allDone = steps.every((s) => s.state === "done");
       const man = steps.find((s) => s.id === "manual");
-      pjPatch(part.live, `<h3 id="cf-t">${esc(p.from === "mrpack" ? T("mrT") : T("cfT"))}</h3>
+      pjPatch(part.live, `<h3 id="cf-t">${esc(p.from === "omnipack" ? T("omImpT") : p.from === "mrpack" ? T("mrT") : p.via === "ftb" ? T("ftbT") : T("cfT"))}</h3>
         <div class="cf-head"><img src="${p.icon || grassThumb(p.name)}" alt=""><div><b>${esc(p.name)}</b><small>${esc(T("cfMeta", { v: p.minecraftVersion, l: modLabel({ loader: p.loader }), n: p.modCount }))}</small></div></div>
         ${ipOverall(run, steps)}
         <div class="cf-steps">${steps.map((s) => `<div class="cf-step ${s.state}"><span class="ic">${ipIcon(s)}</span><span>${esc(s.label)}</span><span class="n">${s.of ? `${s.n}/${s.of}` : ""}</span>
@@ -7874,7 +7902,15 @@
     clearInterval(tick);
     if (!job?.ok) {
       m.close();
-      return showModal({ title: T("cfT"), body: job?.error || "", confirmLabel: "OK", tone: "warn" });
+      return showModal({ title: p.from === "omnipack" ? T("omImpT") : p.from === "mrpack" ? T("mrT") : p.via === "ftb" ? T("ftbT") : T("cfT"), body: job?.error || "", confirmLabel: "OK", tone: "warn" });
+    }
+    // Mods refusés par leur hébergeur pendant l'installation : ajoutés à l'étape « À la main ».
+    if (job.refusedManual?.length) {
+      for (const x of job.refusedManual) if (!p.manual.some((y) => y.modId === x.modId)) p.manual.push(x);
+      let manS = steps.find((s) => s.id === "manual");
+      if (!manS) steps.push((manS = { id: "manual", label: "", state: "wait", n: 0, of: 0 }));
+      manS.label = `${T("cfStepManual")} · ${cfKinds(p.manual)}`;
+      manS.of = p.manual.length;
     }
     for (const s of steps) if (s.id !== "manual" && s.state !== "done") s.state = "done";
     const manStep = steps.find((s) => s.id === "manual");

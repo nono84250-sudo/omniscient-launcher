@@ -9,7 +9,8 @@ Minecraft, et rejoins-le en un clic avec le bon modpack installé automatiquemen
 
 - **Windows** : installeur dans l'onglet [Releases](../../releases/latest)
   ou sur [omniscientlauncher.com/download](https://omniscientlauncher.com/download).
-- **Linux** : AppImage et paquet `.deb` dans les releases, à partir de la prochaine version.
+- **Linux** (64 bits) : `OmniscientLauncher.AppImage` pour la plupart des distributions, ou `omniscient-launcher_amd64.deb`
+  pour Ubuntu, Debian et Mint, dans l'onglet [Releases](../../releases/latest).
 
 Le launcher se met à jour tout seul à partir des releases de ce dépôt.
 
@@ -52,7 +53,8 @@ Open source Minecraft launcher for [Omniscient](https://omniscientlauncher.com):
 server and join it in one click, with the right modpack installed automatically.
 
 - **Windows**: installer in [Releases](../../releases/latest).
-- **Linux**: AppImage and `.deb` in the releases, starting with the next version.
+- **Linux** (64-bit): `OmniscientLauncher.AppImage` for most distros, or `omniscient-launcher_amd64.deb` for Ubuntu,
+  Debian and Mint, in [Releases](../../releases/latest).
 
 Development: `npm install` then `npm start`. Licensed under the **GNU GPL v3** (see [LICENSE](LICENSE)).
 The "Omniscient" name and logo are not covered by the license. Not affiliated with Mojang or Microsoft.

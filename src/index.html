@@ -116,6 +116,12 @@
     --focus-ring: #b8860b;
     --shadow-pop: 0 12px 28px rgba(20, 20, 30, 0.18);
   }
+  /* Thème clair : petits textes secondaires un peu plus foncés pour rester lisibles. */
+  :root[data-theme="light"] {
+    --muted: color-mix(in srgb, var(--foreground) 72%, transparent);
+    --muted2: color-mix(in srgb, var(--foreground) 70%, transparent);
+  }
+  :root[data-theme="light"] .sidebar-beta { color: var(--accent); }
 
   * { box-sizing: border-box; }
   /* Inter aussi dans les boutons et champs (Chromium ne leur fait pas heriter la police). */
@@ -284,8 +290,9 @@
   /* Barre depliee en mode visiteur : « Se connecter » et « Parametres »
      prennent toute la largeur comme les autres entrees, icone et texte sur la meme verticale. */
   #sidebar.expanded #ms-account:has(.signin-btn) { align-items: stretch; }
-  .sidebar-btn.signin-btn { color: var(--accent); background: color-mix(in srgb, var(--accent) 16%, transparent); }
-  .sidebar-btn.signin-btn:hover { color: var(--accent); background: color-mix(in srgb, var(--accent) 26%, transparent); }
+  /* Bouton à part (contour) : un fond bleu le faisait passer pour la page ouverte. */
+  .sidebar-btn.signin-btn { color: var(--accent); background: none; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 70%, transparent); }
+  .sidebar-btn.signin-btn:hover { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
   /* Bandeau visiteur en haut de l'annuaire : voir updateGuestBanner() dans renderer.js. */
   .guest-banner {
     display: flex;
@@ -671,8 +678,8 @@
   .row-band-hit { position: absolute; left: 0; right: 0; top: 0; height: 8px; z-index: 1; cursor: help; }
   .band-legend-anchor { position: relative; display: inline-flex; }
   .band-help {
-    width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--border); background: none; color: var(--muted);
-    font: 700 11.5px inherit; font-family: inherit; cursor: pointer; display: inline-grid; place-items: center; padding: 0;
+    height: 24px; border-radius: 999px; border: 1px solid var(--border); background: none; color: var(--muted);
+    font: 600 11.5px inherit; font-family: inherit; cursor: pointer; display: inline-flex; align-items: center; padding: 0 9px; white-space: nowrap;
   }
   .band-help:hover, .band-help[aria-expanded="true"] { color: var(--foreground); border-color: var(--accent); }
   .band-legend-pop {
@@ -680,6 +687,10 @@
     padding: 12px; border-radius: 8px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow-pop); font-size: 12.5px; text-align: left;
   }
   .band-legend-pop .muted { color: var(--muted); }
+  .friends-loading { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 32px 0; color: var(--muted); font-size: 13px; }
+  .friends-spin { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border); border-top-color: var(--accent); animation: friends-spin 0.9s linear infinite; }
+  @keyframes friends-spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .friends-spin { animation: none; } }
   .band-legend-rows { display: flex; flex-direction: column; gap: 6px; margin-top: 2px; }
   .band-legend-rows span { display: inline-flex; align-items: center; gap: 8px; }
   .band-legend-rows i { width: 18px; height: 5px; border-radius: 3px; display: inline-block; flex: none; }
@@ -1663,25 +1674,30 @@
   .detail-actions .join-btn-wide:hover:not(:disabled) { background: var(--accent-hover); }
   /* « Rejoindre » sur toute la largeur, puis Installer, Favori et
      Signaler cote a cote, chacun avec son libelle. */
-  .detail-actions-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  /* Grille de 2 colonnes : un bouton seul sur sa ligne prend toute la largeur, les libellés peuvent
+     passer à la ligne. */
+  .detail-actions-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .detail-actions-row > .btn-secondary:last-child:nth-child(odd) { grid-column: 1 / -1; }
   /* Liste Multijoueur desactivee par le proprietaire : une ligne discrete sous Jouer. */
   .detail-list-note { display: flex; gap: 8px; align-items: flex-start; margin: 0; font-size: 12.5px; line-height: 1.45; color: var(--muted); }
   .detail-list-note i { flex: 0 0 auto; width: 8px; height: 8px; margin-top: 5px; border-radius: 50%; background: var(--warn); }
   .detail-actions-row .btn-secondary {
-    flex: 1 1 0; min-width: 0; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-    padding: 8px 10px; font-size: 13px; white-space: nowrap;
+    min-width: 0; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 8px 10px; font-size: 13px; white-space: normal; text-align: center; line-height: 1.2;
   }
   .detail-actions-row .btn-secondary svg { width: 15px; height: 15px; flex: 0 0 auto; }
   .detail-actions-row .detail-fav-btn.active { color: #e3b341; border-color: #e3b341; }
   .detail-actions-row .detail-fav-btn.active svg { fill: currentColor; }
-  .detail-actions-row .detail-report-btn { color: var(--muted); }
-  .detail-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  /* Les 3 infos sur une ligne ; une 4e tuile (RAM) prend toute la largeur. */
+  .detail-info-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .detail-info-grid > .stat-tile:nth-child(4) { grid-column: 1 / -1; }
   .detail-info-grid .stat-tile { background: var(--surface-raised); min-width: 0; }
   .detail-info-grid .stat-value { overflow-wrap: anywhere; }
   .detail-info-wide { grid-column: 1 / -1; }
   .tag-chip.tag-chip-outline { background: transparent; }
   .detail-more-tags { margin-top: 12px; }
-  .detail-more-tags .stat-label { margin-bottom: 6px; }
+  /* Même style que le titre « Infos ». */
+  .detail-more-tags .stat-label { margin: 0 0 8px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--accent); }
   .detail-more-tags .tag-row { margin: 0; }
   .tag-chip.tag-chip-accent { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
 
@@ -1861,7 +1877,7 @@
   /* Mode discret : interrupteur discret dans la barre du haut. */
   .discreet-toggle {
     -webkit-app-region: no-drag; margin-right: 4px; height: 26px; padding: 0 10px; border-radius: var(--radius-pill);
-    border: 1px solid transparent; background: none; color: var(--muted); font: 500 12px "Inter", "Segoe UI", Arial, sans-serif; cursor: pointer; white-space: nowrap;
+    border: 1px solid var(--border); background: none; color: var(--foreground); font: 500 12px "Inter", "Segoe UI", Arial, sans-serif; cursor: pointer; white-space: nowrap;
   }
   .discreet-toggle:hover { background: var(--surface-raised); color: var(--foreground); }
   .discreet-toggle[aria-pressed="true"] { color: var(--foreground); border-color: #9184d9; background: color-mix(in srgb, #9184d9 22%, transparent); }
@@ -2221,9 +2237,11 @@
   .notif-empty-state { padding: 18px 12px; }
   .notif-empty-state h3 { font-size: 14px; }
   /* Assistant du premier lancement : trois gros choix, une seule fois. */
-  .wizard-options { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 14px 0 4px; }
+  /* Les 3 choix sur une ligne, une seule colonne si la fenêtre est étroite. */
+  .wizard-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0 4px; }
+  @media (max-width: 560px) { .wizard-options { grid-template-columns: 1fr; } }
   .wizard-option {
-    width: 150px; padding: 14px 10px; border-radius: var(--radius-l); border: 1px solid var(--border); background: var(--surface);
+    min-width: 0; padding: 14px 10px; border-radius: var(--radius-l); border: 1px solid var(--border); background: var(--surface); text-align: center;
     color: var(--foreground); display: flex; flex-direction: column; gap: 6px; align-items: center; cursor: pointer; font: inherit; font-size: 13px;
   }
   .wizard-option[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
